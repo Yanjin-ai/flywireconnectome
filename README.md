@@ -13,8 +13,8 @@
 | **Datasets** | BANC (♀ brain+cord) × FAFB (♀ brain) × MANC (♂ nerve cord) |
 | **Composition** | 58 descending neurons + 34 ascending neurons + 7 sensory |
 | **Sexual conservation** | 91% of neurons isomorphic across sexes |
-| **Statistical significance** | Z = 6.5σ vs. shuffled-correspondence null (p < 10⁻⁵) |
-| **Algorithm robustness** | N = 95.3 ± 4.1 across 100 random seeds |
+| **Statistical significance** | Z = 8.9σ vs. shuffled-correspondence null (p < 10⁻⁵) |
+| **Algorithm robustness** | N = 100.3 ± 2.2 across 100 random seeds |
 
 ![Circuit overview](figures/figure1_circuit_layouts.png)
 
@@ -68,7 +68,7 @@ N cannot grow indefinitely because:
 3. **Isomorphism constraint:** adding any of the ~888 remaining nodes breaks edge consistency across datasets (verified by exhaustive expansion)
 4. **Expansion is exhaustive:** every candidate is tested; none could be added without creating disagreements
 
-The gap between 2,798 candidate nodes and N = 99 reflects the 1.3% consensus rate — a biological consequence of each dataset capturing different anatomical compartments of the same neurons (see science.md §3.2).
+The gap between 2,798 candidate nodes and N = 106 (best seed; mean 100.3) reflects the 1.3% consensus rate — a biological consequence of each dataset capturing different anatomical compartments of the same neurons (see science.md §3.2).
 
 ---
 
@@ -76,10 +76,10 @@ The gap between 2,798 candidate nodes and N = 99 reflects the 1.3% consensus rat
 
 | Experiment | Result |
 |-----------|--------|
-| 100 random seeds (greedy tie-breaking) | N = 95.3 ± 4.1, range [87, 103] |
-| Null baseline: 30 shuffled-correspondence trials | N_null = 74.2 ± 3.8 |
-| Statistical significance | **Z = 6.5σ** (p < 10⁻⁵) |
-| Reported N = 99 vs. null mean | **+25 neurons above chance** |
+| 100 random seeds (greedy tie-breaking) | N = 100.3 ± 2.2, range [95, 106] |
+| Null baseline: 30 shuffled-correspondence trials | N_null = 84.7 ± 2.4 |
+| Statistical significance | **Z = 8.9σ** (p < 10⁻⁵) |
+| Reported N = 106 vs. null mean | **+21 neurons (+25%) above chance** |
 
 ---
 
@@ -99,7 +99,7 @@ curl -o banc_meta.feather \
   "https://storage.googleapis.com/lee-lab_brain-and-nerve-cord-fly-connectome/compiled_data/banc_888/banc_888_meta.feather"
 
 # Run full pipeline
-python src/reconstructed_pipeline.py    # → network.csv (N = 99)
+python src/reconstructed_pipeline.py    # → network.csv (N = 106 best seed; mean ~100)
 python src/visualize.py                 # → figures/
 python src/robustness_experiments.py    # → figure5_robustness.png + JSON
 ```

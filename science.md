@@ -94,11 +94,11 @@ We shuffled the FAFB neuron correspondence (permuting which FAFB neuron maps to 
 >
 > *The real circuit is 21 neurons (+25%) larger than the null expectation — a result with probability <10⁻⁵ under random correspondence.*
 
-The real circuit is 25 neurons larger than the null expectation — a result extremely unlikely under random correspondence. This confirms that the conserved structure reflects true biological invariance, not a coincidence of graph density.
+
 
 ### 4.3 Centrality enrichment
 
-Circuit neurons (N = 99) have significantly higher betweenness centrality in the consensus graph than non-circuit matched neurons, consistent with their role as structural hubs at the sensorimotor interface.
+Circuit neurons (N = 106 best; mean 100.3) show slightly higher betweenness centrality in the consensus graph (mean = 0.00077 ± 0.00315) compared to non-circuit matched neurons (mean = 0.00067 ± 0.00330). The difference is numerically small and a formal statistical test (Mann-Whitney U) was not performed; this should be treated as a directional observation rather than a confirmed enrichment. Degree in the BANC graph is likewise slightly lower for circuit neurons (30.5 ± 17.0) than non-circuit neurons (41.4 ± 37.9), consistent with the circuit selecting for structurally specialised neurons rather than highly-connected hubs.
 
 
 ![Fig. 5 — Robustness](figures/figure5_robustness.png)
@@ -179,9 +179,11 @@ The 91% cross-sex conservation rate is striking given that Berg et al. (2025) re
 ## 7. Limitations and Future Directions
 
 **Limitations:**
-- N = 99 is a heuristic lower bound on the true MCIS; the NP-hard exact solution may be larger
-- MANC annotation coverage of DN/AN cell types is incomplete (only 2,495 neurons cross-linked via MCNS), limiting the triplet pool
-- The 1.3% consensus rate reflects partial-volume biology; a full brain+cord dataset pair (BANC vs. a second BANC-equivalent) would yield a richer comparison
+- **N is a heuristic lower bound.** The greedy algorithm finds a local optimum; the true MCIS is NP-hard to certify exactly. The narrow variance (±2.2 across 100 seeds, range [95, 106]) provides empirical evidence that our solution is near-optimal, but this cannot be formally proven without an exact ILP solver — which would be computationally infeasible at 987 nodes.
+- **No continuous NBLAST score available.** The BANC metadata contains binary match flags and manual-check labels, but not the underlying NBLAST scores. A proper confidence-vs-MCIS-size curve requires access to raw NBLAST scores (available via the R `bancr` package). The 86% manually-checked rate provides a qualitative confidence floor.
+- **MANC triplet coverage is low.** Only 2,798 of 3,414 triplets appear in all three edge lists; MANC coverage of DN/AN is incomplete because the MCNS cross-link table was used as a proxy.
+- **Partial-volume biology.** The 1.3% consensus rate is a fundamental property of comparing brain-only (FAFB) with cord-only (MANC) datasets. A BANC-vs-BANC comparison (two independent BANC specimens) would yield a much higher consensus rate and a larger MCIS, providing a clean upper-bound measurement.
+- **Centrality analysis is preliminary.** The betweenness centrality difference (circuit vs. non-circuit) was not formally tested. A rigorous enrichment analysis with permutation-based p-values is needed before claiming structural hub enrichment.
 
 **Future directions for FlyWire collaboration:**
 1. *Multi-connectome MCIS:* Extend to MAOL and MCNS when full NBLAST-based triplet tables are available; track how circuit size scales with matching confidence
