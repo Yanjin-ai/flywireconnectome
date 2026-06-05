@@ -9,7 +9,7 @@
 
 | | |
 |--|--|
-| **Circuit size** | **N = 106 neurons (best seed; mean = 100.3 ± 2.2)**, 13 conserved directed edges |
+| **Circuit size** | **N = 104 neurons** (20-seed multi-start; mean 100.3±2.2 across 100 seeds) · 6 conserved directed edges |
 | **Datasets** | BANC (♀ brain+cord) × FAFB (♀ brain) × MANC (♂ nerve cord) |
 | **Composition** | 58 descending neurons + 34 ascending neurons + 7 sensory |
 | **Sexual conservation** | 91% of neurons isomorphic across sexes |
@@ -68,7 +68,7 @@ N cannot grow indefinitely because:
 3. **Isomorphism constraint:** adding any of the ~888 remaining nodes breaks edge consistency across datasets (verified by exhaustive expansion)
 4. **Expansion is exhaustive:** every candidate is tested; none could be added without creating disagreements
 
-The gap between 2,798 candidate nodes and N = 106 (best seed; mean 100.3) reflects the 1.3% consensus rate — a biological consequence of each dataset capturing different anatomical compartments of the same neurons (see science.md §3.2).
+The gap between 2,798 candidate nodes and N = 104 (20-seed result; mean 100.3) reflects the 1.3% consensus rate — a biological consequence of each dataset capturing different anatomical compartments of the same neurons (see science.md §3.2).
 
 ---
 
@@ -81,6 +81,7 @@ The gap between 2,798 candidate nodes and N = 106 (best seed; mean 100.3) reflec
 | Degree-preserving rewire null (20 trials) | Z = 1.0σ | Degree structure explains ~97% of N |
 | Centrality enrichment (1000 permutations) | p = 0.0040, **lower** betweenness | Circuit = peripheral relays, not hubs |
 | Manual annotation rate | Circuit 91.9% vs non-circuit 83.8% | p < 0.001; high-confidence result |
+| NBLAST confidence curve (6 tiers) | N scales 10→28→59→88→104 monotonically | No artifact of low-confidence matches |
 
 ---
 
@@ -110,7 +111,7 @@ solver = MCISSolver(
     n_seeds=100
 )
 result = solver.solve()
-print(result.summary())  # N=106, edges=13, isomorphic=True
+print(result.summary())  # N=104, edges=6, isomorphic=True
 result.to_csv('network.csv')
 ```
 
@@ -132,7 +133,7 @@ curl -o banc_meta.feather \
   "https://storage.googleapis.com/lee-lab_brain-and-nerve-cord-fly-connectome/compiled_data/banc_888/banc_888_meta.feather"
 
 # Run full pipeline
-python src/reconstructed_pipeline.py    # → network.csv (N = 106 best seed; mean ~100)
+python src/reconstructed_pipeline.py    # → network.csv (N = 104, verified isomorphic)
 python src/visualize.py                 # → figures/
 python src/robustness_experiments.py    # → figure5_robustness.png + JSON
 ```
@@ -142,7 +143,7 @@ python src/robustness_experiments.py    # → figure5_robustness.png + JSON
 ## Repository Structure
 
 ```
-network.csv                  ← 106 rows × 3 columns (BANC | FAFB | MANC neuron IDs)
+network.csv                  ← 104 rows × 3 columns (BANC | FAFB | MANC neuron IDs)
 science.md                   ← Full scientific report (hypothesis, methods, results)
 README.md                    ← This file
 figures/
@@ -150,7 +151,9 @@ figures/
   figure2_composition.png       neuron class & NT profile
   figure3_hub_circuit.png       conserved-edge hub neurons
   figure4_dimorphism_nt.png     sex conservation & neurochemistry
-  figure5_robustness.png        100-seed robustness + null baseline
+  figure5_robustness.png        robustness (100-seed, 3 nulls, centrality)
+  figure6_spatial.png           BANC anatomical projections
+  figure7_nblast_confidence.png NBLAST confidence curve
 src/
   reconstructed_pipeline.py    main MCIS pipeline
   visualize.py                  all figures
