@@ -189,6 +189,23 @@ The two serotonergic/glutamatergic neurons (LN-DN2, ANXXX169) are notably neurom
 
 ## 7. Biological Interpretation
 
+### 7.0 Cell-type enrichment: the circuit is not a random brain sample
+
+Before interpreting the biology, we verify that the 104-neuron MCIS is not a random sample of the Drosophila brain. Comparing against the full 139,244-neuron FAFB background:
+
+| Neuron class | Circuit (N=104) | FAFB background | Fold enrichment | Fisher exact p |
+|-------------|-----------------|-----------------|-----------------|----------------|
+| Descending | 55.8% (58) | 0.85% (1,183) | **65.7×** | 9.8 × 10⁻⁹⁶ |
+| Ascending | 32.7% (34) | 1.13% (1,577) | **28.9×** | 2.9 × 10⁻⁴³ |
+
+The circuit is 65.7× enriched for descending neurons and 28.9× enriched for ascending neurons relative to whole-brain frequencies (both p < 10⁻⁴⁰). These are not marginal enrichments — they reflect a near-complete depletion of all non-sensorimotor neuron classes from the MCIS.
+
+Top enriched developmental hemilineages (developmental origin of circuit neurons): SMPpv2 (56.7×), LB5 (48.9×), LB12 (40.6×), LB11 (33.4×). These are established output hemilineages projecting from brain to nerve cord (Ito et al. 2013), directly confirming the developmental constraint hypothesis.
+
+![Fig. 9 — Cell-type enrichment](figures/figure9_enrichment.png)
+**Figure 9.** Cell-type enrichment analysis. **(A)** Superclass fold-enrichment vs FAFB background (gold = >2×). **(B)** Hemilineage enrichment — top lineages are output/projecting classes (SMPpv2, LB series). **(C)** Neurotransmitter profile: circuit is ACh-dominant vs mixed background. **(D)** Laterality: circuit neurons are bilateral (left+right), consistent with bilateral locomotion coordination. **(E)** Fisher exact test summary: p < 10⁻⁴³ for both major enrichments.
+
+
 ### 7.1 Structural evidence for the sensorimotor bottleneck
 
 Pospisil et al. (2024) showed that ~1% of brain neurons directly influence motor output (the "effectome"), with descending neurons as the obligate conduit. Our result provides **direct structural corroboration**: the largest isomorphic subgraph across three independent connectomes consists almost entirely of DNs and ANs — demonstrating that the sensorimotor bottleneck is not only functionally constrained but **structurally canalized across sexes and specimens**.
@@ -211,6 +228,7 @@ The 93.3% cross-sex conservation is consistent with the developmental constraint
 - **No raw NBLAST scores.** BANC metadata contains binary match results; continuous confidence curves require the R `bancr` package (§4.5 uses NBLAST agreement as proxy).
 - **Degree-preserving null Z=1.0σ.** Most of MCIS size is explained by FAFB degree distribution, limiting edge-pattern specificity claims.
 - **Limited MANC coverage.** Only ~2,498 of MANC's 23,641 neurons are cross-linked, constraining the triplet pool.
+- **Cell-type level FAFB×MCNS comparison.** At the cell-type aggregation level (collapsing individual neurons to types), FAFB and MCNS share 7,289 cell types with 60.4% edge consensus — far higher than the 1.3% individual-neuron consensus. This confirms that the low consensus rate is a property of individual-neuron vs cell-type level analysis, not of the datasets per se.
 - **Centrality analysis is preliminary.** The betweenness difference (p=0.004) should be treated as directional until replicated.
 
 ---
