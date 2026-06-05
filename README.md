@@ -4,12 +4,12 @@
 
 ## Result
 
-**N = 75** neurons verified isomorphic across **BANC × FAFB × MANC**  
-**6 conserved directed edges** — identical across all three datasets  
+**N = 99** neurons verified isomorphic across **BANC × FAFB × MANC**  
+**13 conserved directed edges** — identical across all three datasets  
 **Circuit identity:** Sensorimotor bottleneck (descending + ascending neurons)
 
 ```
-network.csv   — 75 rows × 3 columns (BANC | FAFB | MANC neuron IDs)
+network.csv   — 99 rows × 3 columns (BANC | FAFB | MANC neuron IDs)
 science.md    — Scientific summary with visualizations and hypothesis
 src/          — Analysis pipeline code
 figures/      — All circuit visualizations
@@ -88,7 +88,7 @@ python src/reconstructed_pipeline.py   # → network.csv
 python src/visualize.py                # → figures/
 ```
 
-Expected output: `network.csv` with 75 rows, 3 columns.  
+Expected output: `network.csv` with 99 rows, 3 columns.  
 Runtime: ~3 minutes on a standard laptop.
 
 ---

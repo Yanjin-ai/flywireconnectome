@@ -1,7 +1,7 @@
 # A Conserved Sensorimotor Circuit Identified Across Three Drosophila Connectomes
 
 **Dataset:** BANC (brain & nerve cord, ♀) × FAFB (adult brain, ♀) × MANC (nerve cord, ♂)  
-**Circuit size:** N = 75 neurons · 6 verified conserved synaptic edges  
+**Circuit size:** N = 99 neurons · 13 verified conserved synaptic edges  
 **Method:** Neuron-level MCIS with NBLAST-matched cross-connectome correspondence
 
 ---
