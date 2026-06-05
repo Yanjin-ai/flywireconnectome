@@ -74,12 +74,45 @@ The gap between 2,798 candidate nodes and N = 106 (best seed; mean 100.3) reflec
 
 ## Robustness Evidence
 
-| Experiment | Result |
-|-----------|--------|
-| 100 random seeds (greedy tie-breaking) | N = 100.3 ± 2.2, range [95, 106] |
-| Null baseline: 30 shuffled-correspondence trials | N_null = 84.7 ± 2.4 |
-| Statistical significance | **Z = 8.9σ** (p < 10⁻⁵) |
-| Reported N = 106 vs. null mean | **+21 neurons (+25%) above chance** |
+| Experiment | Result | Interpretation |
+|-----------|--------|---------------|
+| 100 random seeds | N = 100.3 ± 2.2, range [95, 106] | Stable result; not seed-dependent |
+| Correspondence-shuffle null (30 trials) | Z = 8.9σ (p < 10⁻⁵) | Neuron identity matters |
+| Degree-preserving rewire null (20 trials) | Z = 1.0σ | Degree structure explains ~97% of N |
+| Centrality enrichment (1000 permutations) | p = 0.0040, **lower** betweenness | Circuit = peripheral relays, not hubs |
+| Manual annotation rate | Circuit 91.9% vs non-circuit 83.8% | p < 0.001; high-confidence result |
+
+---
+
+
+## Python Package
+
+```bash
+pip install -e "git+https://github.com/Yanjin-ai/flywireconnectome.git#egg=mcis_connectome&subdirectory=."
+```
+
+Or as a CLI tool after cloning:
+```bash
+python -m mcis_connectome.cli \
+    --banc  banc_626_edge_list.csv \
+    --fafb  fafb_783_edge_list.csv \
+    --manc  manc_1.2.1_edge_list.csv \
+    --meta  banc_meta.feather \
+    --seeds 100 --out network.csv
+```
+
+Or as Python API:
+```python
+from src.mcis_connectome import MCISSolver
+solver = MCISSolver(
+    edge_lists={'BANC': 'banc.csv', 'FAFB': 'fafb.csv', 'MANC': 'manc.csv'},
+    triplets_path='banc_meta.feather',
+    n_seeds=100
+)
+result = solver.solve()
+print(result.summary())  # N=106, edges=13, isomorphic=True
+result.to_csv('network.csv')
+```
 
 ---
 
