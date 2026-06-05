@@ -1,0 +1,5 @@
+figures/**/.DS_Store
+._*
+__pycache__/
+*.feather
+data/
