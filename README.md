@@ -5,6 +5,11 @@
 
 ---
 
+![Circuit Overview](figures/figure1_circuit_layouts.png)
+*The 104-neuron conserved sensorimotor circuit across BANC × FAFB × MANC.  
+Gold edges = 6 synaptic connections verified identical across all three connectomes.  
+Red = descending neurons (brain→nerve cord) · Blue = ascending (nerve cord→brain).*
+
 ## Result at a Glance
 
 | | |
@@ -143,10 +148,11 @@ python src/robustness_experiments.py    # → figure5_robustness.png + JSON
 ## Repository Structure
 
 ```
+extended_abstract.pdf  ← 2-page conference-style summary (figures + methods)
 network.csv                  ← 104 rows × 3 columns (BANC | FAFB | MANC neuron IDs)
 science.md                   ← Full scientific report (hypothesis, methods, results)
 README.md                    ← This file
-figures/
+figures/  (8 publication-quality figures)
   figure1_circuit_layouts.png   circuit network (3 layouts)
   figure2_composition.png       neuron class & NT profile
   figure3_hub_circuit.png       conserved-edge hub neurons
@@ -154,6 +160,7 @@ figures/
   figure5_robustness.png        robustness (100-seed, 3 nulls, centrality)
   figure6_spatial.png           BANC anatomical projections
   figure7_nblast_confidence.png NBLAST confidence curve
+  figure8_sexual_conservation.png sexual dimorphism deep dive
 src/
   reconstructed_pipeline.py    main MCIS pipeline
   visualize.py                  all figures
