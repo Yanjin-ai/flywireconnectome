@@ -150,7 +150,7 @@ The circuit is 62.7× enriched for descending neurons and 27.5× enriched for as
 Top enriched developmental hemilineages: SMPpv2 (56.7×), LB5 (48.9×), LB12 (40.6×), LB11 (33.4×) — all established output hemilineages projecting from brain to nerve cord (Ito et al. 2013), directly confirming the developmental constraint hypothesis.
 
 ![Fig. 3 — Cell-type enrichment](figures/figure9_enrichment.png)
-**Figure 3.** Cell-type enrichment vs FAFB whole-brain background. **(A)** Superclass fold-enrichment. **(B)** Top enriched developmental hemilineages. **(C)** Neurotransmitter profile: ACh-dominant (63%) vs mixed background. **(D)** Laterality: bilateral representation consistent with bilateral locomotion. **(E)** Fisher exact test summary.
+**Figure 3.** Cell-type enrichment vs FAFB whole-brain background. **(A)** Superclass fold-enrichment. **(B)** Top enriched developmental hemilineages. **(C)** Neurotransmitter profile: ACh-dominant (61.5%; 64/104) vs mixed background. **(D)** Laterality: bilateral representation consistent with bilateral locomotion. **(E)** Fisher exact test summary.
 
 ---
 
@@ -180,7 +180,7 @@ Top enriched developmental hemilineages: SMPpv2 (56.7×), LB5 (48.9×), LB12 (40
 **Figure 6.** Hub neurons connected by the 6 conserved edges, with neurotransmitter identity annotated. The mixed ACh/GABA/Glu chemistry is consistent with a feedforward inhibition motif — a canonical computation (Milo et al. 2002) enabling temporal filtering of descending motor commands.
 
 ![Fig. 7 — Composition](figures/figure2_composition.png)
-**Figure 7.** **(A)** DN/AN dominance. **(B)** Acetylcholine-dominant NT profile (63%). **(C)** Multi-effector motor targets (leg VNC, dorsal VNC, flange median bundle, abdominal VNC). **(D)** Node degree distribution. **(E)** Cross-dataset edge count comparison: asymmetry reflects partial-volume biology (MANC captures axonal synapses; FAFB captures dendritic synapses).
+**Figure 7.** **(A)** DN/AN dominance. **(B)** Acetylcholine-dominant NT profile (61.5%; 64/104). **(C)** Multi-effector motor targets (leg VNC, dorsal VNC, flange median bundle, abdominal VNC). **(D)** Node degree distribution. **(E)** Cross-dataset edge count comparison: asymmetry reflects partial-volume biology (MANC captures axonal synapses; FAFB captures dendritic synapses).
 
 ### 6.4 Motor targets — multi-effector coordination
 
