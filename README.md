@@ -6,8 +6,8 @@
 ---
 
 ![Circuit Overview](figures/figure1_circuit_layouts.png)
-*The 104-neuron conserved sensorimotor circuit across BANC × FAFB × MANC.  
-Gold edges = 6 synaptic connections verified identical across all three connectomes.  
+*The 105-neuron conserved sensorimotor circuit across BANC × FAFB × MANC.  
+Gold edges = 12 synaptic connections verified identical across all three connectomes.  
 Red = descending neurons (brain → nerve cord) · Blue = ascending neurons (nerve cord → brain).*
 
 ---
@@ -16,13 +16,13 @@ Red = descending neurons (brain → nerve cord) · Blue = ascending neurons (ner
 
 | | |
 |--|--|
-| **Circuit size** | **N = 104 neurons** (20-seed multi-start; mean 100.3 ± 2.2 across 100 seeds) |
-| **Conserved edges** | 6 directed edges, verified isomorphic across all 3 datasets |
+| **Circuit size** | **N = 105 neurons** (best of 100-seed multi-start; distribution 100.5 ± 2.2, range [96, 105]) |
+| **Conserved edges** | 12 directed edges, verified isomorphic across all 3 datasets |
 | **Datasets** | BANC v626 (♀ brain+cord) × FAFB v783 (♀ brain) × MANC v1.2.1 (♂ nerve cord) |
-| **Composition** | 61 descending (58.7%) + 36 ascending (34.6%) + 7 sensory neurons |
-| **Sexual conservation** | 88.5% isomorphic across ♀ and ♂ (92/104) |
-| **Statistical significance** | Z = 8.9σ vs correspondence-shuffle null (p < 10⁻⁵) |
-| **Cell-type enrichment** | Descending 62.7× (p=1.6×10⁻⁹⁴), Ascending 27.5× (p=2.6×10⁻⁴¹) vs FAFB background |
+| **Composition** | 65 descending (61.9%) + 33 ascending (31.4%) + 7 sensory neurons |
+| **Sexual conservation** | 88.6% isomorphic across ♀ and ♂ (93/105) |
+| **Statistical significance** | Correspondence-shuffle null collapses to 76.2 ± 1.5 (>15σ below real) |
+| **Cell-type enrichment** | Descending 66.2× (p=3.0×10⁻¹⁰⁴), Ascending 25.0× (p=1.2×10⁻³⁶) vs FAFB background |
 | **Anatomical position** | Cervical connective (Fig. 4): expected locus for brain–cord relay neurons |
 
 ---
@@ -31,7 +31,7 @@ Red = descending neurons (brain → nerve cord) · Blue = ascending neurons (ner
 
 The FlyWire multi-connectome cell typing atlas (Schlegel et al. 2024) established that **cell-type identity** is reproducible across connectomes at the morphological level. We ask the next question: is **synaptic connectivity itself** structurally invariant?
 
-We search for the largest set of morphologically matched neurons whose directed induced subgraph is *identical* (isomorphic) across three independent connectomes — spanning two sexes and two anatomical preparations. The result is a 104-neuron sensorimotor backbone enriched 62.7× for descending neurons and 27.5× for ascending neurons relative to the whole-brain background, consistent with the sensorimotor bottleneck hypothesis (Pospisil et al. 2024).
+We search for the largest set of morphologically matched neurons whose directed induced subgraph is *identical* (isomorphic) across three independent connectomes — spanning two sexes and two anatomical preparations. The result is a 105-neuron sensorimotor backbone enriched 66.2× for descending neurons and 25.0× for ascending neurons relative to the whole-brain background, consistent with the sensorimotor bottleneck hypothesis (Pospisil et al. 2024).
 
 ---
 
@@ -64,9 +64,9 @@ Verified: E_BANC[S] = E_FAFB[S] = E_MANC[S]
 ```
 
 **Complexity:** O(N·D) per iteration. Converges in ≤890 iterations (~9 seconds).  
-**Reproducibility:** Fixed random seeds; fully deterministic per seed; results reported as 20-seed multi-start.  
-**Unit tests:** `pytest tests/ -v` — 12 tests, all pass.  
-**Near-optimality:** ≥90% of time-limited branch-and-bound on all 10 tested small subgraphs.
+**Reproducibility:** Fixed random seeds; deterministic per seed; result reported as the best of a 100-seed multi-start.  
+**Unit tests:** `pytest tests/ -v` — 14 tests (13 synthetic + 1 real-data smoke, skipped without data), all pass.  
+**Near-optimality:** ILP (PuLP/CBC) on 50 sampled subgraphs → mean optimality gap 1.15% (max 10.5%); see `results/ilp_validation.json`.
 
 ### Why N is bounded
 
@@ -82,12 +82,12 @@ N cannot grow indefinitely:
 
 | Experiment | Result | Interpretation |
 |-----------|--------|---------------|
-| 100 random seeds | N = 100.3 ± 2.2, range [95, 106] | Stable; not seed-dependent |
-| Correspondence-shuffle null (30 trials) | N_null = 84.7 ± 2.4; Z = 8.9σ (p < 10⁻⁵) | Neuron identity is essential |
-| Degree-preserving rewire null (20 trials) | N_null = 96.9 ± 2.1; Z = 1.0σ | Degree structure explains most of achievable N |
-| Centrality permutation (1000 trials) | p = 0.004; circuit has *lower* betweenness | Peripheral relays, not hubs |
-| Manual annotation rate | Circuit 91.9% vs non-circuit 83.8% (p < 0.001) | High-confidence correspondences |
-| NBLAST confidence curve (6 tiers) | N = 10 → 28 → 30 → 59 → 88 → 104 (monotonic) | Not driven by low-confidence matches |
+| 100 random seeds | N = 100.5 ± 2.2, range [96, 105]; best = 105 | Stable; not seed-dependent |
+| Correspondence-shuffle null (20× best-of-5) | N_null = 76.2 ± 1.5 (>15σ below real) | Neuron identity is essential |
+| Degree-preserving rewire null (20× best-of-5) | N_null = 100.8 ± 2.1 ≈ real mean (Z ≈ 2σ vs best) | Degree structure explains most of achievable N |
+| Centrality permutation (1000 trials) | p = 0.009; circuit has *lower* betweenness | Peripheral relays, not hubs |
+| Manual annotation rate | Circuit 93.3% vs non-circuit 85.0% (p = 0.008) | Better-annotated correspondences |
+| NBLAST confidence curve (6 tiers) | N = 4 → 39 → 53 → 74 → 91 → 105 (monotonic) | Not driven by low-confidence matches |
 
 ---
 
@@ -116,7 +116,7 @@ solver = MCISSolver(
     n_seeds=20
 )
 result = solver.solve()
-print(result.summary())  # MCISResult(N=104, edges=6, isomorphic=True)
+print(result.summary())  # MCISResult(N=105, edges=12, isomorphic=True)
 result.to_csv('network.csv')
 ```
 
@@ -127,32 +127,45 @@ result.to_csv('network.csv')
 ```bash
 git clone https://github.com/Yanjin-ai/flywireconnectome.git
 cd flywireconnectome
-pip install pandas numpy networkx matplotlib seaborn pyarrow scipy
+pip install -e ".[test]"          # or: pip install -r requirements.txt
 
-# Edge lists (from https://codex.flywire.ai/api/download):
-#   banc_626_edge_list.csv · fafb_783_edge_list.csv · manc_1.2.1_edge_list.csv
+# Place the input files in a data directory and point MCIS_DATA_DIR at it:
+#   banc_meta.feather          banc_626_edge_list.csv
+#   fafb_783_edge_list.csv     manc_1.2.1_edge_list.csv
+#   fafb_annotations.tsv       (for the enrichment analysis)
+export MCIS_DATA_DIR=/path/to/data
 
-# BANC metadata:
-curl -o banc_meta.feather \
-  "https://storage.googleapis.com/lee-lab_brain-and-nerve-cord-fly-connectome/compiled_data/banc_888/banc_888_meta.feather"
+# Edge lists:     https://codex.flywire.ai/api/download
+# BANC metadata:  https://storage.googleapis.com/lee-lab_brain-and-nerve-cord-fly-connectome/compiled_data/banc_888/banc_888_meta.feather
+# FAFB annotations: https://github.com/flyconnectome/flywire_annotations
 
-# FAFB annotations (for enrichment analysis):
-# https://github.com/flyconnectome/flywire_annotations
-
-# Run:
-python src/reconstructed_pipeline.py    # → network.csv (104 rows, verified isomorphic)
-python src/visualize.py                 # → figures/
-python src/robustness_experiments.py    # → figure5_robustness.png
-pytest tests/ -v                        # → 12/12 tests pass
+# Run the canonical pipeline (writes network.csv + results/ + figures/ into the repo):
+python src/run_analysis.py --seeds 100        # → network.csv, results/canonical_results.json
+python src/exact_ilp.py                        # → results/ilp_validation.json (PuLP/CBC)
+python src/derived_stats.py                    # → results/derived_stats.json (composition/enrichment)
+python src/confidence_tiers.py                 # → results/confidence_tiers.json
+python src/visualize.py                        # → figures/figure1-4
+python src/figures_extra.py                    # → figures/figure6,8,9
+python src/regenerate_figure7.py               # → figures/figure7
+python src/robustness_experiments.py           # → figures/figure5 (from results/*.json)
+python src/make_abstract.py                     # → extended_abstract.pdf/.png (from results/*.json)
+pytest tests/ -v                               # → unit tests pass (synthetic graphs; real-data smoke test skips without MCIS_DATA_DIR)
 ```
+
+> **Note on BANC versioning.** The correspondence columns (`fafb_match`,
+> `manc_match`) come from the `banc_888_meta.feather` build; the BANC edge list
+> uses `root_626` IDs. The metadata's `root_626` column is the join key into the
+> v626 edge list, so the cross-dataset bijection is consistent despite the build
+> labels differing.
 
 ---
 
 ## Repository Structure
 
 ```
-network.csv                    104 rows × 3 columns (BANC | FAFB | MANC neuron IDs)
+network.csv                    105 rows × 3 columns (BANC | FAFB | MANC neuron IDs)
 science.md                     Scientific report (10 sections, 13 references)
+results/                       Reproducible JSON outputs (canonical, ILP, derived, confidence)
 extended_abstract.pdf          2-page conference-style summary
 README.md                      This file
 figures/
@@ -166,11 +179,20 @@ figures/
   figure8_sexual_conservation.png Sexual conservation deep dive
   figure9_enrichment.png       Cell-type enrichment vs FAFB background
 tests/
-  test_solver.py               12 unit tests (all pass)
+  test_solver.py               14 tests (13 synthetic + 1 real-data smoke)
 src/
-  reconstructed_pipeline.py   Main MCIS pipeline
-  visualize.py                 Figure generation
-  robustness_experiments.py   Statistical validation
+  run_analysis.py             Canonical pipeline (MCIS + nulls + centrality)
+  exact_ilp.py                ILP optimality validation (PuLP/CBC)
+  derived_stats.py            Composition / enrichment / dimorphism / annotation quality
+  confidence_tiers.py         NBLAST confidence-tier curve
+  mcis_paths.py               Shared path resolution (MCIS_DATA_DIR → ./data)
+  visualize.py                 figures 1-4
+  figures_extra.py             figures 6, 8, 9
+  regenerate_figure7.py        figure 7
+  robustness_experiments.py    figure 5 (from results/*.json)
+  make_abstract.py             extended_abstract.pdf/.png (from results/*.json)
+  reconstructed_pipeline.py    Deprecated shim → run_analysis.py
+  analysis_pipeline.py         Deprecated/disabled (early cell-type-level method)
   mcis_connectome/             Installable Python package
     solver.py                  MCISSolver + MCISResult classes
     utils.py                   load_edge_list, build_consensus_component

@@ -3,3 +3,11 @@ figures/**/.DS_Store
 __pycache__/
 *.feather
 data/
+
+# Local agent state
+.claude/
+
+# Large connectome data — download per README, never commit
+*_edge_list*.csv
+*.tsv
+results/_*.log

@@ -209,3 +209,41 @@ class TestExactVsGreedy:
         mean_ratio = np.mean(gaps)
         assert mean_ratio >= 0.80, f"Greedy mean optimality ratio {mean_ratio:.2f} < 0.80"
         print(f"\n  Greedy optimality ratio: {mean_ratio:.2f} ± {np.std(gaps):.2f}")
+
+
+class TestDataLoading:
+    """Smoke tests for the real data-loading path."""
+
+    def test_load_edge_list_from_tempfile(self, tmp_path):
+        """utils.load_edge_list parses a 2-column CSV and honours node_filter."""
+        from mcis_connectome.utils import load_edge_list, build_consensus_component
+        p = tmp_path / "edges.csv"
+        p.write_text("source,target\n1,2\n2,3\n3,99\n")
+        G = load_edge_list(str(p))
+        assert G.number_of_edges() == 3
+        G2 = load_edge_list(str(p), node_filter={"1", "2", "3"})
+        assert G2.number_of_edges() == 2  # edge to 99 dropped
+        # consensus helper on indexed edge sets
+        giant, gbe, gfe, gme = build_consensus_component(
+            {(0, 1), (1, 2)}, {(0, 1), (1, 2)}, {(0, 1), (1, 2)})
+        assert len(giant) == 3 and gbe == gfe == gme
+
+    def test_real_data_smoke(self):
+        """If MCIS_DATA_DIR (or ./data) holds the real inputs, the canonical
+        loader must build the ~987-node consensus component. Skipped otherwise."""
+        import os
+        from mcis_paths import data_dir
+        d = data_dir()
+        needed = ["banc_meta.feather", "fafb_783_edge_list.csv",
+                  "manc_1.2.1_edge_list.csv"]
+        if not (os.path.isdir(d) and all(os.path.exists(d + f) for f in needed) and
+                (os.path.exists(d + "banc_626_edge_list.csv") or
+                 os.path.exists(d + "banc_626_edge_list (2).csv"))):
+            import pytest
+            pytest.skip("real data not available; set MCIS_DATA_DIR to run")
+        from run_analysis import build_solver
+        from pathlib import Path
+        solver = build_solver(Path(d), n_seeds=1)
+        solver._load()
+        assert solver._ng > 500, f"giant component unexpectedly small: {solver._ng}"
+        assert len(solver._triples) > 1000

@@ -3,8 +3,8 @@
 **Yanjin Li** · FlyWire Qualification Challenge · June 2026
 
 **Datasets:** BANC v626 (♀ brain+cord) · FAFB v783 (♀ brain) · MANC v1.2.1 (♂ nerve cord)  
-**Result:** N = 104 neurons · 6 conserved directed edges · Z = 8.9σ vs correspondence-shuffle null  
-**Code:** [github.com/Yanjin-ai/flywireconnectome](https://github.com/Yanjin-ai/flywireconnectome)
+**Result:** N = 105 neurons · 12 conserved directed edges · correspondence-shuffle null 76.2 ± 1.5 (>15σ separation)  
+**Code:** [github.com/Yanjin-ai/flywireconnectome](https://github.com/Yanjin-ai/flywireconnectome) · all numbers reproduced by `src/run_analysis.py` (`results/`)
 
 ---
 
@@ -18,9 +18,9 @@ This extends previous work (Schlegel et al. 2024; Witvliet et al. 2021) which qu
 
 **Operationalised predictions (testable from available data):**
 
-1. *Annotation quality:* Circuit neurons should have higher manual-annotation confidence. **Verified:** 91.9% manually-checked vs 83.8% for non-circuit members (Fisher exact p < 0.001; §4.4).
-2. *Statistical significance:* Shuffling cross-dataset correspondence should yield a significantly smaller MCIS. **Verified:** Z = 8.9σ vs correspondence-shuffle null (§4.2).
-3. *Degree-distribution signal:* Degree-preserving edge rewire should yield a substantially smaller MCIS if specific edge patterns matter beyond degree sequence. **Result:** Z = 1.0σ — the FAFB degree distribution alone accounts for the majority of achievable N, while neuron identity via NBLAST correspondence provides the additional signal to reach the full N = 104 (§4.2, full interpretation).
+1. *Annotation quality:* Circuit neurons should have higher manual-annotation confidence. **Verified:** 93.3% manually-annotated (`manual_cluster`) vs 85.0% for non-circuit members (Fisher exact p = 0.008; §4.4).
+2. *Statistical significance:* Shuffling cross-dataset correspondence should yield a significantly smaller MCIS. **Verified:** null collapses to 76.2 ± 1.5 vs real 100.5 ± 2.2 (>15σ separation; §4.2).
+3. *Degree-distribution signal:* Degree-preserving edge rewire should yield a substantially smaller MCIS if specific edge patterns matter beyond degree sequence. **Result:** the degree-preserving null reaches 100.8 ± 2.1 — statistically indistinguishable from the real per-seed mean — so the FAFB degree distribution alone accounts for nearly all of the achievable N; neuron identity via NBLAST correspondence provides the additional signal to reach the full N = 105 (Z ≈ 2σ against the best; §4.2, full interpretation).
 
 ---
 
@@ -55,9 +55,9 @@ To justify the choice of BANC × FAFB × MANC as the primary triplet, we charact
 
 ### 2.2 Why only 1.3% edge consensus
 
-Of ~245,000 unique edges among matched neurons, 2,648 appear in all three datasets (1.3%). This is biologically interpretable, not a data quality failure. Descending neurons have dendrites in the brain (synapses captured by FAFB) and axonal outputs in the ventral nerve cord (synapses captured by MANC); only BANC captures both compartments. This is consistent with Witvliet et al. (2021): approximately 60% of *C. elegans* chemical synapses are variable across individuals even under controlled conditions, without any cross-compartment sampling.
+Among the 2,798 triplets present in all three edge lists, only **2,609 directed edges** are shared by all three connectomes (the consensus graph used for the search); the large majority of edges present in any single dataset are not shared. This is biologically interpretable, not a data quality failure. Descending neurons have dendrites in the brain (synapses captured by FAFB) and axonal outputs in the ventral nerve cord (synapses captured by MANC); only BANC captures both compartments. This is consistent with Witvliet et al. (2021): approximately 60% of *C. elegans* chemical synapses are variable across individuals even under controlled conditions, without any cross-compartment sampling.
 
-At the cell-type aggregation level (collapsing individual neurons to named types), FAFB and MCNS share 7,289 types with 60.4% edge consensus — confirming that the low individual-neuron consensus rate is a property of the cross-compartment comparison, not of dataset quality per se.
+At the cell-type aggregation level (collapsing individual neurons to named types), FAFB and MCNS share 7,289 named types — far higher overlap than the individual-neuron level, confirming that the low individual-neuron consensus is a property of the cross-compartment comparison, not of dataset quality per se.
 
 ---
 
@@ -92,7 +92,7 @@ Complexity: O(N·D) per iteration, D = number of disagreement edges
 Convergence: ≤890 iterations on the 987-node instance (~9 seconds)
 ```
 
-**Why greedy over alternatives?** We evaluated two alternatives in pilot experiments: (i) *edge-centric growth* (seed from highest-degree consensus node, greedy addition) → N = 71; (ii) *centrality-biased removal* (prefer to remove low-betweenness nodes) → N = 93. Both were dominated by greedy disagreement removal → N = 104. The greedy approach benefits from a global view of disagreements rather than local seeding, consistent with findings in the Maximum Common Subgraph literature (McGregor 1982; Raymond & Willett 2002).
+**Why greedy over alternatives?** In pilot experiments an *edge-centric growth* strategy (seed from the highest-degree consensus node, then greedily add isomorphism-preserving nodes) was consistently dominated by greedy disagreement removal, which benefits from a global view of disagreements rather than local seeding — consistent with findings in the Maximum Common Subgraph literature (McGregor 1982; Raymond & Willett 2002). The edge-centric comparison is reported alongside the robustness panel ([`src/robustness_experiments.py`](src/robustness_experiments.py)).
 
 **Exact MCIS validation via ILP.** To provide a certified lower bound on the optimality gap, we formulated MCIS as an Integer Linear Program and solved it to provable optimality on randomly sampled induced subgraphs of varying size.
 
@@ -102,18 +102,18 @@ $$\text{maximise} \sum_v x_v \quad \text{subject to} \quad x_i + x_j \leq 1 \; \
 
 where $\mathcal{D}$ is the set of disagreement edges restricted to the subgraph. This is a Maximum Independent Set on the disagreement graph, which is itself NP-hard in general but tractable on small instances via branch-and-bound with LP relaxation (solved here with PuLP/CBC).
 
-*Results on subgraph samples.* We drew 50 random induced subgraphs at four size tiers from the 987-node consensus component, solved each exactly with the ILP, and compared against the greedy + exhaustive expansion result:
+*Results on subgraph samples.* We drew 50 random induced subgraphs at four size tiers from the 987-node consensus component, solved each exactly with the ILP (PuLP/CBC), and compared against the greedy + exhaustive expansion result. These numbers are produced by [`src/exact_ilp.py`](src/exact_ilp.py) and stored in `results/ilp_validation.json`:
 
 | Subgraph size | Instances | Greedy N (mean ± sd) | ILP-optimal N (mean ± sd) | Optimality gap |
 |--------------|-----------|----------------------|--------------------------|----------------|
-| 20 nodes | 15 | 10.5 ± 1.9 | 10.6 ± 1.9 | **0.9%** |
-| 30 nodes | 15 | 16.3 ± 2.3 | 16.4 ± 2.3 | **0.6%** |
-| 40 nodes | 10 | 22.1 ± 2.8 | 22.3 ± 2.7 | **0.9%** |
-| 50 nodes | 10 | 27.8 ± 3.1 | 28.1 ± 3.0 | **1.1%** |
+| 20 nodes | 15 | 12.7 ± 1.4 | 12.8 ± 1.3 | **0.5%** |
+| 30 nodes | 15 | 18.2 ± 1.5 | 18.3 ± 1.5 | **0.7%** |
+| 40 nodes | 10 | 20.3 ± 1.5 | 20.6 ± 1.6 | **1.5%** |
+| 50 nodes | 10 | 22.9 ± 1.6 | 23.5 ± 1.7 | **2.6%** |
 
-Across all 50 instances, the greedy algorithm achieved ≥ 98% of the ILP-certified optimum in every case, with a mean gap of 0.9% and maximum gap of 4.5% (one 50-node instance). The ILP solve time scaled from 0.03 s (20 nodes) to 18 s (50 nodes); the 987-node full instance is computationally intractable for exact ILP but the consistent sub-1% gap on subgraphs, combined with the 100-seed variance of ±2.2 (§4.1), provides strong empirical evidence that N = 104 is within 1–2 neurons of the true optimum.
+Across all 50 instances the greedy + expansion heuristic achieves a **mean optimality gap of 1.15%** (maximum 10.5% on a single 50-node instance; 80% of instances within 2%). The gap grows modestly with subgraph size, as expected for a local-search heuristic. ILP solve times were 0.02–1.3 s for these sizes; the full 987-node instance is intractable for exact ILP, but the consistent low gap on subgraphs, together with the 100-seed variance of ±2.2 (§4.1), indicates that the reported N is within a few neurons of the true optimum.
 
-**Unit tests:** `pytest tests/ -v` — 12 tests covering isomorphism verification, planted subgraph recovery (known ground truth), expansion monotonicity, and null model consistency. All pass.
+**Unit tests:** `pytest tests/ -v` — 14 tests covering isomorphism verification, planted subgraph recovery (known ground truth), expansion monotonicity, null model consistency, a synthetic greedy-vs-exact (brute-force) check, and data-loading smoke tests. 13 run on synthetic graphs; 1 real-data smoke test is skipped when `MCIS_DATA_DIR` is unset. All pass.
 
 ---
 
@@ -121,29 +121,31 @@ Across all 50 instances, the greedy algorithm achieved ≥ 98% of the ILP-certif
 
 ### 4.1 Algorithmic robustness — 100 random seeds
 
-> *N = 100.3 ± 2.2, range [95, 106] across 100 random tie-breaking seeds (each followed by exhaustive expansion).*
+> *N = 100.5 ± 2.2, range [96, 105] across 100 random tie-breaking seeds (each followed by exhaustive expansion).*
 
-The narrow range (±2.2 over a 987-node search space) confirms that N ≈ 100 is a stable structural property of the data, not a fragile artifact of a specific node ordering. Our reported N = 104 (20-seed multi-start) lies near the median of this distribution.
+The narrow range (±2.2 over a 987-node search space) confirms that N ≈ 100 is a stable structural property of the data, not a fragile artifact of a specific node ordering. The reported circuit is the **best of the 100-seed multi-start, N = 105**, shipped as `network.csv`; the full distribution and all statistics below are produced by [`src/run_analysis.py`](src/run_analysis.py) (`results/canonical_results.json`).
 
 ### 4.2 Three null models
 
-| Null model | Construction | N_null | Z vs N=104 | Interpretation |
-|-----------|-------------|--------|-----------|----------------|
-| Correspondence-shuffle (30 trials) | Permute FAFB neuron→triplet mapping; BANC and MANC graphs unchanged | 84.7 ± 2.4 | **8.9σ** (p < 10⁻⁵) | Neuron identity (NBLAST matching) is essential |
-| Degree-preserving rewire (20 trials) | Rewire ~33% of FAFB edges while preserving exact in/out degree per neuron | 96.9 ± 2.1 | 1.0σ | FAFB degree sequence alone accounts for the majority of achievable N |
-| Centrality permutation (1000 trials) | Permute betweenness centrality labels across matched neurons | — | p = 0.004 | Circuit neurons have *lower* betweenness than matched pool average |
+All nulls use the *same* search procedure as the real result (best-of-5 multi-start per trial), so comparisons are apples-to-apples (20 trials each; [`src/run_analysis.py`](src/run_analysis.py)).
 
-**Interpretation of the degree-preserving null (Z = 1.0σ):** This result indicates that the FAFB degree distribution is the dominant determinant of how large an MCIS can be found. The correspondence-shuffle null (Z = 8.9σ) shows that NBLAST-based neuron identity is additionally required to reach N = 104 — but the degree structure provides most of the "ceiling." The correct reading is not that "both are required" but that the degree sequence is a near-sufficient condition, and specific neuron identity provides an additional, statistically significant contribution.
+| Null model | Construction | N_null | vs real | Interpretation |
+|-----------|-------------|--------|-----------|----------------|
+| Correspondence-shuffle | Permute *both* FAFB and MANC neuron→triplet mappings; BANC unchanged | 76.2 ± 1.5 | >15σ below real 100.5 ± 2.2 | Neuron identity (NBLAST matching) is essential |
+| Degree-preserving rewire | Rewire ~33% of FAFB edges while preserving exact in/out degree per neuron | 100.8 ± 2.1 | indistinguishable from real mean (Z ≈ 2σ vs best N=105) | FAFB degree sequence alone accounts for nearly all of the achievable N |
+| Centrality permutation (1000 trials) | Permute neuron labels on the consensus-graph betweenness | — | p = 0.009 | Circuit neurons have *lower* betweenness than matched pool average |
+
+**Interpretation of the degree-preserving null.** This result indicates that the FAFB degree distribution is the dominant determinant of how large an MCIS can be found: a degree-preserving rewire reaches 100.8 ± 2.1, statistically indistinguishable from the real per-seed mean (100.5 ± 2.2). The correspondence-shuffle null (collapsing to 76.2 ± 1.5) shows that NBLAST-based neuron identity is additionally required — but the honest reading is that the degree sequence is a near-sufficient condition, and specific neuron identity provides the additional, smaller contribution needed to reach the best N = 105.
 
 ### 4.3 Centrality: circuit neurons are peripheral relays
 
-Circuit betweenness centrality = 0.000387 vs non-circuit matched neurons = 0.002062 (permutation p = 0.004, 1000 permutations). Circuit neurons have **lower** betweenness — they are inter-system relay neurons at the brain–body interface, not structural hubs within the brain network. This is biologically coherent: DN/AN neurons are few-input, few-output specialists bridging two anatomical compartments rather than central integrators.
+Circuit betweenness centrality = 0.00096 vs non-circuit matched neurons = 0.00224 on the consensus graph (one-sided label-permutation test, p = 0.009, 1000 permutations; the test asks specifically whether circuit betweenness is *lower* than the matched pool). Circuit neurons have **lower** betweenness — they are inter-system relay neurons at the brain–body interface, not structural hubs within the brain network. This is biologically coherent: DN/AN neurons are few-input, few-output specialists bridging two anatomical compartments rather than central integrators.
 
 ### 4.4 Annotation quality — verified prediction
 
-> *Circuit: 91.9% manually checked (97/104 triplets) vs non-circuit: 83.8% (2,268/2,706 triplets); Fisher exact p < 0.001.*
+> *Circuit: 93.3% manually annotated (98/105, `manual_cluster` non-null) vs non-circuit: 85.0% (2,814/3,309); Fisher exact p = 0.008.*
 
-The MCIS result is enriched for the most carefully verified NBLAST correspondences, not driven by low-confidence matches.
+The MCIS result is enriched for the more carefully annotated correspondences, not driven by low-confidence matches.
 
 ### 4.5 NBLAST confidence curve
 
@@ -151,38 +153,38 @@ Using agreement between automated NBLAST top-1 output and expert-curated match a
 
 | Top-k% (highest confidence first) | Triplet pool | MCIS N |
 |-----------------------------------|--------------|--------|
-| 10% | 279 | 10 |
-| 20% | 559 | 28 |
-| 30% | 839 | 30 |
-| 50% | 1,399 | 59 |
-| 75% | 2,098 | 88 |
-| 100% | 2,798 | **104** |
+| 10% | 280 | 4 |
+| 20% | 560 | 39 |
+| 30% | 839 | 53 |
+| 50% | 1,399 | 74 |
+| 75% | 2,098 | 91 |
+| 100% | 2,798 | **105** |
 
-N increases monotonically without discontinuity across all confidence tiers, confirming that the result is not driven by a small pocket of low-confidence matches.
+N increases monotonically without discontinuity across all confidence tiers ([`src/confidence_tiers.py`](src/confidence_tiers.py), `results/confidence_tiers.json`), confirming that the result is not driven by a small pocket of low-confidence matches.
 
 ![Fig. 1 — NBLAST confidence](figures/figure7_nblast_confidence.png)
-**Figure 1.** NBLAST confidence analysis. **(A)** MCIS size vs confidence threshold: monotonic increase from N=10 (top 10%) to N=104 (full pool). **(B)** Distribution of NBLAST agreement across 2,798 triplets.
+**Figure 1.** NBLAST confidence analysis. **(A)** MCIS size vs confidence threshold: monotonic increase from N=4 (top 10%) to N=105 (full pool). **(B)** Distribution of NBLAST agreement across 2,798 triplets.
 
 ![Fig. 2 — Robustness panel](figures/figure5_robustness.png)
-**Figure 2.** Robustness and validation. **(A)** 100-seed MCIS distribution: 100.3 ± 2.2, range [95, 106]. **(B)** Three-way null comparison: correspondence-shuffle (Z=8.9σ) and degree-preserving rewire (Z=1.0σ). **(C)** N bound waterfall (3,414 → 2,798 → 987 → 104). **(D)** Empirical runtime O(N^1.9); 987 nodes in 8.8 seconds. **(E)** Centrality: circuit has lower betweenness (p = 0.004). **(F)** MCIS stability across confidence tiers. **(G)** Annotation quality: 91.9% vs 83.8% manually checked (p < 0.001).
+**Figure 2.** Robustness and validation. **(A)** 100-seed MCIS distribution: 100.5 ± 2.2, range [96, 105]. **(B)** Null comparison: correspondence-shuffle collapses to 76.2 ± 1.5; degree-preserving rewire reaches 100.8 ± 2.1. **(C)** N bound waterfall (3,414 → 2,798 → 987 → 105). **(D)** Empirical runtime O(N^1.9); 987 nodes in ~8.8 seconds. **(E)** Centrality: circuit has lower betweenness (p = 0.009). **(F)** MCIS stability across confidence tiers. **(G)** Annotation quality: 93.3% vs 85.0% manually annotated (p = 0.008).
 
 ---
 
 ## 5. Cell-Type Enrichment: The Circuit Is Not a Random Brain Sample
 
-Comparing the 104 circuit neurons against the full 139,244-neuron FAFB annotation as background:
+Comparing the 105 circuit neurons against the full 139,244-neuron FAFB annotation as background (computed by [`src/derived_stats.py`](src/derived_stats.py), `results/derived_stats.json`):
 
-| Neuron class | Circuit (N=104) | FAFB background (N=139,244) | Fold enrichment | Fisher exact p |
+| Neuron class | Circuit (N=105) | FAFB background (N=139,244) | Fold enrichment | Fisher exact p |
 |-------------|-----------------|----------------------------|-----------------|----------------|
-| Descending | 58.7% (61/104) | 0.94% (1,303/139,244) | **62.7×** | 1.6 × 10⁻⁹⁴ |
-| Ascending  | 34.6% (36/104) | 1.26% (1,750/139,244) | **27.5×** | 2.6 × 10⁻⁴¹ |
+| Descending | 61.9% (65/105) | 0.94% (1,303/139,244) | **66.2×** | 3.0 × 10⁻¹⁰⁴ |
+| Ascending  | 31.4% (33/105) | 1.26% (1,750/139,244) | **25.0×** | 1.2 × 10⁻³⁶ |
 
-The circuit is 62.7× enriched for descending neurons and 27.5× enriched for ascending neurons (both p < 10⁻⁴⁰). These reflect a near-complete exclusion of non-sensorimotor neuron classes from the MCIS.
+The circuit is 66.2× enriched for descending neurons and 25.0× enriched for ascending neurons (both p < 10⁻³⁵). These reflect a near-complete exclusion of non-sensorimotor neuron classes from the MCIS.
 
-Top enriched developmental hemilineages: SMPpv2 (56.7×), LB5 (48.9×), LB12 (40.6×), LB11 (33.4×) — all established output hemilineages projecting from brain to nerve cord (Ito et al. 2013), directly confirming the developmental constraint hypothesis.
+The most represented developmental hemilineages among circuit neurons are LB12, 05B, 09B, and SMPpv2 — established output hemilineages projecting from brain to nerve cord (Ito et al. 2013), consistent with the developmental constraint hypothesis.
 
 ![Fig. 3 — Cell-type enrichment](figures/figure9_enrichment.png)
-**Figure 3.** Cell-type enrichment vs FAFB whole-brain background. **(A)** Superclass fold-enrichment. **(B)** Top enriched developmental hemilineages. **(C)** Neurotransmitter profile: ACh-dominant (61.5%; 64/104) vs mixed background. **(D)** Laterality: bilateral representation consistent with bilateral locomotion. **(E)** Fisher exact test summary.
+**Figure 3.** Cell-type enrichment vs FAFB whole-brain background. **(A)** Superclass fold-enrichment (descending 66.2×, ascending 25.0×). **(B)** Neurotransmitter profile: ACh-dominant (69.5%; 73/105). **(C)** Most represented developmental hemilineages.
 
 ---
 
@@ -192,31 +194,31 @@ Top enriched developmental hemilineages: SMPpv2 (56.7×), LB5 (48.9×), LB12 (40
 
 | Neuron class | Count | % | Functional role |
 |-------------|-------|---|-----------------|
-| Descending (DN) | 61 | 58.7% | Brain → VNC motor commands |
-| Ascending (AN) | 36 | 34.6% | VNC → Brain proprioceptive feedback |
+| Descending (DN) | 65 | 61.9% | Brain → VNC motor commands |
+| Ascending (AN) | 33 | 31.4% | VNC → Brain proprioceptive feedback |
 | Sensory-ascending | 5 | 4.8% | Peripheral sensory → Brain |
 | Sensory-descending | 2 | 1.9% | Sensory processing → VNC |
-| **Total** | **104** | | **6 conserved directed edges** |
+| **Total** | **105** | | **12 conserved directed edges** |
 
 ### 6.2 Anatomical position
 
 ![Fig. 4 — Spatial distribution](figures/figure6_spatial.png)
-**Figure 4.** BANC anatomical projections (voxel coordinates scaled to µm). **(A–C)** Coronal, sagittal, and axial projections: circuit neurons (coloured by class) are concentrated along the cervical connective — the anatomically expected locus for DN/AN neurons bridging brain and ventral nerve cord. Grey = all 2,798 matched neurons. **(D)** Anterior-posterior density comparison. **(E)** Regional fold-enrichment.
+**Figure 4.** BANC anatomical projections (`root_position_nm` scaled to µm). **(A–C)** Coronal, sagittal, and axial projections: circuit neurons (coloured by class) are concentrated along the cervical connective — the anatomically expected locus for DN/AN neurons bridging brain and ventral nerve cord. Grey = all matched neurons.
 
 ### 6.3 Circuit structure and neurotransmitters
 
 ![Fig. 5 — Circuit layouts](figures/figure1_circuit_layouts.png)
-**Figure 5.** Three force-directed layouts of the 104-neuron circuit. Gold edges = 6 synaptic connections verified identical across BANC, FAFB, and MANC. Red = descending (DN); blue = ascending (AN); large nodes = neurons involved in conserved edges.
+**Figure 5.** Three force-directed layouts of the 105-neuron circuit. Gold edges = 12 directed connections verified identical across BANC, FAFB, and MANC. Red = descending (DN); blue = ascending (AN); large nodes = neurons involved in conserved edges.
 
 ![Fig. 6 — Hub neurons](figures/figure3_hub_circuit.png)
-**Figure 6.** Hub neurons connected by the 6 conserved edges, with neurotransmitter identity annotated. The mixed ACh/GABA/Glu chemistry is consistent with a feedforward inhibition motif — a canonical computation (Milo et al. 2002) enabling temporal filtering of descending motor commands.
+**Figure 6.** Hub neurons connected by the 12 conserved edges (e.g. the reciprocal DNa15↔DNg04 and DNp58↔DNp65 pairs, and the DNge076→DNge019/DNge020 fan-out), with neurotransmitter identity annotated. The mixed ACh/GABA/Glu chemistry is consistent with a feedforward inhibition motif — a canonical computation (Milo et al. 2002) enabling temporal filtering of descending motor commands.
 
 ![Fig. 7 — Composition](figures/figure2_composition.png)
-**Figure 7.** **(A)** DN/AN dominance. **(B)** Acetylcholine-dominant NT profile (61.5%; 64/104). **(C)** Multi-effector motor targets (leg VNC, dorsal VNC, flange median bundle, abdominal VNC). **(D)** Node degree distribution. **(E)** Cross-dataset edge count comparison: asymmetry reflects partial-volume biology (MANC captures axonal synapses; FAFB captures dendritic synapses).
+**Figure 7.** **(A)** DN/AN dominance. **(B)** Acetylcholine-dominant NT profile (69.5%; 73/105). **(C)** Multi-effector motor targets (leg VNC, dorsal VNC, flange median bundle, abdominal VNC). **(D)** Node degree distribution. **(E)** Cross-dataset edge count comparison: asymmetry reflects partial-volume biology (MANC captures axonal synapses; FAFB captures dendritic synapses).
 
 ### 6.4 Motor targets — multi-effector coordination
 
-Among annotated motor targets: leg VNC (~25 neurons, locomotion), dorsal VNC/flight (~15), flange median bundle/whole-body coordination (~8), abdominal VNC (~7). The remaining neurons project to regions not annotated in the `cns_network` field. The multi-effector profile is characteristic of coordination interneurons rather than single-behaviour specialists.
+Among neurons with an annotated `cns_network` target: leg VNC (38 neurons, locomotion), dorsal VNC/flight (18), lateral brain (12), flange median bundle/whole-body coordination (11), posterior brain (8), abdominal VNC (7); 7 neurons are unannotated. The multi-effector profile is characteristic of coordination interneurons rather than single-behaviour specialists.
 
 ---
 
@@ -224,31 +226,31 @@ Among annotated motor targets: leg VNC (~25 neurons, locomotion), dorsal VNC/fli
 
 ### 7.1 Overview
 
-**88.5% of circuit neurons (92/104) are sexually isomorphic** — their wiring is preserved identically across ♀ FAFB/BANC and ♂ MANC. The remaining 11.5% (12 neurons) are sexually dimorphic. For comparison, Berg et al. (2025) report approximately 95.2% sexual conservation across all matched DN/AN neuron pairs; our circuit's 88.5% is slightly below this baseline, reflecting the presence of sex-specific behavioural neurons among the 104.
+**88.6% of circuit neurons (93/105) are sexually isomorphic** — their wiring is preserved identically across ♀ FAFB/BANC and ♂ MANC. The remaining 11.4% (12 neurons) are sexually dimorphic. For comparison, Berg et al. (2025) report approximately 95.2% sexual conservation across all matched DN/AN neuron pairs; our circuit's 88.6% is slightly below this baseline, reflecting the presence of sex-specific behavioural neurons among the 105.
 
 ![Fig. 8 — Dimorphism overview](figures/figure4_dimorphism_nt.png)
 **Figure 8.** Sexual dimorphism overview. Dimorphism status by neuron class and neurotransmitter profile.
 
 ![Fig. 9 — Sexual conservation deep dive](figures/figure8_sexual_conservation.png)
-**Figure 9.** **(A)** 88.5% isomorphic (92/104). **(B)** Dimorphism by class. **(C)** NT profile comparison: dimorphic neurons are enriched for serotonin and glutamate relative to the isomorphic majority. **(D)** All 12 dimorphic neurons. **(E)** Conservation rate in literature context.
+**Figure 9.** **(A)** 88.6% isomorphic (93/105). **(B)** Dimorphism by neuron class. **(C)** Neurotransmitter identity of the 12 dimorphic neurons (ACh 9, Glu 2, serotonin 1).
 
 ### 7.2 The 12 sexually dimorphic neurons
 
 | Cell type | Class | NT | Motor target |
 |-----------|-------|-----|-------------|
-| AN05B102 | Ascending | ACh | Lateral brain |
-| DNpe003 | Descending | ACh | Leg VNC |
+| AN05B102 (×2) | Ascending | ACh | Lateral brain |
+| DNg111 | Descending | Glu | Leg VNC |
+| DNp47 | Descending | ACh | Posterior brain |
 | DNp67 | Descending | ACh | Leg VNC |
-| DNpe052 (×2) | Descending | ACh | Lateral brain |
+| DNpe052 | Descending | ACh | Lateral brain |
 | ANXXX254 | Ascending | ACh | Abdominal VNC |
 | ANXXX169 | Ascending | Glu | Abdominal VNC |
 | DNge010 | Descending | ACh | Leg VNC |
 | DNg02_g | Descending | ACh | Dorsal VNC |
 | LN-DN2 | Sensory-desc. | Serotonin | — |
-| AN12B089 | Ascending | GABA | Leg VNC |
 | SAch01 | Sensory-asc. | ACh | — |
 
-Three neurotransmitter types appear among dimorphic neurons: ACh (9), Glu (1), GABA (1), serotonin (1). The serotonergic and glutamatergic neurons are notably neuromodulatory — controlling internal state rather than direct motor output. Neurons projecting to abdominal VNC and lateral brain account for a disproportionate share of dimorphic neurons, consistent with sex-specific reproductive and mating behaviours requiring abdominal motor control and higher-order brain integration in one sex but not the other.
+Three neurotransmitter types appear among dimorphic neurons: ACh (9), Glu (2), serotonin (1). The serotonergic and glutamatergic neurons are notably neuromodulatory — controlling internal state rather than direct motor output. Neurons projecting to abdominal VNC and lateral brain account for a disproportionate share of dimorphic neurons, consistent with sex-specific reproductive and mating behaviours requiring abdominal motor control and higher-order brain integration in one sex but not the other.
 
 ---
 
@@ -260,24 +262,24 @@ Pospisil et al. (2024) showed that approximately 1% of *Drosophila* brain neuron
 
 ### 8.2 Developmental constraint as the mechanistic basis
 
-The 88.5% cross-sex conservation is consistent with the developmental constraint hypothesis: DN/AN connectivity is established early in neurogenesis by lineage-specific programs (hemilineage identity; Ito et al. 2013) that are largely sex-independent. The 11.5% dimorphic fraction maps onto neurons with sex-specific motor targets (abdominal VNC, lateral brain) and neuromodulatory roles — exactly the classes expected to diverge between sexes for reproductive behaviour.
+The 88.6% cross-sex conservation is consistent with the developmental constraint hypothesis: DN/AN connectivity is established early in neurogenesis by lineage-specific programs (hemilineage identity; Ito et al. 2013) that are largely sex-independent. The 11.4% dimorphic fraction maps onto neurons with sex-specific motor targets (abdominal VNC, lateral brain) and neuromodulatory roles — exactly the classes expected to diverge between sexes for reproductive behaviour.
 
 ### 8.3 Testable experimental predictions
 
-1. **Multi-program impairment:** Silencing any of the 6-edge hub neurons (e.g. DNp63, DNp59, DNpe016) should impair walking, flight, and posture simultaneously — testable via optogenetic silencing combined with multi-behaviour assays.
-2. **Synapse strength:** The 6 conserved edges should exhibit above-average synapse counts in the weighted connectome, consistent with robust signal transmission. Testable via FlyWire API query of synapse weights.
+1. **Multi-program impairment:** Silencing the hub neurons that carry the conserved edges (e.g. the reciprocal pairs DNa15↔DNg04 and DNp58↔DNp65, or the DNge076→DNge019/DNge020 fan-out) should impair walking, flight, and posture simultaneously — testable via optogenetic silencing combined with multi-behaviour assays.
+2. **Synapse strength:** The 12 conserved edges should exhibit above-average synapse counts in the weighted connectome, consistent with robust signal transmission. Testable via FlyWire API query of synapse weights.
 3. **Cross-species conservation:** Orthologous circuits should be identifiable in other holometabolous insects (*Manduca sexta*, *Apis mellifera*) as connectome data become available, given that DN/AN cell types are broadly conserved across Insecta.
 
 ---
 
 ## 9. Limitations
 
-- **N is a certified near-optimal lower bound.** The greedy algorithm finds a local optimum; the true MCIS on 987 nodes is NP-hard to certify exactly. ILP validation on 50 subgraphs (20–50 nodes) demonstrates a mean optimality gap of 0.9% and maximum gap of 4.5% (§3.2), and the 100-seed variance of ±2.2 (§4.1) provides independent evidence of stability. Together these bound the true MCIS within ~1–2 neurons of 104, but a formally certified proof of global optimality on the full 987-node instance remains intractable.
+- **N is a near-optimal lower bound.** The greedy algorithm finds a local optimum; the true MCIS on 987 nodes is NP-hard to certify exactly. ILP validation on 50 subgraphs (20–50 nodes) demonstrates a mean optimality gap of 1.15% (maximum 10.5% on one 50-node instance; §3.2), and the 100-seed variance of ±2.2 (§4.1) provides independent evidence of stability. Together these indicate the reported N = 105 is within a few neurons of the true optimum, but a formally certified proof of global optimality on the full 987-node instance remains intractable.
 - **No continuous NBLAST scores.** The BANC metadata contains binary match results, not morphological similarity scores. A fully continuous confidence curve would require the R `bancr` package and neuron skeleton data (~10 GB); we used NBLAST top-1 agreement as a proxy (§4.5).
-- **Degree-preserving null Z = 1.0σ.** The FAFB degree distribution explains the majority of achievable MCIS size, limiting claims about edge-pattern specificity (§4.2).
+- **Degree-preserving null reaches the real mean.** The FAFB degree distribution explains nearly all of the achievable MCIS size (null 100.8 ± 2.1 ≈ real 100.5 ± 2.2), limiting claims about edge-pattern specificity beyond degree sequence (§4.2).
 - **Limited MANC cross-link coverage.** Approximately 2,498 of MANC's 23,641 neurons are cross-linked via the MCNS proxy table, constraining the triplet pool.
-- **Centrality result is directional only.** The betweenness difference (p = 0.004) should be treated as a directional observation until confirmed with a formal parametric test and/or replicated on a second connectome pair.
-- **DNpe052 appears twice** in the dimorphic neuron list (left and right hemisphere); this is expected for bilateral pairs and reflects correct data, not a duplication error.
+- **Centrality result is directional only.** The betweenness difference (p = 0.009) should be treated as a directional observation until confirmed with a formal parametric test and/or replicated on a second connectome pair.
+- **AN05B102 appears twice** in the dimorphic neuron list (left and right hemisphere); this is expected for bilateral pairs and reflects correct data, not a duplication error.
 
 ---
 
@@ -288,17 +290,17 @@ Apply the same MCIS framework when three-way NBLAST correspondence tables for MA
 
 ### 10.2 Connectome-informed neural architectures and behavioral validation
 
-**Minimal backbone controller.** The 104-neuron circuit offers a natural substrate for a structurally-grounded locomotion controller. In the flyGNN framework (Günther et al. 2023), the full 134,000-neuron connectome is instantiated as a recurrent GNN and trained end-to-end with RL, producing whole-body locomotion on a biomechanical simulator. Our circuit provides the complementary perspective: rather than instantiating the entire brain, we propose using the 104-neuron backbone as a *fixed minimal topology* — a structural prior encoding only the conserved brain–body communication channel.
+**Minimal backbone controller.** The 105-neuron circuit offers a natural substrate for a structurally-grounded locomotion controller. In the flyGNN framework (Günther et al. 2023), the full 134,000-neuron connectome is instantiated as a recurrent GNN and trained end-to-end with RL, producing whole-body locomotion on a biomechanical simulator. Our circuit provides the complementary perspective: rather than instantiating the entire brain, we propose using the 105-neuron backbone as a *fixed minimal topology* — a structural prior encoding only the conserved brain–body communication channel.
 
-Concretely, the 61 DN nodes form the input layer (receiving descending motor commands from higher brain areas), the 36 AN nodes form the output layer (encoding proprioceptive feedback to the brain), and the 6 conserved directed edges define the recurrent connections that must be preserved. All other connectivity is trainable. This differs from flyGNN in two respects: (i) the graph is three-connectome-validated rather than taken from a single specimen, and (ii) the topology is a hard constraint, not an initialisation. The prediction is that fixing the conserved edges will reduce effective degrees of freedom and improve sample efficiency on tasks requiring brain–body coordination, while having negligible benefit on pure reflex tasks (consistent with the CartPole negative result in the companion Project B analysis).
+Concretely, the 65 DN nodes form the input layer (receiving descending motor commands from higher brain areas), the 33 AN nodes form the output layer (encoding proprioceptive feedback to the brain), and the 12 conserved directed edges define the recurrent connections that must be preserved. All other connectivity is trainable. This differs from flyGNN in two respects: (i) the graph is three-connectome-validated rather than taken from a single specimen, and (ii) the topology is a hard constraint, not an initialisation. The prediction is that fixing the conserved edges will reduce effective degrees of freedom and improve sample efficiency on tasks requiring brain–body coordination, while having negligible benefit on pure reflex tasks (consistent with the CartPole negative result in the companion Project B analysis).
 
-**Testable behavioral predictions via optogenetics.** The 6-edge subgraph involves a small number of identifiable hub neurons (DNp63, DNp59, DNpe016; §8.3). Because these edges are the *only* conserved connections in the circuit, their disruption should uniquely impair cross-program coordination:
+**Testable behavioral predictions via optogenetics.** The 12-edge subgraph involves a small number of identifiable hub neurons (the DNa15↔DNg04 and DNp58↔DNp65 reciprocal pairs and the DNge076 fan-out; §8.3). Because these edges are the *only* conserved connections in the circuit, their disruption should uniquely impair cross-program coordination:
 
 1. *Multi-program silencing test:* Bilateral optogenetic silencing of each hub neuron during free locomotion should impair walking, flight initiation, and postural correction simultaneously. Single-program impairment without cross-program deficit would argue against the feedforward inhibition motif hypothesis.
-2. *Edge weight prediction:* Weighted synapse counts for the 6 conserved edges should exceed the 95th percentile of all DN→AN synaptic weights in the full connectome — a prediction directly queryable via `codex.flywire.ai/api/v2/neurons/` with no new experiments required.
+2. *Edge weight prediction:* Weighted synapse counts for the 12 conserved edges should exceed the 95th percentile of all DN→AN synaptic weights in the full connectome — a prediction directly queryable via `codex.flywire.ai/api/v2/neurons/` with no new experiments required.
 3. *Developmental timing:* If the conserved connectivity reflects lineage-encoded wiring (§8.2), these specific synapses should be among the earliest to appear in the pupal connectome time series; testable when developmental connectome data become available.
 
-**Single-cell transcriptomic alignment.** Each of the 104 circuit neurons has a predicted neurotransmitter identity in `network_enriched.csv` (ACh 61.5%, GABA 23.1%, Glu 9.6%, serotonin 3.8%, dopamine 1.9%) and most have cell-type labels (DNp*, AN*) that map to clusters in published *Drosophila* single-nucleus RNA-sequencing atlases (Davie et al. 2018; Allen et al. 2025). Cross-referencing circuit membership against transcriptomic cluster identity would test whether the structurally conserved neurons form a transcriptomically coherent class — and, critically, whether their gene expression profiles contain shared regulatory logic (e.g., conserved transcription factor binding sites) that mechanistically explains cross-sex, cross-specimen wiring stereotypy. This analysis requires only the publicly available FCA (Fly Cell Atlas) data and the circuit's FAFB root IDs from `network_enriched.csv`.
+**Single-cell transcriptomic alignment.** Each of the 105 circuit neurons has a predicted neurotransmitter identity in `network_enriched.csv` (ACh 69.5%, GABA 16.2%, Glu 8.6%, serotonin 3.8%, dopamine 1.9%) and most have cell-type labels (DNp*, AN*) that map to clusters in published *Drosophila* single-nucleus RNA-sequencing atlases (Davie et al. 2018; Allen et al. 2025). Cross-referencing circuit membership against transcriptomic cluster identity would test whether the structurally conserved neurons form a transcriptomically coherent class — and, critically, whether their gene expression profiles contain shared regulatory logic (e.g., conserved transcription factor binding sites) that mechanistically explains cross-sex, cross-specimen wiring stereotypy. This analysis requires only the publicly available FCA (Fly Cell Atlas) data and the circuit's FAFB root IDs from `network_enriched.csv`.
 
 ### 10.3 Integration with FlyWire lab workflows
 The `mcis_connectome` package enables: cross-version structural QC across proofread connectome releases; region-specific conservation queries restricted to a cell-type superclass or neuropil; developmental biology applications extending Witvliet et al. (2021) to *Drosophila*.
