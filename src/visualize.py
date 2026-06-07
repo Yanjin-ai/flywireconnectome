@@ -1,8 +1,14 @@
 """
-Circuit Visualization — 75-neuron conserved sensorimotor circuit
+Circuit Visualization — conserved sensorimotor circuit
 BANC × FAFB × MANC
+
+Paths:
+  Edge lists are read from the data directory (MCIS_DATA_DIR env var, or the
+  fallback below). network.csv / network_enriched.csv are read from the repo
+  (they are committed). Figures are written into the repo's figures/ folder.
 """
 
+import os
 import pandas as pd
 import numpy as np
 import networkx as nx
@@ -15,12 +21,20 @@ import matplotlib.gridspec as gridspec
 import warnings
 warnings.filterwarnings('ignore')
 
-DATA_DIR = '/Volumes/SANDISK ELE/flywire研究/'
-OUT_DIR  = '/Volumes/SANDISK ELE/flywire研究/repo/figures/'
+from mcis_paths import data_dir, figures_dir, repo_root
+DATA_DIR = data_dir()
+REPO     = repo_root()
+OUT_DIR  = figures_dir()
+
+def _edge_list(*names):
+    for n in names:
+        if os.path.exists(DATA_DIR + n):
+            return DATA_DIR + n
+    return DATA_DIR + names[0]
 
 # ── load data ────────────────────────────────────────────────────────────────
-df = pd.read_csv(DATA_DIR + 'network_enriched.csv')
-net = pd.read_csv(DATA_DIR + 'network.csv')
+df = pd.read_csv(os.path.join(REPO, 'network_enriched.csv'))
+net = pd.read_csv(os.path.join(REPO, 'network.csv'))
 
 # Rebuild the verified induced subgraph
 def load_filtered(fp, nodes):
@@ -32,9 +46,9 @@ banc_nodes = set(net['BANC'].astype(str))
 fafb_nodes = set(net['FAFB'].astype(str))
 manc_nodes = set(net['MANC'].astype(str))
 
-Gb = load_filtered(DATA_DIR + 'banc_626_edge_list (2).csv', banc_nodes)
-Gf = load_filtered(DATA_DIR + 'fafb_783_edge_list.csv', fafb_nodes)
-Gm = load_filtered(DATA_DIR + 'manc_1.2.1_edge_list.csv', manc_nodes)
+Gb = load_filtered(_edge_list('banc_626_edge_list.csv', 'banc_626_edge_list (2).csv'), banc_nodes)
+Gf = load_filtered(_edge_list('fafb_783_edge_list.csv'), fafb_nodes)
+Gm = load_filtered(_edge_list('manc_1.2.1_edge_list.csv'), manc_nodes)
 
 # Map BANC→indices
 banc_list = list(net['BANC'].astype(str))
@@ -45,7 +59,7 @@ mi = {m: i for i, m in enumerate(net['MANC'].astype(str))}
 be = {(bi[u], bi[v]) for u,v in Gb.edges() if u in bi and v in bi}
 fe = {(fi[u], fi[v]) for u,v in Gf.edges() if u in fi and v in fi}
 me = {(mi[u], mi[v]) for u,v in Gm.edges() if u in mi and v in mi}
-circuit_edges = be & fe & me   # 6 verified edges
+circuit_edges = be & fe & me   # directed edges present in all three connectomes
 
 # Build circuit graph (BANC IDs as labels)
 CG = nx.DiGraph()
@@ -150,7 +164,7 @@ axes[0].legend(handles=legend_elements, loc='lower left',
                title_fontsize=9)
 
 fig1.suptitle(
-    'Conserved Sensorimotor Circuit  ·  N = 75 neurons  ·  BANC × FAFB × MANC',
+    f'Conserved Sensorimotor Circuit  ·  N = {len(net)} neurons  ·  BANC × FAFB × MANC',
     color='white', fontsize=15, fontweight='bold', y=1.01)
 plt.tight_layout()
 fig1.savefig(OUT_DIR + 'figure1_circuit_layouts.png',
@@ -227,7 +241,7 @@ bars = ax_mat.bar(x, edge_counts, color=['#4FC3F7','#A5D6A7','#EF9A9A'],
                   width=0.5, alpha=0.85, label='Dataset edges')
 ax_mat.axhline(consensus, color='#FFD700', lw=2.5, ls='--', label=f'Consensus ({consensus} edges)')
 ax_mat.set_xticks(x); ax_mat.set_xticklabels(datasets, color='#ccc', fontsize=11)
-ax_mat.set_title('E  Edge Count Comparison — Same N=75 Neurons Across Datasets',
+ax_mat.set_title(f'E  Edge Count Comparison — Same N={len(net)} Neurons Across Datasets',
                  color='white', fontsize=11, pad=8)
 ax_mat.set_ylabel('Synapse Connections', color='#aaa', fontsize=9)
 ax_mat.tick_params(colors='#aaa')
@@ -238,14 +252,14 @@ for bar, v in zip(bars, edge_counts):
                 f'{v:,}', ha='center', color='white', fontsize=10, fontweight='bold')
 
 fig2.suptitle(
-    'Circuit Composition & Cross-Connectome Consistency  ·  75-neuron Shared Circuit',
+    f'Circuit Composition & Cross-Connectome Consistency  ·  {len(net)}-neuron Shared Circuit',
     color='white', fontsize=14, fontweight='bold', y=1.01)
 fig2.savefig(OUT_DIR + 'figure2_composition.png',
              dpi=180, bbox_inches='tight', facecolor='#0D1117')
 print('Saved figure2_composition.png')
 
 # ══════════════════════════════════════════════════════════════════════════════
-# FIGURE 3 — Hub neurons + 6 conserved edges highlighted
+# FIGURE 3 — Hub neurons + conserved edges highlighted
 # ══════════════════════════════════════════════════════════════════════════════
 fig3, ax = plt.subplots(figsize=(14, 10))
 fig3.patch.set_facecolor('#0D1117')
@@ -293,7 +307,7 @@ ax.legend(handles=sc_patches, loc='lower left',
           title='Neuron class', title_fontsize=10, framealpha=0.8)
 
 ax.set_title(
-    '6 Conserved Synaptic Connections  ·  Verified across BANC × FAFB × MANC\n'
+    f'{len(circuit_edges)} Conserved Synaptic Connections  ·  Verified across BANC × FAFB × MANC\n'
     'Gold = conserved edge  ·  Large nodes = circuit hubs  ·  Small nodes = isolated members',
     color='white', fontsize=12, pad=12)
 ax.axis('off')

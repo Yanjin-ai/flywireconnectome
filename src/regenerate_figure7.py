@@ -13,16 +13,28 @@ import numpy as np
 
 OUT = 'figures/figure7_nblast_confidence.png'
 
-# ── Data ────────────────────────────────────────────────────────────────────
-# Panel A: NBLAST confidence tier → MCIS size (science.md §4.5)
-tiers    = [10, 20, 30, 50, 75, 100]          # top-k %
-pools    = [279, 559, 839, 1399, 2098, 2798]  # triplet pool at each tier
-mcis_n   = [10,  28,  30,  59,  88,  104]     # MCIS N at each tier
+# ── Data (from reproducible results, not hard-coded) ─────────────────────────
+import json, os
+with open('results/confidence_tiers.json') as f:
+    _t = json.load(f)['tiers']
+# Panel A: NBLAST confidence tier → MCIS size (src/confidence_tiers.py)
+tiers  = [r['pct']  for r in _t]
+pools  = [r['pool'] for r in _t]
+mcis_n = [r['N']    for r in _t]
 
-# Panel B: NBLAST agreement distribution across 2,798 triplets
+# Panel B: NBLAST agreement distribution across the 2,798 in-all-3 triplets,
+# recomputed from the BANC metadata confidence proxy (0/1/2 datasets agree).
+import pandas as pd
+from mcis_paths import data_dir
+_D = data_dir()
+_m = pd.read_feather(_D + 'banc_meta.feather')
+_m = _m[_m['fafb_match'].notna() & _m['manc_match'].notna()].drop_duplicates('root_626')
+_agree = ((_m['fafb_match'].astype(str) == _m['fafb_nblast_match'].astype(str)).astype(int)
+          + (_m['manc_match'].astype(str) == _m['manc_nblast_match'].astype(str)).astype(int))
 agree_labels = ['Neither agrees\n(expert override)', 'One agrees\n(partial)', 'Both agree\n(high confidence)']
-agree_counts = [1024, 1380, 394]   # total = 2798
-agree_pcts   = [f'{v/2798:.0%}' for v in agree_counts]
+agree_counts = [int((_agree == k).sum()) for k in (0, 1, 2)]
+_tot = sum(agree_counts)
+agree_pcts   = [f'{v/_tot:.0%}' for v in agree_counts]
 agree_colors = ['#d62728', '#ff7f0e', '#2ca02c']   # red / orange / green
 
 # ── Figure layout ────────────────────────────────────────────────────────────
@@ -103,7 +115,7 @@ for bar, pct, count in zip(bars, agree_pcts, agree_counts):
     )
 
 ax_b.set_ylabel('Number of triplets', fontsize=10)
-ax_b.set_title('B  NBLAST Agreement Distribution\n(confidence proxy for 2,798 triplets)',
+ax_b.set_title(f'B  NBLAST Agreement Distribution\n(confidence proxy, {_tot:,} matched triplets)',
                fontsize=10, loc='left', color='#333333')
 ax_b.set_ylim(0, max(agree_counts) * 1.25)
 ax_b.spines[['top', 'right']].set_visible(False)
