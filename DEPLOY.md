@@ -1,5 +1,8 @@
 # Deploying the interactive explorer
 
+**Live instance:** <https://yanjin-ai-flywireconnectome-srcexplorer-app-pmdboy.streamlit.app/>
+
+
 The Streamlit explorer (`src/explorer_app.py`) runs entirely from committed
 artifacts (`network_enriched.csv`, `results/*.json`) — **no 300 MB data download
 is needed**, so it deploys to Streamlit Community Cloud for free.
