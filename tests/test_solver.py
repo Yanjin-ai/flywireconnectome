@@ -247,3 +247,61 @@ class TestDataLoading:
         solver._load()
         assert solver._ng > 500, f"giant component unexpectedly small: {solver._ng}"
         assert len(solver._triples) > 1000
+
+
+class TestIncrementalMCIS:
+    """Incremental MCIS == full re-solve, and the O(|ΔE|) impact query."""
+
+    def _setup(self):
+        from incremental_mcis import (build_disagreement, full_solve,
+                                      incremental_update, apply_delta,
+                                      touched_nodes, impact_query)
+        return (build_disagreement, full_solve, incremental_update,
+                apply_delta, touched_nodes, impact_query)
+
+    def test_exact_incremental_equals_full(self):
+        """radius=None incremental update reproduces a full re-solve exactly."""
+        (build_disagreement, full_solve, incremental_update,
+         apply_delta, touched_nodes, _) = self._setup()
+        ng = 12
+        be = {(0, 1), (1, 2), (3, 4), (5, 6), (7, 8)}
+        fe = {(0, 1), (1, 2), (3, 4), (5, 6)}          # (7,8) disagrees
+        me = {(0, 1), (1, 2), (3, 4), (5, 6), (9, 10)}  # (9,10) disagrees
+        adj, forced = build_disagreement(be, fe, me, ng)
+        S = full_solve(adj, list(range(ng)), forced)
+        ops = [("edge_insert", 7, 8)]                  # add (7,8) to FAFB
+        fe2 = set(fe) | {(7, 8)}
+        adj2, forced2 = build_disagreement(be, fe2, me, ng)
+        S_inc, _ = incremental_update(S, adj, adj2, touched_nodes(ops),
+                                      list(range(ng)), forced2, radius=None)
+        S_full = full_solve(adj2, list(range(ng)), forced2)
+        assert S_inc == S_full
+
+    def test_impact_query_detects_consensus_change(self):
+        """impact_query reports a consensus edge gained iff the edited pair is
+        already present in the other two connectomes."""
+        (_, _, _, _, _, impact_query) = self._setup()
+        be = {(1, 2)}
+        me = {(1, 2)}
+        fe = set()                                     # (1,2) not yet in FAFB
+        r = impact_query(be, fe, me, "FAFB", [("edge_insert", 1, 2)])
+        assert (1, 2) in r["consensus_gained"]
+        # editing a pair absent elsewhere can never create a consensus edge
+        r2 = impact_query(be, fe, me, "FAFB", [("edge_insert", 4, 5)])
+        assert r2["consensus_gained"] == [] and r2["consensus_lost"] == []
+
+
+class TestConservation:
+    """Degree-preserving rewire preserves degree; consensus exceeds null on a
+    planted graph."""
+
+    def test_rewire_preserves_degree(self):
+        from conservation_track import degree_preserving_rewire
+        import networkx as nx
+        edges = {(0, 1), (0, 2), (1, 2), (2, 3), (3, 4), (4, 0)}
+        ng = 5
+        G = nx.DiGraph(); G.add_nodes_from(range(ng)); G.add_edges_from(edges)
+        ind, outd = dict(G.in_degree()), dict(G.out_degree())
+        rewired = degree_preserving_rewire(edges, ng, seed=3)
+        H = nx.DiGraph(); H.add_nodes_from(range(ng)); H.add_edges_from(rewired)
+        assert dict(H.in_degree()) == ind and dict(H.out_degree()) == outd

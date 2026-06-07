@@ -88,6 +88,7 @@ N cannot grow indefinitely:
 | Centrality permutation (1000 trials) | p = 0.009; circuit has *lower* betweenness | Peripheral relays, not hubs |
 | Manual annotation rate | Circuit 93.3% vs non-circuit 85.0% (p = 0.008) | Better-annotated correspondences |
 | NBLAST confidence curve (6 tiers) | N = 4 → 39 → 53 → 74 → 91 → 105 (monotonic) | Not driven by low-confidence matches |
+| **Conservation beyond degree (edges)** | **2,609 consensus edges vs degree-null 353 ± 17 → 7.4×, Z = 136σ** | Specific wiring is conserved well beyond degree sequence |
 
 ---
 
@@ -148,7 +149,11 @@ python src/visualize.py                        # → figures/figure1-4
 python src/figures_extra.py                    # → figures/figure6,8,9
 python src/regenerate_figure7.py               # → figures/figure7
 python src/robustness_experiments.py           # → figures/figure5 (from results/*.json)
+python src/conservation_track.py                # → conservation track: edges conserved beyond degree (Z=136σ)
+python src/incremental_mcis.py                  # → incremental MCIS + O(|ΔE|) version-QC query
+python src/neuroglancer_overlay.py --color conservation  # → results/neuroglancer_state.json (FlyWire)
 python src/make_abstract.py                     # → extended_abstract.pdf/.png (from results/*.json)
+streamlit run src/explorer_app.py               # → interactive explorer (uses only committed artifacts)
 pytest tests/ -v                               # → unit tests pass (synthetic graphs; real-data smoke test skips without MCIS_DATA_DIR)
 ```
 
@@ -185,6 +190,10 @@ src/
   exact_ilp.py                ILP optimality validation (PuLP/CBC)
   derived_stats.py            Composition / enrichment / dimorphism / annotation quality
   confidence_tiers.py         NBLAST confidence-tier curve
+  conservation_track.py        Per-edge/per-neuron conservation vs degree-null (figure 10)
+  incremental_mcis.py          Incremental MCIS + O(|ΔE|) version-QC query (figure 11)
+  neuroglancer_overlay.py      FlyWire Neuroglancer state (colour by class/conservation)
+  explorer_app.py              Streamlit interactive explorer
   mcis_paths.py               Shared path resolution (MCIS_DATA_DIR → ./data)
   visualize.py                 figures 1-4
   figures_extra.py             figures 6, 8, 9

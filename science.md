@@ -168,6 +168,21 @@ N increases monotonically without discontinuity across all confidence tiers ([`s
 ![Fig. 2 — Robustness panel](figures/figure5_robustness.png)
 **Figure 2.** Robustness and validation. **(A)** 100-seed MCIS distribution: 100.5 ± 2.2, range [96, 105]. **(B)** Null comparison: correspondence-shuffle collapses to 76.2 ± 1.5; degree-preserving rewire reaches 100.8 ± 2.1. **(C)** N bound waterfall (3,414 → 2,798 → 987 → 105). **(D)** Empirical runtime O(N^1.9); 987 nodes in ~8.8 seconds. **(E)** Centrality: circuit has lower betweenness (p = 0.009). **(F)** MCIS stability across confidence tiers. **(G)** Annotation quality: 93.3% vs 85.0% manually annotated (p = 0.008).
 
+### 4.6 Conservation beyond degree sequence — the conservation track
+
+The MCIS *size* (node count) is largely explained by the degree sequence (§4.2). This is expected: the MCIS is dominated by neurons with few or no induced edges, so a degree-preserving rewire can recover a similarly large *set* of nodes. The scientifically decisive question is about the **shared wiring itself**: are there more edges present in all three connectomes than a degree-preserving rewiring of each connectome would produce by chance?
+
+We answer this at the edge level ([`src/conservation_track.py`](src/conservation_track.py), `results/conservation_track.json`). Over the 987-node consensus component (56,337 edges present in ≥1 connectome):
+
+| Quantity | Observed | Degree-preserving null (100 trials) | Result |
+|---|---|---|---|
+| Edges present in all 3 connectomes | **2,609** | 352.9 ± 16.5 | **7.4× enrichment, Z = 136σ** |
+
+So while node-count MCIS is degree-explained, **specific synaptic connectivity is conserved 7.4× above the degree-sequence expectation** — strong, unambiguous evidence that the cross-connectome agreement reflects real wiring identity, not merely matched degree distributions. This reframes the contribution from a binary "conserved circuit" to a continuous **conservation track**: every neuron receives a conservation z-score (observed consensus-incident edges vs degree-null), yielding a ranked map of which neurons carry the conserved wiring (top: ANXXX108 z=35, DNge106 z=28, DNg73/AN17B008 z=21). This per-neuron track is what the Neuroglancer overlay (§10.5) colours.
+
+![Fig. 3 — Conservation track](figures/figure10_conservation_track.png)
+**Figure 3.** **(A)** Edge support across connectomes (1 / 2 / all-3). **(B)** Beyond-degree test: observed 2,609 consensus edges vs degree-preserving null 353 ± 17 (Z = 136σ). **(C)** Per-neuron conservation z-score track.
+
 ---
 
 ## 5. Cell-Type Enrichment: The Circuit Is Not a Random Brain Sample
@@ -276,7 +291,7 @@ The 88.6% cross-sex conservation is consistent with the developmental constraint
 
 - **N is a near-optimal lower bound.** The greedy algorithm finds a local optimum; the true MCIS on 987 nodes is NP-hard to certify exactly. ILP validation on 50 subgraphs (20–50 nodes) demonstrates a mean optimality gap of 1.15% (maximum 10.5% on one 50-node instance; §3.2), and the 100-seed variance of ±2.2 (§4.1) provides independent evidence of stability. Together these indicate the reported N = 105 is within a few neurons of the true optimum, but a formally certified proof of global optimality on the full 987-node instance remains intractable.
 - **No continuous NBLAST scores.** The BANC metadata contains binary match results, not morphological similarity scores. A fully continuous confidence curve would require the R `bancr` package and neuron skeleton data (~10 GB); we used NBLAST top-1 agreement as a proxy (§4.5).
-- **Degree-preserving null reaches the real mean.** The FAFB degree distribution explains nearly all of the achievable MCIS size (null 100.8 ± 2.1 ≈ real 100.5 ± 2.2), limiting claims about edge-pattern specificity beyond degree sequence (§4.2).
+- **Degree-preserving null reaches the real MCIS *size*** (null 100.8 ± 2.1 ≈ real 100.5 ± 2.2; §4.2). This limits claims based on *node count*. It does **not** limit the wiring claim: at the *edge* level, all-3 consensus edges are enriched 7.4× over the same degree-preserving null (Z = 136σ; §4.6), so specific connectivity is conserved well beyond degree sequence. The right unit of analysis is edges, not node count.
 - **Limited MANC cross-link coverage.** Approximately 2,498 of MANC's 23,641 neurons are cross-linked via the MCNS proxy table, constraining the triplet pool.
 - **Centrality result is directional only.** The betweenness difference (p = 0.009) should be treated as a directional observation until confirmed with a formal parametric test and/or replicated on a second connectome pair.
 - **AN05B102 appears twice** in the dimorphic neuron list (left and right hemisphere); this is expected for bilateral pairs and reflects correct data, not a duplication error.
@@ -309,6 +324,16 @@ CLI: `python -m mcis_connectome.cli --banc ... --fafb ... --manc ... --meta ... 
 
 ### 10.4 Interactive Codex dashboard
 A lightweight overlay on the FlyWire Codex 3D viewer that highlights MCIS membership and allows researchers to trace neuron morphology interactively across datasets.
+
+### 10.5 Implemented extensions
+
+These three directions are implemented in this repository (not just proposed):
+
+**(a) Incremental MCIS for version QC** ([`src/incremental_mcis.py`](src/incremental_mcis.py)). We formalise MCIS as Maximum Independent Set on the *disagreement graph* and prove it is separable over connected components, giving an exact component-local incremental update under an edge delta ΔE. Empirically, however, the disagreement graph is a single dense, low-diameter component, so exact incremental maintenance offers no speedup (a genuine structural finding: a single edit's constraint reaches almost the whole graph within two hops; a radius-1 bounded variant gives ~2.9× at a ~3-neuron approximation cost). The primitive that *is* both local and useful for proofreaders is the **O(|ΔE|) consensus-impact query** (≈2 µs, independent of graph size): given an edit to one connectome, report which all-3 consensus edges are gained or lost by checking only the edited pairs against the other two connectomes — directly answering "does my edit touch any published conserved circuit?" (`results/incremental_benchmark.json`).
+
+**(b) Connectome conservation track** (§4.6) — the per-neuron, null-normalised conservation score, reframing the deliverable from a binary circuit to a continuous track.
+
+**(c) Ecosystem-native visualisation** ([`src/neuroglancer_overlay.py`](src/neuroglancer_overlay.py), [`src/explorer_app.py`](src/explorer_app.py)). A FlyWire-compatible Neuroglancer state loads the circuit's FAFB neurons coloured by class or by conservation z-score (shareable via `fafbseg.encode_url`); a Streamlit app lets users filter the circuit, inspect the conservation track and conserved-edge subgraph, and download results — all from the committed artifacts, no bulk data download required.
 
 ---
 
