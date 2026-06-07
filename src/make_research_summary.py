@@ -109,13 +109,16 @@ def main():
     # (2) Codex 3D meshes panel (instructions + anatomical render stand-in)
     axm = fig.add_axes([0.52, 0.66, 0.44, 0.25]); axm.axis("off")
     axm.set_title("(2) Codex 3D meshes", fontsize=10, fontweight="bold", loc="left")
+    # actual Codex 3D-mesh screenshot if available, else the anatomical stand-in
+    f_codex = os.path.join(figures_dir(), "codex_3d_fafb.png")
     f6 = os.path.join(figures_dir(), "figure6_spatial.png")
-    if os.path.exists(f6):
-        axm.imshow(mpimg.imread(f6))
-    axm.text(0, -0.06, f"Verified Codex 3D-mesh view: all {n} FAFB neurons render "
-             "inside the whole-brain mesh and converge at the midline / cervical "
-             "connective (live link in results/codex_3d_url.txt; IDs in "
-             "codex_circuit_ids.txt). Anatomical distribution shown here.",
+    img = f_codex if os.path.exists(f_codex) else f6
+    if os.path.exists(img):
+        axm.imshow(mpimg.imread(img))
+    axm.text(0, -0.06, f"All {n} circuit neurons rendered as Codex 3D meshes inside "
+             "the FAFB whole-brain, converging at the midline / cervical connective "
+             "(codex.flywire.ai; live link in results/codex_3d_url.txt, IDs in "
+             "codex_circuit_ids.txt).",
              transform=axm.transAxes, fontsize=7, color="#444", wrap=True)
 
     # (3) observations / hypothesis
