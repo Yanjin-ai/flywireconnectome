@@ -1,14 +1,15 @@
-# Exact versions used to reproduce the published results (tested on Python 3.14;
-# these pins require Python >= 3.11). For a looser install on Python >= 3.10 use
-# `pip install -e .` instead, which uses the floor constraints in setup.py.
-pandas==2.3.3
-numpy==2.3.5
-networkx==3.6.1
-pyarrow==23.0.0
-scipy==1.17.1
-matplotlib==3.10.8
-seaborn==0.13.2
-pulp==3.3.2
-pytest==9.0.3
-streamlit==1.54.0          # optional: src/explorer_app.py
+# Compatibility floors — resolves on Python 3.10–3.14, including whatever
+# default Python Streamlit Community Cloud offers (pip picks matching wheels).
+# For the EXACT versions used to produce the published results, see
+# requirements-lock.txt (`pip install -r requirements-lock.txt`).
+pandas>=2.0
+numpy>=1.24
+networkx>=3.0
+pyarrow>=14
+scipy>=1.10
+matplotlib>=3.7
+seaborn>=0.12
+pulp>=2.7
+pytest>=7.0
+streamlit>=1.30          # for src/explorer_app.py
 # optional (Neuroglancer short links, FlyWire auth): fafbseg, nglui, caveclient

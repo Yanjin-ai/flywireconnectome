@@ -15,8 +15,12 @@ is needed**, so it deploys to Streamlit Community Cloud for free.
 2. Sign in with the GitHub account that owns the repo (one-time OAuth — this
    step can only be done by you; it can't be automated).
 3. Confirm: **Repository** `Yanjin-ai/flywireconnectome`, **Branch** `main`,
-   **Main file path** `src/explorer_app.py`. Under *Advanced settings* pick
-   **Python 3.12** (matches the pinned `requirements.txt`).
+   **Main file path** `src/explorer_app.py`. **Leave the Python version at the
+   default** that Streamlit offers (do *not* manually switch it).
+   > Known quirk: changing the Python dropdown (e.g. to 3.12) makes the deploy
+   > form re-validate into a bad state and falsely show "This repository/branch/
+   > file does not exist". At the default version the fields validate correctly.
+   > `requirements.txt` now uses version *floors*, so any offered Python works.
 4. Click **Deploy**. First build installs `requirements.txt` (~1–2 min).
 
 Your app will be live at a URL like
