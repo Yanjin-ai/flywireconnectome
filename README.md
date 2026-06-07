@@ -150,8 +150,10 @@ python src/figures_extra.py                    # → figures/figure6,8,9
 python src/regenerate_figure7.py               # → figures/figure7
 python src/robustness_experiments.py           # → figures/figure5 (from results/*.json)
 python src/conservation_track.py                # → conservation track: edges conserved beyond degree (Z=136σ)
-python src/incremental_mcis.py                  # → incremental MCIS + O(|ΔE|) version-QC query
+python src/incremental_mcis.py                  # → incremental MCIS + O(|ΔE|) version-QC report
+python src/spectral_mcis.py                     # → spectral solver vs ILP/greedy (~95% opt, 10-100× faster)
 python src/neuroglancer_overlay.py --color conservation  # → results/neuroglancer_state.json (FlyWire)
+python src/make_animation.py                    # → figures/circuit_3d_conservation.gif
 python src/make_abstract.py                     # → extended_abstract.pdf/.png (from results/*.json)
 streamlit run src/explorer_app.py               # → interactive explorer (uses only committed artifacts)
 pytest tests/ -v                               # → unit tests pass (synthetic graphs; real-data smoke test skips without MCIS_DATA_DIR)
@@ -191,9 +193,11 @@ src/
   derived_stats.py            Composition / enrichment / dimorphism / annotation quality
   confidence_tiers.py         NBLAST confidence-tier curve
   conservation_track.py        Per-edge/per-neuron conservation vs degree-null (figure 10)
-  incremental_mcis.py          Incremental MCIS + O(|ΔE|) version-QC query (figure 11)
+  incremental_mcis.py          Incremental MCIS + O(|ΔE|) version-QC report (figure 11)
+  spectral_mcis.py             Spectral relaxation solver vs ILP/greedy (figure 12)
   neuroglancer_overlay.py      FlyWire Neuroglancer state (colour by class/conservation)
   explorer_app.py              Streamlit interactive explorer
+  make_animation.py            Rotating 3D conservation GIF
   mcis_paths.py               Shared path resolution (MCIS_DATA_DIR → ./data)
   visualize.py                 figures 1-4
   figures_extra.py             figures 6, 8, 9

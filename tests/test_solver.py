@@ -305,3 +305,29 @@ class TestConservation:
         rewired = degree_preserving_rewire(edges, ng, seed=3)
         H = nx.DiGraph(); H.add_nodes_from(range(ng)); H.add_edges_from(rewired)
         assert dict(H.in_degree()) == ind and dict(H.out_degree()) == outd
+
+
+class TestSpectralAndReport:
+    def test_spectral_returns_valid_independent_set(self):
+        """spectral_mis output must be an independent set in the disagreement
+        graph and at least as good as a trivial single node."""
+        from incremental_mcis import build_disagreement
+        from spectral_mcis import spectral_mis
+        ng = 12
+        be = {(0, 1), (1, 2), (3, 4), (5, 6)}
+        fe = {(0, 1), (3, 4), (5, 6), (7, 8)}      # (1,2) & (7,8) disagree
+        me = {(0, 1), (1, 2), (3, 4), (5, 6)}
+        adj, _ = build_disagreement(be, fe, me, ng)
+        S = spectral_mis(list(range(ng)), adj)
+        # independence: no two chosen nodes adjacent in the disagreement graph
+        for v in S:
+            assert not (adj[v] & S), "spectral_mis returned a non-independent set"
+        assert len(S) >= 1
+
+    def test_qc_report_flags_lost_conserved_edge(self):
+        from incremental_mcis import impact_query, qc_report
+        be, fe, me = {(1, 2)}, {(1, 2)}, {(1, 2)}    # (1,2) is a consensus edge
+        impact = impact_query(be, fe, me, "FAFB", [("edge_delete", 1, 2)])
+        assert (1, 2) in impact["consensus_lost"]
+        txt = qc_report(impact, {1: "DNa15", 2: "DNg04"})
+        assert "LOST" in txt and "DNa15" in txt and "DNg04" in txt
