@@ -18,12 +18,59 @@ Red = descending neurons (brain → nerve cord) · Blue = ascending neurons (ner
 |--|--|
 | **Circuit size** | **N = 105 neurons** (best of 100-seed multi-start; distribution 100.5 ± 2.2, range [96, 105]) |
 | **Conserved edges** | 12 directed edges, verified isomorphic across all 3 datasets |
+| **🔑 Wiring conserved *beyond degree*** | **2,609 consensus edges vs degree-null 352.9 ± 16.5 → 7.4×, Z = 136σ** — specific connectivity is conserved, not just degree sequence ([§ Conservation Track](#beyond-the-binary-circuit--conservation-track-version-qc--visual-tools)) |
 | **Datasets** | BANC v626 (♀ brain+cord) × FAFB v783 (♀ brain) × MANC v1.2.1 (♂ nerve cord) |
 | **Composition** | 65 descending (61.9%) + 33 ascending (31.4%) + 7 sensory neurons |
 | **Sexual conservation** | 88.6% isomorphic across ♀ and ♂ (93/105) |
 | **Statistical significance** | Correspondence-shuffle null collapses to 76.2 ± 1.5 (>15σ below real) |
 | **Cell-type enrichment** | Descending 66.2× (p=3.0×10⁻¹⁰⁴), Ascending 25.0× (p=1.2×10⁻³⁶) vs FAFB background |
 | **Anatomical position** | Cervical connective (Fig. 4): expected locus for brain–cord relay neurons |
+
+---
+
+## Beyond the Binary Circuit — Conservation Track, Version-QC & Visual Tools
+
+The MCIS *size* (node count) is largely explained by the degree sequence — but the shared **wiring** is not. This section is the substantive extension beyond the qualification result.
+
+### 🔑 Specific connectivity is conserved far beyond degree (the headline)
+
+Over the 987-node consensus component, **2,609 directed edges are present in all three connectomes vs 352.9 ± 16.5 under a degree-preserving null → 7.4× enrichment, Z = 136σ**. So cross-connectome agreement reflects real wiring identity, not matched degree distributions. We therefore report a continuous, null-normalised **per-neuron conservation track** instead of a binary circuit ([`src/conservation_track.py`](src/conservation_track.py) → `results/conservation_track.json`, `results/neuron_conservation.csv`).
+
+![Conservation track](figures/figure10_conservation_track.png)
+
+### Conserved circuit in 3D (conserved edges = gold; colour = conservation z)
+
+![3D conservation animation](figures/circuit_3d_conservation.gif)
+
+*The conserved edges concentrate along the cervical connective — the expected brain↔cord relay locus. ([`src/make_animation.py`](src/make_animation.py))*
+
+### Version-QC tool — "does my proofreading edit touch a published conserved circuit?"
+
+An **O(|ΔE|) consensus-impact query** (~2 µs, independent of graph size) reports which conserved edges an edit gains/loses, named by cell type ([`src/incremental_mcis.py`](src/incremental_mcis.py) → `results/qc_report_demo.txt`):
+
+```
+Connectome version QC report
+================================
+Conserved (all-3) edges lost:   1
+Neurons touching conserved wiring: 2
+  LOST  ANXXX202_b -> AN27X017  (a published conserved edge would disappear)
+```
+
+We formalise MCIS as Maximum Independent Set on the *disagreement graph*; exact incremental maintenance is provably correct but gives no speedup because that graph is one dense, low-diameter component (an honest structural finding) — so the O(|ΔE|) query above is the primitive that is both local and useful.
+
+| | |
+|--|--|
+| ![Incremental](figures/figure11_incremental.png) | ![Spectral](figures/figure12_spectral.png) |
+| Incremental MCIS: speed/accuracy vs radius | Spectral solver: ~95% of ILP optimum, 10–100× faster |
+
+### Spectral relaxation solver
+
+An eigenvector-based MIS heuristic on the disagreement graph reaches **~95% of the ILP optimum at 10–100× lower runtime** ([`src/spectral_mcis.py`](src/spectral_mcis.py) → `results/spectral_validation.json`).
+
+### Ecosystem-native, interactive
+
+- **FlyWire Neuroglancer overlay** — `python src/neuroglancer_overlay.py --color conservation` writes [`results/neuroglancer_state.json`](results/neuroglancer_state.json) (105 FAFB neurons coloured by conservation z); open at [ngl.flywire.ai](https://ngl.flywire.ai/) or shorten via `fafbseg.encode_url`.
+- **Streamlit explorer** — `streamlit run src/explorer_app.py`: filter the circuit, inspect the conservation track + conserved-edge subgraph, download CSV. Runs from committed artifacts (no bulk data download).
 
 ---
 
