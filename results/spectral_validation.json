@@ -1,0 +1,40 @@
+{
+  "tiers": [
+    {
+      "size": 30,
+      "greedy_pct_opt": 96.7,
+      "spectral_pct_opt": 97.5,
+      "greedy_ms": 3.34,
+      "spectral_ms": 3.47,
+      "ilp_ms": 441.76
+    },
+    {
+      "size": 50,
+      "greedy_pct_opt": 98.0,
+      "spectral_pct_opt": 96.9,
+      "greedy_ms": 3.74,
+      "spectral_ms": 1.04,
+      "ilp_ms": 39.98
+    },
+    {
+      "size": 80,
+      "greedy_pct_opt": 96.0,
+      "spectral_pct_opt": 92.7,
+      "greedy_ms": 5.34,
+      "spectral_ms": 1.65,
+      "ilp_ms": 60.45
+    },
+    {
+      "size": 120,
+      "greedy_pct_opt": 97.0,
+      "spectral_pct_opt": 91.9,
+      "greedy_ms": 10.51,
+      "spectral_ms": 1.62,
+      "ilp_ms": 152.22
+    }
+  ],
+  "summary": {
+    "mean_spectral_pct_opt": 94.8,
+    "mean_greedy_pct_opt": 96.9
+  }
+}
