@@ -118,6 +118,10 @@ Rather than defining ad hoc neuron matching, we use the **BANC metadata** (`banc
 
 BANC is the only dataset spanning both brain and ventral nerve cord. Its metadata explicitly provides individual-neuron-level cross-links to FAFB (brain-only) and MANC (cord-only). No equivalent three-way correspondence exists for MAOL or MCNS at this resolution. The triplet also tests cross-sex conservation (♀ FAFB/BANC vs ♂ MANC).
 
+### Graph-matching formulation
+
+Because the NBLAST correspondence fixes a 1:1 neuron identity across datasets, we **do not search over node matchings** (the hard part of general Maximum Common Subgraph). With the bijection fixed, "mutually isomorphic directed induced subgraph" collapses to **edge-set equality**, and maximising N becomes exactly **Maximum Independent Set (MIS) on the *disagreement graph*** — the graph that links any neuron pair whose directed connection is present in some but not all three datasets. We solve this three ways: a fast **greedy heuristic** (below, multi-start), an **exact ILP** (PuLP/CBC) for certified near-optimality on subgraphs, and a **spectral relaxation** as a fast alternative. This is why we avoid the NP-hard matching search of classical MCS solvers (McGregor 1982; Raymond & Willett 2002; McSplit).
+
 ### Algorithm: Greedy Disagreement Removal + Exhaustive Expansion
 
 ```
@@ -140,6 +144,14 @@ Verified: E_BANC[S] = E_FAFB[S] = E_MANC[S]
 **Reproducibility:** Fixed random seeds; deterministic per seed; result reported as the best of a 100-seed multi-start.  
 **Unit tests:** `pytest tests/ -v` — 14 tests (13 synthetic + 1 real-data smoke, skipped without data), all pass.  
 **Near-optimality:** ILP (PuLP/CBC) on 50 sampled subgraphs → mean optimality gap 1.15% (max 10.5%); see `results/ilp_validation.json`.
+
+### Assumptions
+
+1. **Fixed correspondence is ground truth.** A neuron's identity across datasets is the BANC-metadata NBLAST `fafb_match` / `manc_match` (Bates et al. 2025); we do not re-derive matches. One neuron ↔ one identity (a bijection), so isomorphism = edge-set equality.
+2. **Unweighted, directed edges define structure.** Per the challenge spec, synapse weights are ignored; an edge is present/absent, direction preserved. All analysis is on the unweighted directed graphs.
+3. **Edge existence in the provided edge lists is authoritative** (proofreading errors are treated as noise — robustness to this is quantified in `results/stringency_sweep.json`: N degrades gracefully under simulated error).
+4. **Dataset versions:** BANC v626 edge list (correspondence columns from the `banc_888` metadata build; `root_626` is the join key), FAFB v783, MANC v1.2.1.
+5. **Reported N is the best of a fixed 100-seed multi-start** (a heuristic lower bound); ILP on sampled subgraphs bounds the optimality gap to ~1%.
 
 ### Why N is bounded
 
@@ -226,9 +238,11 @@ python src/robustness_experiments.py           # → figures/figure5 (from resul
 python src/conservation_track.py                # → conservation track: edges conserved beyond degree (Z=136σ)
 python src/incremental_mcis.py                  # → incremental MCIS + O(|ΔE|) version-QC report
 python src/spectral_mcis.py                     # → spectral solver vs ILP/greedy (~95% opt, 10-100× faster)
+python src/stringency_sweep.py                  # → reconstruction-error robustness (results/stringency_sweep.json)
 python src/neuroglancer_overlay.py --color conservation  # → results/neuroglancer_state.json (FlyWire)
 python src/make_animation.py                    # → figures/circuit_3d_conservation.gif
 python src/make_abstract.py                     # → extended_abstract.pdf/.png (from results/*.json)
+python src/make_research_summary.py             # → research_summary_fafb.pdf + Codex ID list
 streamlit run src/explorer_app.py               # → interactive explorer (uses only committed artifacts)
 pytest tests/ -v                               # → unit tests pass (synthetic graphs; real-data smoke test skips without MCIS_DATA_DIR)
 ```
