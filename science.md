@@ -92,7 +92,7 @@ Complexity: O(N·D) per iteration, D = number of disagreement edges
 Convergence: ≤890 iterations on the 987-node instance (~9 seconds)
 ```
 
-**Why greedy over alternatives?** In pilot experiments an *edge-centric growth* strategy (seed from the highest-degree consensus node, then greedily add isomorphism-preserving nodes) was consistently dominated by greedy disagreement removal, which benefits from a global view of disagreements rather than local seeding — consistent with findings in the Maximum Common Subgraph literature (McGregor 1982; Raymond & Willett 2002). The edge-centric comparison is reported alongside the robustness panel ([`src/robustness_experiments.py`](src/robustness_experiments.py)).
+**Relation to the Maximum Common Subgraph literature.** Classical MCS solvers (McGregor's backtracking, 1982; the clique-on-the-product-graph reduction of Raymond & Willett 2002; modern branch-and-bound solvers such as McSplit) must *discover* the node correspondence, which makes general MCS doubly hard (subgraph isomorphism is NP-complete; maximum common subgraph is NP-hard). Our setting is fundamentally easier because the correspondence is **given a priori** by NBLAST (each neuron has one identity across datasets). With a fixed bijection, "mutually isomorphic induced subgraph" reduces to **edge-set equality**, and maximising N becomes exactly **Maximum Independent Set on the disagreement graph** D (§3.2) — we never search over matchings. This is why we can certify near-optimality with a compact ILP (MIS, not the product-graph clique program) and why a simple greedy is competitive. We still benchmark the heuristic: greedy disagreement removal dominates an *edge-centric growth* alternative (seed from the highest-degree consensus node, grow), the latter being hampered by local seeding ([`src/robustness_experiments.py`](src/robustness_experiments.py)).
 
 **Exact MCIS validation via ILP.** To provide a certified lower bound on the optimality gap, we formulated MCIS as an Integer Linear Program and solved it to provable optimality on randomly sampled induced subgraphs of varying size.
 
@@ -135,7 +135,7 @@ All nulls use the *same* search procedure as the real result (best-of-5 multi-st
 | Degree-preserving rewire | Rewire ~33% of FAFB edges while preserving exact in/out degree per neuron | 100.8 ± 2.1 | indistinguishable from real mean (Z ≈ 2σ vs best N=105) | FAFB degree sequence alone accounts for nearly all of the achievable N |
 | Centrality permutation (1000 trials) | Permute neuron labels on the consensus-graph betweenness | — | p = 0.009 | Circuit neurons have *lower* betweenness than matched pool average |
 
-**Interpretation of the degree-preserving null.** This result indicates that the FAFB degree distribution is the dominant determinant of how large an MCIS can be found: a degree-preserving rewire reaches 100.8 ± 2.1, statistically indistinguishable from the real per-seed mean (100.5 ± 2.2). The correspondence-shuffle null (collapsing to 76.2 ± 1.5) shows that NBLAST-based neuron identity is additionally required — but the honest reading is that the degree sequence is a near-sufficient condition, and specific neuron identity provides the additional, smaller contribution needed to reach the best N = 105.
+**Interpretation of the degree-preserving null.** The degree-preserving rewire is a Maslov–Sneppen randomisation (Maslov & Sneppen 2002): it scrambles connectivity while holding each neuron's in/out degree fixed, isolating the contribution of the degree sequence from that of specific wiring. This result indicates that the FAFB degree distribution is the dominant determinant of how large an MCIS can be found: the Maslov–Sneppen null reaches 100.8 ± 2.1, statistically indistinguishable from the real per-seed mean (100.5 ± 2.2). The correspondence-shuffle null (collapsing to 76.2 ± 1.5) shows that NBLAST-based neuron identity is additionally required — but the honest reading is that the degree sequence is a near-sufficient condition, and specific neuron identity provides the additional, smaller contribution needed to reach the best N = 105.
 
 ### 4.3 Centrality: circuit neurons are peripheral relays
 
@@ -182,6 +182,22 @@ So while node-count MCIS is degree-explained, **specific synaptic connectivity i
 
 ![Fig. 3 — Conservation track](figures/figure10_conservation_track.png)
 **Figure 3.** **(A)** Edge support across connectomes (1 / 2 / all-3). **(B)** Beyond-degree test: observed 2,609 consensus edges vs degree-preserving null 353 ± 17 (Z = 136σ). **(C)** Per-neuron conservation z-score track.
+
+### 4.7 Robustness to connectomic reconstruction error
+
+Every connectome carries proofreading error. To test whether the result is an artifact of the exact edge sets, we independently perturbed each connectome — flipping a fraction *p* of its edges (removing real edges = false negatives, adding random edges = false positives) — and recomputed the MCIS ([`src/stringency_sweep.py`](src/stringency_sweep.py), `results/stringency_sweep.json`):
+
+| Edge error per connectome | MCIS N (best-of-3) |
+|---|---|
+| 0% | 105.0 ± 0.0 |
+| 5% | 92.5 ± 1.1 |
+| 10% | 85.0 ± 1.0 |
+| 20% | 72.8 ± 1.3 |
+
+N **degrades gracefully** (≈ linear, no cliff): even with 20% of every connectome's edges corrupted, a 73-neuron conserved circuit survives. The conserved backbone is therefore a stable structural feature, not a fragile coincidence of the specific reconstructions.
+
+![Fig. 4 — Reconstruction-error robustness](figures/figure13_stringency.png)
+**Figure 4.** MCIS size vs per-connectome edge perturbation; graceful, near-linear decline.
 
 ---
 
@@ -285,6 +301,22 @@ The 88.6% cross-sex conservation is consistent with the developmental constraint
 2. **Synapse strength:** The 12 conserved edges should exhibit above-average synapse counts in the weighted connectome, consistent with robust signal transmission. Testable via FlyWire API query of synapse weights.
 3. **Cross-species conservation:** Orthologous circuits should be identifiable in other holometabolous insects (*Manduca sexta*, *Apis mellifera*) as connectome data become available, given that DN/AN cell types are broadly conserved across Insecta.
 
+### 8.4 Alternative hypotheses — what the data can and cannot distinguish
+
+The headline observation (105 matched neurons with edge-level connectivity conserved 7.4× above a degree-preserving null) is consistent with several hypotheses. We state them explicitly and mark which our current data adjudicate:
+
+| Hypothesis | Prediction | Verdict from this study |
+|---|---|---|
+| **H1 — Developmental canalisation.** The backbone is wired by lineage-specific programs largely independent of sex/specimen. | Conserved across sexes; enriched in known output hemilineages; conserved beyond degree. | **Supported** (88.6% cross-sex; LB/SMPpv2 hemilineages; 7.4× beyond-degree) — but not *proven*: a structural snapshot cannot show the wiring was set developmentally rather than refined by activity. |
+| **H2 — Degree/sampling artifact.** Apparent conservation is a by-product of matched degree sequences and shared dense regions. | A Maslov–Sneppen (degree-preserving) null should reproduce the shared edges. | **Rejected at the edge level** (observed 2,609 vs 353 ± 17; Z = 136σ). Note it is *not* rejected for node-count (§4.2) — hence we report edges, not N, as the conserved signal. |
+| **H3 — Annotation/proofreading bias.** Conservation tracks the best-annotated, most-proofread neurons. | The result should collapse when restricted to high-confidence matches, and circuit/non-circuit annotation rates should differ strongly. | **Largely rejected**: N grows monotonically across all NBLAST-confidence tiers (§4.5) and the annotation-rate gap is modest (93.3% vs 85.0%). A residual bias cannot be fully excluded. |
+| **H4 — Functional/activity-driven conservation** (vs developmental). | Conserved edges would correlate with co-activity or behavioural necessity, not just lineage. | **Cannot be distinguished** with static connectomes alone — requires activity imaging or perturbation (§8.3 prediction 1) and the synapse-weight readout (prediction 2). This is the key open question. |
+| **H5 — Generic-subgraph property** (any matched neuron set would look conserved). | Enrichment for specific classes should be absent. | **Rejected**: the circuit is 66.2×/25.0× enriched for descending/ascending neurons — the conservation is specifically sensorimotor, not a generic property of matched neurons. |
+
+### 8.5 Comparison to models and behavioural data
+
+Our structural backbone complements three recent computational/functional lines. (i) *Connectome-constrained mechanistic models* (Lappalainen et al. 2024) instantiate measured connectivity and fit single-neuron dynamics to predict activity in the fly **visual** system, succeeding precisely where connectivity is sparse; our result extends the "sparse, connectome-constrained" regime to the **sensorimotor** axis and supplies a three-connectome-validated topology rather than a single-specimen one. (ii) The **effectome** (Pospisil et al. 2024) identifies the ~1% of brain neurons with direct motor leverage via descending neurons; our backbone is the *structurally invariant* core of exactly that population (93% DN/AN), suggesting the effectome's obligate conduit is also the most evolutionarily canalised. (iii) Whole-brain leaky-integrator simulations (Shiu et al. 2024) predict sensorimotor responses from FAFB connectivity; the 12 conserved edges (reciprocal DN↔DN pairs with mixed ACh/GABA) are concrete, falsifiable targets whose perturbation such a model could be asked to reproduce. None of these works tests cross-connectome structural invariance, which is the gap this study fills.
+
 ---
 
 ## 9. Limitations
@@ -352,3 +384,6 @@ These three directions are implemented in this repository (not just proposed):
 11. Ito M. et al. (2013) The organization of extrinsic neurons and their implications in input/output processing of the mushroom body of *Drosophila melanogaster*. *Microscopy* 62, 58–69. [doi:10.1093/jmicro/dfs064](https://doi.org/10.1093/jmicro/dfs064) — *Hemilineage identity and developmental origin of DN/AN neurons.*
 12. McGregor J.J. (1982) Backtrack search algorithms and the maximal common subgraph problem. *Software: Practice and Experience* 12, 23–34.
 13. Raymond J.W. & Willett P. (2002) Maximum common subgraph isomorphism algorithms for the matching of chemical structures. *J. Computer-Aided Molecular Design* 16, 521–533.
+14. Maslov S. & Sneppen K. (2002) Specificity and stability in topology of protein networks. *Science* 296, 910–913. [doi:10.1126/science.1065103](https://doi.org/10.1126/science.1065103) — *Degree-preserving rewiring null model.*
+15. Lappalainen J.K. et al. (2024) Connectome-constrained networks predict neural activity across the fly visual system. *Nature* 634, 1132–1140. [doi:10.1038/s41586-024-07939-3](https://doi.org/10.1038/s41586-024-07939-3) — *Connectome-constrained mechanistic models; sparse-connectivity regime.*
+16. McCreesh C., Prosser P. & Trimble J. (2017) A partitioning algorithm for maximum common subgraph problems (McSplit). *IJCAI* 712–719. — *Modern branch-and-bound MCS solver.*

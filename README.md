@@ -162,6 +162,7 @@ N cannot grow indefinitely:
 | Manual annotation rate | Circuit 93.3% vs non-circuit 85.0% (p = 0.008) | Better-annotated correspondences |
 | NBLAST confidence curve (6 tiers) | N = 4 → 39 → 53 → 74 → 91 → 105 (monotonic) | Not driven by low-confidence matches |
 | **Conservation beyond degree (edges)** | **2,609 consensus edges vs degree-null 353 ± 17 → 7.4×, Z = 136σ** | Specific wiring is conserved well beyond degree sequence |
+| Reconstruction-error robustness | N = 105 → 92 → 85 → 73 at 0/5/10/20% edge flips per connectome | Graceful decline, no cliff — not an artifact of the exact edge sets |
 
 ---
 
