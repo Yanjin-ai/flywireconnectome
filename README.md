@@ -86,6 +86,20 @@ An eigenvector-based MIS heuristic on the disagreement graph reaches **~95% of t
 
 ---
 
+## Challenge deliverables
+
+| Required | Delivered |
+|---|---|
+| Solution CSV: 3 dataset columns, N matched-neuron rows | [`network.csv`](network.csv) — 105 rows × {BANC, FAFB, MANC} |
+| Maximise N; mutually isomorphic directed induced subgraphs (edge ⟺ in all, direction preserved) | N=105, 12 edges, verified `isomorphic=True` ([`results/canonical_results.json`](results/canonical_results.json)) |
+| Research: network-graph visualization | one-pager panel 1 + `figures/figure1`, `figure3` |
+| Research: Codex 3D meshes | [`results/codex_circuit_ids.txt`](results/codex_circuit_ids.txt) (105 FAFB IDs → paste into [codex.flywire.ai](https://codex.flywire.ai/), public/no token) + [`results/neuroglancer_state.json`](results/neuroglancer_state.json); see [`results/codex_links.md`](results/codex_links.md) |
+| Research: observations / hypothesis | one-pager panel 3 + science.md §5–§8 |
+| Research: literature & citations | one-pager refs + science.md References (13) |
+| **Concise one-page summary (one dataset = FAFB)** | **[`research_summary_fafb.pdf`](research_summary_fafb.pdf)** |
+
+---
+
 ## Scientific Framing
 
 The FlyWire multi-connectome cell typing atlas (Schlegel et al. 2024) established that **cell-type identity** is reproducible across connectomes at the morphological level. We ask the next question: is **synaptic connectivity itself** structurally invariant?
@@ -258,6 +272,7 @@ src/
   neuroglancer_overlay.py      FlyWire Neuroglancer state (colour by class/conservation)
   explorer_app.py              Streamlit interactive explorer
   make_animation.py            Rotating 3D conservation GIF
+  make_research_summary.py     One-page FAFB research summary + Codex neuron-id list
   mcis_paths.py               Shared path resolution (MCIS_DATA_DIR → ./data)
   visualize.py                 figures 1-4
   figures_extra.py             figures 6, 8, 9
