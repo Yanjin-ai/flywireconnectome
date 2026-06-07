@@ -232,6 +232,12 @@ def main():
     write_enriched(result.triples, REPO / "network_enriched.csv")
     print("\n" + result.summary())
 
+    # conserved directed edges as cell-type pairs (for the viz / explorer)
+    ct = {i: solver._triples.iloc[solver._gl[i]].get("cell_type", "?")
+          for i in best_set}
+    conserved_edge_celltypes = sorted(
+        {(str(ct[i]), str(ct[j])) for (i, j) in edge_sets[0]})
+
     cent = centrality_test(solver, best_set)
     print(f"  Centrality: circuit betweenness {cent['circuit_mean']:.2e} vs "
           f"non-circuit {cent['noncircuit_mean']:.2e} (p = {cent['p_value']:.3f})")
@@ -240,6 +246,7 @@ def main():
         "N_reported": best_n,
         "n_conserved_edges": result.n_edges,
         "isomorphic": bool(result.is_isomorphic),
+        "conserved_edge_celltypes": [list(e) for e in conserved_edge_celltypes],
         "consensus_edges_giant": consensus_edges,
         "seed_distribution": {
             "n_seeds": int(args.seeds),
