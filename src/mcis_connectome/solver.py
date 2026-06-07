@@ -19,9 +19,11 @@ import time
 class MCISResult:
     """Results from an MCIS solve."""
     def __init__(self, node_indices, triples_df, edge_sets, dataset_names):
-        self.node_indices  = node_indices
-        self.triples       = triples_df.iloc[sorted(node_indices)].copy()
-        self.n             = len(node_indices)
+        # triples_df is expected to already contain exactly the selected rows,
+        # aligned to sorted(node_indices). We do NOT re-index it here.
+        self.node_indices  = sorted(node_indices)
+        self.triples       = triples_df.reset_index(drop=True).copy()
+        self.n             = len(self.triples)
         self.dataset_names = dataset_names
         # Verify isomorphism and count edges
         induced = [{(i,j) for i,j in es if i in node_indices and j in node_indices}
@@ -154,6 +156,7 @@ class MCISSolver:
 
     @staticmethod
     def _greedy(gbe, gfe, gme, ng, seed=0):
+        rng = np.random.default_rng(seed)
         active = set(range(ng))
         for _ in range(50000):
             ab = {e for e in gbe if e[0] in active and e[1] in active}
@@ -165,7 +168,11 @@ class MCISSolver:
             for u,v in dis:
                 if u in active: sc[u] += 1
                 if v in active: sc[v] += 1
-            active.remove(max(sc, key=sc.get))
+            # randomised tie-breaking among the worst nodes (seed-dependent,
+            # so multi-seed restarts explore genuinely different orderings)
+            top = max(sc.values())
+            worst = [n for n, s in sc.items() if s == top]
+            active.remove(worst[int(rng.integers(len(worst)))])
         return set(active), -1
 
     @staticmethod
