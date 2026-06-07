@@ -56,6 +56,37 @@ def degree_preserving_rewire(edges, n_nodes, seed):
     return set(G.edges())
 
 
+def weighted_consensus(bw, fw, mw):
+    """Conserved synaptic strength: for each edge present in all three weighted
+    connectomes, the min weight across them (the strength that survives the
+    cross-connectome bottleneck). Returns (per_edge_dict, total_strength)."""
+    common = set(bw) & set(fw) & set(mw)
+    per_edge = {e: min(bw[e], fw[e], mw[e]) for e in common}
+    return per_edge, float(sum(per_edge.values()))
+
+
+def strength_preserving_null(bw, fw, mw, ng, trials=100, seed=0):
+    """Degree- AND strength-aware null: rewire each connectome's binary topology
+    preserving in/out degree, then reassign that connectome's observed weight
+    multiset randomly onto the rewired edges (preserving the strength
+    distribution while destroying specific weight↔edge associations). Returns
+    the null distribution of total conserved strength."""
+    rng = np.random.default_rng(seed)
+    out = []
+    for t in range(trials):
+        trial = {}
+        for name, w in (("b", bw), ("f", fw), ("m", mw)):
+            edges = list(w.keys())
+            rewired = list(degree_preserving_rewire(set(edges), ng, seed=10 * t
+                                                    + {"b": 1, "f": 2, "m": 3}[name]))
+            vals = rng.permutation(list(w.values()))
+            trial[name] = {e: float(vals[k % len(vals)])
+                           for k, e in enumerate(rewired)} if rewired else {}
+        _, tot = weighted_consensus(trial["b"], trial["f"], trial["m"])
+        out.append(tot)
+    return np.array(out)
+
+
 def main():
     import argparse
     ap = argparse.ArgumentParser()
@@ -145,8 +176,29 @@ def main():
                               for k in (1, 2, 3)},
         "top_conserved_neurons": df.head(15)[["BANC", "cell_type",
                                               "conservation_z"]].to_dict("records"),
-        "weighted": bool(args.weights),
+        "weighted": None,
     }
+
+    # ---- optional weighted (degree+strength-preserving) conservation --------
+    # --weights expects a CSV of giant-local edges with per-connectome synapse
+    # weights: columns i,j,w_banc,w_fafb,w_manc (derive once from synapse tables).
+    if args.weights and os.path.exists(args.weights):
+        w = pd.read_csv(args.weights)
+        bw = {(int(r.i), int(r.j)): float(r.w_banc) for r in w.itertuples() if r.w_banc > 0}
+        fw = {(int(r.i), int(r.j)): float(r.w_fafb) for r in w.itertuples() if r.w_fafb > 0}
+        mw = {(int(r.i), int(r.j)): float(r.w_manc) for r in w.itertuples() if r.w_manc > 0}
+        _, obs_w = weighted_consensus(bw, fw, mw)
+        null_w = strength_preserving_null(bw, fw, mw, ng,
+                                          trials=min(args.null_trials, 100))
+        zw = (obs_w - null_w.mean()) / (null_w.std() or 1e-9)
+        out["weighted"] = {"observed_strength": obs_w,
+                           "null_mean": float(null_w.mean()),
+                           "null_std": float(null_w.std()), "z": float(zw)}
+        print(f"  Weighted conservation: observed strength {obs_w:.0f} vs "
+              f"strength-null {null_w.mean():.0f} ± {null_w.std():.0f}  Z = {zw:.1f}σ")
+    elif args.weights:
+        print(f"  (--weights file not found: {args.weights}; ran binary track only)")
+
     with open(results_dir() + "conservation_track.json", "w") as f:
         json.dump(out, f, indent=2, default=float)
 

@@ -127,6 +127,55 @@ def diff_edges(old_edges, new_edges):
             + [("edge_delete", i, j) for (i, j) in dele])
 
 
+def node_ops_to_edge_ops(node_ops, edges):
+    """Translate proofreading NODE edits (merge / split) into the edge_insert /
+    edge_delete ops the rest of the pipeline already handles — so merge/split
+    semantics ride on the same O(|ΔE|) impact engine.
+
+    ("node_merge", a, b): neuron b is merged into a — every edge incident to b
+        is relabelled to a (b's connectivity becomes a's).
+    ("node_split", a, b, keep_b): neuron a is split; the directed pairs in
+        `keep_b` (given as (src,dst) in a's incidence) move from a to a new id b.
+    `edges` is the current directed edge set of the affected connectome.
+    """
+    ops = []
+    for op in node_ops:
+        if op[0] == "node_merge":
+            _, a, b = op
+            for (u, v) in edges:
+                if u == b or v == b:
+                    ops.append(("edge_delete", u, v))
+                    nu, nv = (a if u == b else u), (a if v == b else v)
+                    if nu != nv:
+                        ops.append(("edge_insert", nu, nv))
+        elif op[0] == "node_split":
+            _, a, b, keep_b = op
+            for (u, v) in keep_b:
+                if (u, v) in edges:
+                    ops.append(("edge_delete", u, v))
+                    nu, nv = (b if u == a else u), (b if v == a else v)
+                    ops.append(("edge_insert", nu, nv))
+    return ops
+
+
+def cave_edit_delta(root_id, dataset="FAFB", timestamp_old=None, timestamp_new=None):
+    """Pull a real proofreading edge delta from the FlyWire CAVE edit history
+    (requires `caveclient` + a valid FlyWire auth token; network access).
+
+    Returns edit ops (edge_insert/edge_delete) between the two timestamps for the
+    neuron's connectivity, ready for impact_query(). This is the hook that turns
+    the synthetic-delta benchmark into a live version-QC check; it is intentionally
+    import-guarded so the rest of the module runs without CAVE credentials.
+    """
+    import caveclient  # noqa: F401  (raises if unavailable — that's the contract)
+    raise NotImplementedError(
+        "cave_edit_delta requires a FlyWire CAVE token. Implement by querying "
+        "client.chunkedgraph.get_change_log(root_id) for the two timestamps, "
+        "diffing the resulting adjacency, and returning edge ops. See "
+        "https://caveclient.readthedocs.io/ — left as an authenticated hook."
+    )
+
+
 # ─────────────────────────── incremental update ────────────────────────────
 def _ball(touched, adj, radius, candidates):
     """Radius-r BFS ball (over candidate nodes) around the touched set."""

@@ -331,3 +331,35 @@ class TestSpectralAndReport:
         assert (1, 2) in impact["consensus_lost"]
         txt = qc_report(impact, {1: "DNa15", 2: "DNg04"})
         assert "LOST" in txt and "DNa15" in txt and "DNg04" in txt
+
+
+class TestNodeEditsAndWeighted:
+    def test_node_merge_translates_to_edge_ops(self):
+        """Merging b into a relabels b's edges onto a (delete + reinsert)."""
+        from incremental_mcis import node_ops_to_edge_ops, impact_query
+        edges = {(5, 9)}                      # b=9 has an incoming edge from 5
+        ops = node_ops_to_edge_ops([("node_merge", 1, 9)], edges)
+        assert ("edge_delete", 5, 9) in ops and ("edge_insert", 5, 1) in ops
+        # if (5,1) already exists in the other two connectomes, the merge gains
+        # a conserved edge:
+        be = {(5, 1)}; me = {(5, 1)}; fe = set()
+        impact = impact_query(be, fe, me, "FAFB", ops)
+        assert (5, 1) in impact["consensus_gained"]
+
+    def test_weighted_consensus_and_strength_null(self):
+        from conservation_track import weighted_consensus, strength_preserving_null
+        # planted shared strong edge (0,1) in all three; rest disjoint/weak
+        bw = {(0, 1): 10.0, (2, 3): 1.0}
+        fw = {(0, 1): 8.0, (4, 5): 1.0}
+        mw = {(0, 1): 12.0, (6, 7): 1.0}
+        per_edge, total = weighted_consensus(bw, fw, mw)
+        assert per_edge == {(0, 1): 8.0} and total == 8.0
+        null = strength_preserving_null(bw, fw, mw, ng=8, trials=30, seed=1)
+        assert total >= null.mean()   # planted conserved strength ≥ chance
+
+    def test_cave_hook_is_guarded(self):
+        """cave_edit_delta must not silently fake data; it requires CAVE."""
+        import pytest
+        from incremental_mcis import cave_edit_delta
+        with pytest.raises((ImportError, NotImplementedError)):
+            cave_edit_delta("720575940000000000")

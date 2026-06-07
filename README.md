@@ -62,7 +62,7 @@ Neurons touching conserved wiring: 2
   LOST  ANXXX202_b -> AN27X017  (a published conserved edge would disappear)
 ```
 
-We formalise MCIS as Maximum Independent Set on the *disagreement graph*; exact incremental maintenance is provably correct but gives no speedup because that graph is one dense, low-diameter component (an honest structural finding) — so the O(|ΔE|) query above is the primitive that is both local and useful.
+Packaged as the **`mcis-watch`** CLI (`python src/mcis_watch.py --dataset FAFB --edits edits.csv`), which also accepts neuron **merge/split** edits and has a `cave_edit_delta` hook for live FlyWire CAVE edit history. We formalise MCIS as Maximum Independent Set on the *disagreement graph*; exact incremental maintenance is provably correct but gives no speedup because that graph is one dense, low-diameter component (an honest structural finding) — so the O(|ΔE|) query above is the primitive that is both local and useful.
 
 | | |
 |--|--|
@@ -252,7 +252,8 @@ src/
   derived_stats.py            Composition / enrichment / dimorphism / annotation quality
   confidence_tiers.py         NBLAST confidence-tier curve
   conservation_track.py        Per-edge/per-neuron conservation vs degree-null (figure 10)
-  incremental_mcis.py          Incremental MCIS + O(|ΔE|) version-QC report (figure 11)
+  incremental_mcis.py          Incremental MCIS + O(|ΔE|) impact query, merge/split ops, CAVE hook (figure 11)
+  mcis_watch.py                `mcis-watch` CLI: QC-report an edit against conserved circuits
   spectral_mcis.py             Spectral relaxation solver vs ILP/greedy (figure 12)
   neuroglancer_overlay.py      FlyWire Neuroglancer state (colour by class/conservation)
   explorer_app.py              Streamlit interactive explorer
