@@ -70,7 +70,11 @@ An eigenvector-based MIS heuristic on the disagreement graph reaches **~95% of t
 ### Ecosystem-native, interactive
 
 - **FlyWire Neuroglancer overlay** — `python src/neuroglancer_overlay.py --color conservation` writes [`results/neuroglancer_state.json`](results/neuroglancer_state.json) (105 FAFB neurons coloured by conservation z); open at [ngl.flywire.ai](https://ngl.flywire.ai/) or shorten via `fafbseg.encode_url`.
-- **Streamlit explorer** — `streamlit run src/explorer_app.py`: filter the circuit, inspect the conservation track + conserved-edge subgraph, download CSV. Runs from committed artifacts (no bulk data download).
+- **Streamlit explorer** — interactive: filter the circuit, inspect the conservation track + conserved-edge subgraph, download CSV. Runs from committed artifacts (no bulk data download).
+
+  [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/deploy?repository=Yanjin-ai/flywireconnectome&branch=main&mainModule=src/explorer_app.py)
+
+  One-click deploy to Streamlit Community Cloud (free) — see [DEPLOY.md](DEPLOY.md). Locally: `streamlit run src/explorer_app.py`.
 
 ---
 

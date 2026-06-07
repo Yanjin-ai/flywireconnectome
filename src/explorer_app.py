@@ -107,7 +107,7 @@ def main():
         if cons is not None:
             top = view.sort_values("conservation_z", ascending=False).head(20)
             st.dataframe(top[["cell_type", "super_class", "consensus_edges",
-                              "conservation_z"]], use_container_width=True)
+                              "conservation_z"]], width="stretch")
             fig, ax = plt.subplots(figsize=(9, 4))
             z = view["conservation_z"].dropna().sort_values(ascending=False).values
             ax.plot(z, color="#1f77b4")
