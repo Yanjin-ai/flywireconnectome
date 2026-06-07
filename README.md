@@ -108,6 +108,22 @@ We search for the largest set of morphologically matched neurons whose directed 
 
 ---
 
+## Research Summary — biological significance
+
+*The 1-page scientific report is [`science.md`](science.md) (it opens with a one-page summary); a print-ready version is [`research_summary_fafb.pdf`](research_summary_fafb.pdf). Key content is mirrored here.*
+
+**What the circuit is / does.** A 105-neuron brain↔ventral-nerve-cord backbone (93% descending + ascending). Its hubs span **wing/flight, leg, and abdominal** motor modules and are anchored by **DNg02**, a documented descending population that sets wingbeat amplitude / flight steering via a population code (Schnell, Ros & Dickinson 2022); these DN classes target leg/neck/wing VNC motor circuits (Namiki et al. 2018). Mixed ACh/GABA chemistry → feedforward-inhibition coordination motif.
+
+| Network graph | Codex 3D meshes (FAFB) |
+|---|---|
+| ![network](figures/figure3_hub_circuit.png) | ![codex](figures/codex_3d_fafb.png) |
+
+**Structural observations.** 66.2×/25.0× descending/ascending enrichment (Fisher p<10⁻³⁵); wiring conserved **7.4× beyond a degree-preserving (Maslov–Sneppen) null** (2,609 vs 353±17, Z=136σ); 88.6% conserved across sexes; peripheral (low-betweenness) relays; robust to 20% simulated reconstruction error.
+
+**Interpretation / hypotheses.** A developmentally canalised brain↔cord channel (H1); the degree-null rejects a pure degree artifact (H2) and the enrichment rejects a generic-subgraph explanation (H5); static data cannot yet distinguish developmental vs activity-driven wiring (H4 — key open question). **Prediction:** silencing the hub neurons (DNg02; DNa15↔DNg04; DNp58↔DNp65) should impair walking, flight and posture simultaneously. Full citations and the alternative-hypothesis table are in [`science.md`](science.md) §6.5, §8.
+
+---
+
 ## Technical Approach
 
 ### Core insight: official morphological correspondence

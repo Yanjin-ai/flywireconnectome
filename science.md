@@ -8,6 +8,32 @@
 
 ---
 
+## 📄 One-Page Scientific Report
+
+**The circuit.** The largest set of morphologically matched neurons whose directed induced subgraph is *identical* across three independent connectomes — BANC (♀ brain+cord), FAFB (♀ brain), MANC (♂ cord) — is a **105-neuron sensorimotor backbone with 12 conserved directed edges**. It is 93% descending + ascending neurons (65 DN + 33 AN + 7 sensory): the brain↔ventral-nerve-cord communication channel.
+
+**What it does.** The conserved hubs span multiple motor modules — **wing/flight, leg, and abdominal** effectors — and are **anchored by DNg02**, a documented descending population that sets wingbeat amplitude / flight steering through a population code (Schnell, Ros & Dickinson 2022). Descending axons of these classes target leg/neck/wing motor circuits in the VNC (Namiki et al. 2018). The mix of cholinergic and GABAergic descending neurons is consistent with a feedforward-inhibition coordination motif (Milo et al. 2002).
+
+![Network graph](figures/figure3_hub_circuit.png)
+*Conserved-circuit network graph: hubs joined by the 12 directed edges identical across all three connectomes (gold).*
+
+![Codex 3D meshes](figures/codex_3d_fafb.png)
+*Codex 3D meshes (FAFB): all 105 neurons inside the whole-brain outline, converging at the midline / cervical connective — the expected brain↔cord relay locus.*
+
+**Structural observations.**
+- **Cell-type identity:** 66.2× enriched for descending and 25.0× for ascending neurons vs the whole-brain FAFB background (Fisher p < 10⁻³⁵) — not a random brain sample.
+- **Wiring conserved beyond degree:** 2,609 edges are shared by all three connectomes vs 352.9 ± 16.5 under a degree-preserving (Maslov–Sneppen) null → **7.4×, Z = 136σ**. Specific connectivity is conserved, not just degree sequence.
+- **Cross-sex:** 88.6% of the circuit is wired identically in ♀ and ♂; the few dimorphic neurons target abdominal VNC / lateral brain.
+- **Robustness:** lower betweenness than matched neurons (peripheral relays, p = 0.009); circuit survives 20% simulated reconstruction error (graceful decline).
+
+**Interpretation & hypotheses.** The backbone is a developmentally canalised brain↔cord channel (H1) — supported by cross-sex conservation and output-hemilineage enrichment. The degree-preserving null **rejects** a pure degree/sampling artifact at the edge level (H2), and the strong class enrichment **rejects** a generic-subgraph explanation (H5); current static data **cannot** distinguish developmentally fixed vs activity-refined wiring (H4 — the key open question). **Prediction:** silencing the hub neurons (DNg02; the reciprocal DNa15↔DNg04 and DNp58↔DNp65 pairs) should impair walking, flight and posture *simultaneously* — testable by optogenetic silencing with multi-behaviour assays.
+
+**Key citations.** Schlegel et al. 2024 (cell typing); Bates et al. 2025 (BANC correspondence); Dorkenwald et al. 2024 (FAFB); Pospisil et al. 2024 (sensorimotor bottleneck); Namiki et al. 2018 & Schnell et al. 2022 (descending-neuron function); Witvliet et al. 2021 (connectome stereotypy). Full reference list in §References.
+
+> Print-ready version: [`research_summary_fafb.pdf`](research_summary_fafb.pdf). The detailed report (methods, statistics, all figures) follows below.
+
+---
+
 ## 1. Hypothesis
 
 The *Drosophila* nervous system has been reconstructed across multiple independent specimens, sexes, and anatomical preparations. Schlegel et al. (2024) established a consensus cell-type atlas spanning five datasets, demonstrating that **cell-type identity** is reproducible at the morphological level. A deeper unresolved question is whether **synaptic connectivity itself** is structurally invariant across independently prepared connectomes.
