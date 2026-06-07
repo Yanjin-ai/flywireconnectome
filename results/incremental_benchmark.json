@@ -3,10 +3,10 @@
   "batches": 40,
   "delta_size": 15,
   "n_disagreement_components": 1,
-  "consensus_impact_query_us": 2.2,
+  "consensus_impact_query_us": 2.1,
   "by_radius": {
     "1": {
-      "mean_speedup": 2.87,
+      "mean_speedup": 2.93,
       "mean_pct_resolved": 88.7,
       "exact_match": "0/40",
       "mean_size_error": 3.1
@@ -18,13 +18,13 @@
       "mean_size_error": 0.0
     },
     "3": {
-      "mean_speedup": 0.85,
+      "mean_speedup": 0.83,
       "mean_pct_resolved": 100.0,
       "exact_match": "40/40",
       "mean_size_error": 0.0
     },
     "exact": {
-      "mean_speedup": 0.95,
+      "mean_speedup": 0.92,
       "mean_pct_resolved": 100.0,
       "exact_match": "40/40",
       "mean_size_error": 0.0

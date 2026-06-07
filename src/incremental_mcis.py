@@ -225,6 +225,26 @@ def impact_query(be, fe, me, dataset, ops):
             "neurons_affected": sorted(neurons)}
 
 
+def qc_report(impact, ct_map):
+    """Human-readable connectome version-QC report from an impact_query result.
+    ct_map: local node index -> cell-type label."""
+    def name(i):
+        return ct_map.get(i, str(i))
+    lines = ["Connectome version QC report",
+             "=" * 32,
+             f"Conserved (all-3) edges gained: {len(impact['consensus_gained'])}",
+             f"Conserved (all-3) edges lost:   {len(impact['consensus_lost'])}",
+             f"Neurons touching conserved wiring: {len(impact['neurons_affected'])}"]
+    for (i, j) in impact["consensus_lost"]:
+        lines.append(f"  LOST  {name(i)} -> {name(j)}  (a published conserved edge "
+                     "would disappear)")
+    for (i, j) in impact["consensus_gained"]:
+        lines.append(f"  GAINED {name(i)} -> {name(j)}")
+    if not impact["consensus_gained"] and not impact["consensus_lost"]:
+        lines.append("  (this edit touches no conserved circuit)")
+    return "\n".join(lines)
+
+
 # ─────────────────────────── benchmark ─────────────────────────────────────
 def main():
     import argparse
@@ -307,6 +327,19 @@ def main():
     iq_mean_us = float(np.mean(iq_times)) * 1e6
     print(f"  Consensus-impact query (O(|ΔE|), {args.delta_size} edits): "
           f"{iq_mean_us:.1f} µs/query (independent of the {ng}-node graph size)")
+
+    # demo QC report: delete one real consensus edge and show the report
+    ct_map = {loc: str(solver._triples.iloc[solver._gl[loc]].get("cell_type", loc))
+              for loc in range(ng)}
+    consensus0 = list(set(solver._gbe) & set(solver._gfe) & set(solver._gme))
+    if consensus0:
+        i, j = consensus0[0]
+        demo = impact_query(set(solver._gbe), set(solver._gfe), set(solver._gme),
+                            "FAFB", [("edge_delete", i, j)])
+        report = qc_report(demo, ct_map)
+        print("\n  " + report.replace("\n", "\n  "))
+        with open(results_dir() + "qc_report_demo.txt", "w") as f:
+            f.write(report + "\n")
 
     out = {"giant_nodes": ng, "batches": args.batches,
            "delta_size": args.delta_size, "n_disagreement_components": n_comp,

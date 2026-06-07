@@ -1,0 +1,6 @@
+Connectome version QC report
+================================
+Conserved (all-3) edges gained: 0
+Conserved (all-3) edges lost:   1
+Neurons touching conserved wiring: 2
+  LOST  ANXXX202_b -> AN27X017  (a published conserved edge would disappear)
