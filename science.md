@@ -180,8 +180,8 @@ We answer this at the edge level ([`src/conservation_track.py`](src/conservation
 
 So while node-count MCIS is degree-explained, **specific synaptic connectivity is conserved 7.4× above the degree-sequence expectation** — strong, unambiguous evidence that the cross-connectome agreement reflects real wiring identity, not merely matched degree distributions. This reframes the contribution from a binary "conserved circuit" to a continuous **conservation track**: every neuron receives a conservation z-score (observed consensus-incident edges vs degree-null), yielding a ranked map of which neurons carry the conserved wiring (top: ANXXX108 z=35, DNge106 z=28, DNg73/AN17B008 z=21). This per-neuron track is what the Neuroglancer overlay (§10.5) colours.
 
-![Fig. 3 — Conservation track](figures/figure10_conservation_track.png)
-**Figure 3.** **(A)** Edge support across connectomes (1 / 2 / all-3). **(B)** Beyond-degree test: observed 2,609 consensus edges vs degree-preserving null 353 ± 17 (Z = 136σ). **(C)** Per-neuron conservation z-score track.
+![Fig. 10 — Conservation track](figures/figure10_conservation_track.png)
+**Figure 10.** **(A)** Edge support across connectomes (1 / 2 / all-3). **(B)** Beyond-degree test: observed 2,609 consensus edges vs degree-preserving null 353 ± 17 (Z = 136σ). **(C)** Per-neuron conservation z-score track.
 
 ### 4.7 Robustness to connectomic reconstruction error
 
@@ -196,8 +196,8 @@ Every connectome carries proofreading error. To test whether the result is an ar
 
 N **degrades gracefully** (≈ linear, no cliff): even with 20% of every connectome's edges corrupted, a 73-neuron conserved circuit survives. The conserved backbone is therefore a stable structural feature, not a fragile coincidence of the specific reconstructions.
 
-![Fig. 4 — Reconstruction-error robustness](figures/figure13_stringency.png)
-**Figure 4.** MCIS size vs per-connectome edge perturbation; graceful, near-linear decline.
+![Fig. 11 — Reconstruction-error robustness](figures/figure13_stringency.png)
+**Figure 11.** MCIS size vs per-connectome edge perturbation; graceful, near-linear decline.
 
 ---
 
@@ -251,6 +251,23 @@ The most represented developmental hemilineages among circuit neurons are LB12, 
 
 Among neurons with an annotated `cns_network` target: leg VNC (38 neurons, locomotion), dorsal VNC/flight (18), lateral brain (12), flange median bundle/whole-body coordination (11), posterior brain (8), abdominal VNC (7); 7 neurons are unannotated. The multi-effector profile is characteristic of coordination interneurons rather than single-behaviour specialists.
 
+### 6.5 Hub neurons: motor modules and documented function
+
+The 13 cell types that carry the 12 conserved edges, grounded in Codex annotations (cell type, neurotransmitter, VNC/brain target) and the descending-neuron literature. We deliberately mark documented single-type function vs target-inferred module — most individual DN/AN types are not yet behaviourally characterised, and we do not over-claim.
+
+| Hub cell type(s) | NT | Target (`cns_network`) | Motor module (Namiki et al. 2018) | Documented function |
+|---|---|---|---|---|
+| **DNg02** (DNg02_g) | ACh | dorsal VNC | wing / flight neuropil | **Yes** — a population of ≥15 pairs that regulates wingbeat amplitude and flight steering via a population code (Schnell, Ros & Dickinson 2022) |
+| DNg04, DNg79, DNa15 | ACh | dorsal VNC | wing / neck / flight | Target-inferred (dorsal motor neuropil); single-type behaviour not yet characterised |
+| DNge019, DNge020 | ACh | leg VNC | leg / locomotion | Target-inferred (leg motor circuits); not individually characterised |
+| DNp58 | ACh | abdominal VNC | abdominal / postural | Target-inferred; not individually characterised |
+| DNp47 | ACh | posterior brain | brain-targeting DN | Not individually characterised |
+| DNge076, DNp65, DNp54 | **GABA** | flange median bundle / post. brain | inhibitory DNs | Inhibitory; not individually characterised |
+| AN09B033 | ACh | (ascending) | proprioceptive feedback | Ascending; not individually characterised |
+| AN06A027 | Glu | (ascending) | proprioceptive feedback | Ascending; not individually characterised |
+
+Two observations follow. (i) The conserved core is **multi-module**: it spans wing/flight (DNg-class, dorsal VNC), leg/locomotion (DNge-class, leg VNC) and abdominal/postural (DNp58, AN06A027) effectors — consistent with a cross-program coordination backbone rather than a single-behaviour pathway. (ii) It is **anchored by a documented controller**: DNg02, the only individually characterised type in the set, is a flight-motor population — its three-way structural conservation means a known population-code flight controller sits inside the invariant backbone. The presence of GABAergic descending neurons (DNge076, DNp65, DNp54) alongside cholinergic ones gives the mixed excitatory/inhibitory chemistry expected of a feedforward-inhibition coordination motif (§8.3).
+
 ---
 
 ## 7. Sexual Conservation Analysis
@@ -289,7 +306,7 @@ Three neurotransmitter types appear among dimorphic neurons: ACh (9), Glu (2), s
 
 ### 8.1 Structural evidence for the sensorimotor bottleneck
 
-Pospisil et al. (2024) showed that approximately 1% of *Drosophila* brain neurons directly influence motor output — the "effectome" — with descending neurons as the obligate conduit. Our result provides **direct structural corroboration**: the largest isomorphic subgraph across three independent connectomes consists almost entirely of DNs and ANs (93.3% of circuit neurons). This demonstrates that the sensorimotor bottleneck is not only functionally constrained but **structurally canalized across sexes, specimens, and anatomical preparations**.
+Pospisil et al. (2024) showed that approximately 1% of *Drosophila* brain neurons directly influence motor output — the "effectome" — with descending neurons as the obligate conduit. Our result provides **direct structural corroboration**: the largest isomorphic subgraph across three independent connectomes consists almost entirely of DNs and ANs (93.3% of circuit neurons). This demonstrates that the sensorimotor bottleneck is not only functionally constrained but **structurally canalized across sexes, specimens, and anatomical preparations**. Notably, the conserved core includes **DNg02** — a documented flight-motor population that sets wingbeat amplitude through a population code (Schnell et al. 2022) — so a behaviourally characterised controller sits inside the invariant backbone (§6.5).
 
 ### 8.2 Developmental constraint as the mechanistic basis
 
@@ -387,3 +404,6 @@ These three directions are implemented in this repository (not just proposed):
 14. Maslov S. & Sneppen K. (2002) Specificity and stability in topology of protein networks. *Science* 296, 910–913. [doi:10.1126/science.1065103](https://doi.org/10.1126/science.1065103) — *Degree-preserving rewiring null model.*
 15. Lappalainen J.K. et al. (2024) Connectome-constrained networks predict neural activity across the fly visual system. *Nature* 634, 1132–1140. [doi:10.1038/s41586-024-07939-3](https://doi.org/10.1038/s41586-024-07939-3) — *Connectome-constrained mechanistic models; sparse-connectivity regime.*
 16. McCreesh C., Prosser P. & Trimble J. (2017) A partitioning algorithm for maximum common subgraph problems (McSplit). *IJCAI* 712–719. — *Modern branch-and-bound MCS solver.*
+17. Namiki S., Dickinson M.H., Wong A.M., Korff W. & Card G.M. (2018) The functional organization of descending sensory-motor pathways in *Drosophila*. *eLife* 7, e34272. [doi:10.7554/eLife.34272](https://doi.org/10.7554/eLife.34272) — *DN types and their leg/neck/wing VNC motor targets.*
+18. Schnell B., Ros I.G. & Dickinson M.H. (2022) A population of descending neurons that regulates the flight motor of *Drosophila*. *Current Biology* 32, 1189–1196. [doi:10.1016/j.cub.2022.01.007](https://doi.org/10.1016/j.cub.2022.01.007) — *DNg02 population-code control of wingbeat amplitude.*
+19. Cande J. et al. (2018) Optogenetic dissection of descending behavioral control in *Drosophila*. *eLife* 7, e34275. [doi:10.7554/eLife.34275](https://doi.org/10.7554/eLife.34275) — *DN activation → behaviour mapping.*
