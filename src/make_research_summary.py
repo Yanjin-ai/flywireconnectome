@@ -112,9 +112,10 @@ def main():
     f6 = os.path.join(figures_dir(), "figure6_spatial.png")
     if os.path.exists(f6):
         axm.imshow(mpimg.imread(f6))
-    axm.text(0, -0.06, f"Paste results/codex_circuit_ids.txt ({n} FAFB root IDs) "
-             f"into {CODEX} → 3D meshes (public, no token). Anatomical "
-             "distribution shown; meshes concentrate on the cervical connective.",
+    axm.text(0, -0.06, f"Verified Codex 3D-mesh view: all {n} FAFB neurons render "
+             "inside the whole-brain mesh and converge at the midline / cervical "
+             "connective (live link in results/codex_3d_url.txt; IDs in "
+             "codex_circuit_ids.txt). Anatomical distribution shown here.",
              transform=axm.transAxes, fontsize=7, color="#444", wrap=True)
 
     # (3) observations / hypothesis

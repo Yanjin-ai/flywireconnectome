@@ -93,7 +93,7 @@ An eigenvector-based MIS heuristic on the disagreement graph reaches **~95% of t
 | Solution CSV: 3 dataset columns, N matched-neuron rows | [`network.csv`](network.csv) — 105 rows × {BANC, FAFB, MANC} |
 | Maximise N; mutually isomorphic directed induced subgraphs (edge ⟺ in all, direction preserved) | N=105, 12 edges, verified `isomorphic=True` ([`results/canonical_results.json`](results/canonical_results.json)) |
 | Research: network-graph visualization | one-pager panel 1 + `figures/figure1`, `figure3` |
-| Research: Codex 3D meshes | [`results/codex_circuit_ids.txt`](results/codex_circuit_ids.txt) (105 FAFB IDs → paste into [codex.flywire.ai](https://codex.flywire.ai/), public/no token) + [`results/neuroglancer_state.json`](results/neuroglancer_state.json); see [`results/codex_links.md`](results/codex_links.md) |
+| Research: Codex 3D meshes | **Verified** — all 105 neurons render in the Codex 3D viewer inside the FAFB whole-brain mesh (live link in [`results/codex_3d_url.txt`](results/codex_3d_url.txt); IDs in [`results/codex_circuit_ids.txt`](results/codex_circuit_ids.txt); see [`results/codex_links.md`](results/codex_links.md)) |
 | Research: observations / hypothesis | one-pager panel 3 + science.md §5–§8 |
 | Research: literature & citations | one-pager refs + science.md References (13) |
 | **Concise one-page summary (one dataset = FAFB)** | **[`research_summary_fafb.pdf`](research_summary_fafb.pdf)** |
