@@ -1,77 +1,77 @@
 {
-  "N": 105,
+  "N": 109,
   "composition": {
     "descending": [
-      65,
-      61.9
+      67,
+      61.5
     ],
     "ascending": [
-      33,
-      31.4
+      34,
+      31.2
     ],
     "sensory_ascending": [
-      5,
-      4.8
+      6,
+      5.5
     ],
     "sensory_descending": [
       2,
-      1.9
+      1.8
     ]
   },
   "neurotransmitter": {
     "acetylcholine": [
-      73,
-      69.5
+      69,
+      63.3
     ],
     "gaba": [
-      17,
-      16.2
+      28,
+      25.7
     ],
     "glutamate": [
-      9,
-      8.6
+      5,
+      4.6
     ],
     "serotonin": [
       4,
-      3.8
+      3.7
     ],
     "dopamine": [
-      2,
-      1.9
+      3,
+      2.8
     ]
   },
   "sexual_conservation": {
-    "isomorphic": 93,
-    "dimorphic": 12,
-    "pct_isomorphic": 88.6
+    "isomorphic": 101,
+    "dimorphic": 8,
+    "pct_isomorphic": 92.7
   },
   "enrichment": {
     "descending": {
-      "circuit": 65,
-      "circuit_pct": 61.9,
+      "circuit": 67,
+      "circuit_pct": 61.5,
       "background": 1303,
       "background_pct": 0.94,
-      "fold": 66.2,
-      "p_value": 3.023738714142882e-104
+      "fold": 65.7,
+      "p_value": 4.1202072642525384e-107
     },
     "ascending": {
-      "circuit": 33,
-      "circuit_pct": 31.4,
+      "circuit": 34,
+      "circuit_pct": 31.2,
       "background": 1750,
       "background_pct": 1.26,
-      "fold": 25.0,
-      "p_value": 1.1945282826214377e-36
+      "fold": 24.8,
+      "p_value": 1.3769822706875746e-37
     }
   },
   "annotation_quality": {
     "metric": "manual_cluster non-null",
-    "circuit": 98,
-    "circuit_n": 105,
-    "circuit_pct": 93.3,
-    "noncircuit": 2814,
-    "noncircuit_n": 3309,
-    "noncircuit_pct": 85.0,
-    "fisher_p": 0.008451749193609043
+    "circuit": 101,
+    "circuit_n": 109,
+    "circuit_pct": 92.7,
+    "noncircuit": 2811,
+    "noncircuit_n": 3305,
+    "noncircuit_pct": 85.1,
+    "fisher_p": 0.013858025628114062
   },
   "fafb_background_total": 139244
 }

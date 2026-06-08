@@ -23,7 +23,9 @@ contract at the top of that script).
 | Heuristic optimality gap — hard (ego) sampling | `src/exact_ilp.py --sampler disagreement_ego` | `ilp_validation_ego.json` |
 | Heuristic optimality gap — hard (degree-stratified) sampling | `src/exact_ilp.py --sampler degree_stratified` | `ilp_validation_stratified.json` |
 | Greedy systematic-underestimation demo | `src/worstcase_greedy.py` | `worstcase_greedy.json` |
-| **Full-graph exact MIS certificate (LB ≤ N ≤ UB)** | `src/exact_full_mis.py` | `exact_full_mis.json` → `certificate` |
+| **Full-graph exact MIS certificate (LB ≤ N ≤ UB)** | `src/exact_full_mis.py --theta` | `exact_full_mis.json` → `certificate` |
+| **Production solver beats baseline greedy (105→109)** | `src/improve_mis.py` | `improve_mis.json` |
+| **Per-neuron NBLAST match confidence of the circuit** | `src/match_confidence.py` | `match_confidence.json`, `circuit_match_confidence.csv` |
 | Spectral vs greedy vs ILP quality/runtime | `src/spectral_mcis.py` | `spectral_validation.json` |
 | Reconstruction-error robustness (N vs edge flip p) | `src/stringency_sweep.py` | `stringency_sweep.json` |
 | Incremental MCIS / consensus-impact QC benchmark | `src/incremental_mcis.py` | `incremental_benchmark.json` |

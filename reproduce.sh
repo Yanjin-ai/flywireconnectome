@@ -5,15 +5,14 @@
 #
 # Determinism contract
 # --------------------
-#   * The headline result (N, the conserved circuit, all null Z-scores) is
-#     FULLY DETERMINISTIC: every stochastic step uses a fixed seed range
-#     (greedy multi-start = seeds 0..99; nulls = fixed seed offsets). Re-running
-#     this script on the same input files reproduces results/*.json bit-for-bit,
-#     on any machine.
-#   * The only non-determinism is CBC's branch-and-bound *time limit* in
-#     exact_full_mis.py: the certified lower bound is stable, but the exact
-#     upper bound found within the time budget can vary with CPU speed. The
-#     greedy lower bound (N) does not.
+#   * The headline result (N=109, the conserved circuit, all null Z-scores) is
+#     FULLY DETERMINISTIC: the production solver is GMIN + (1,2)-swap multi-start
+#     with per-restart fixed seeds (restart r uses seed r), and nulls use fixed
+#     seed offsets. Re-running on the same inputs reproduces results/*.json
+#     bit-for-bit, on any machine.
+#   * The only mild non-determinism is the Lovász-theta UPPER bound (SCS SDP,
+#     tol ~1e-3 → 136); the certified LOWER bound (N=109) and the circuit do not
+#     depend on CPU speed.
 #
 # Inputs (point MCIS_DATA_DIR at the directory containing them):
 #     banc_meta.feather   banc_626_edge_list.csv (or "... (2).csv")
@@ -42,7 +41,7 @@ step () { echo; echo "===> $*"; }
 
 # ---- 1. Canonical result: N, the circuit, the three null models -------------
 step "run_analysis.py  (N, seed distribution, correspondence + degree nulls)"
-python3 src/run_analysis.py --seeds 100 --null-trials 30
+python3 src/run_analysis.py --seeds 3000 --null-trials 30
 
 # ---- 2. Derived composition / enrichment / sexual-conservation stats ---------
 step "derived_stats.py  (composition, NT, descending/ascending enrichment)"
@@ -69,6 +68,10 @@ python3 src/exact_ilp.py --sampler degree_stratified --out ilp_validation_strati
 
 step "worstcase_greedy.py  (synthetic systematic-underestimation demo)"
 python3 src/worstcase_greedy.py
+step "improve_mis.py  (GMIN+2-swap beats baseline greedy on the real graph: 105->109)"
+python3 src/improve_mis.py --restarts 300
+step "match_confidence.py  (per-neuron NBLAST match confidence of the circuit)"
+python3 src/match_confidence.py
 
 step "spectral_mcis.py  (spectral vs greedy vs ILP quality/runtime)"
 python3 src/spectral_mcis.py
@@ -79,7 +82,7 @@ python3 src/stringency_sweep.py
 
 # ---- 7. Full-graph exact MIS certificate (slow; skipped with --quick) -------
 step "exact_full_mis.py  (full 987-node MIS certificate: LB <= N <= UB)"
-python3 src/exact_full_mis.py --seeds 40   # clique-cover UB is instant; LB = greedy multi-start
+python3 src/exact_full_mis.py --seeds 3000 --theta   # LB = GMIN multi-start (109); UB = Lovász theta (136)
 
 # ---- 8. Figures + abstract ---------------------------------------------------
 step "figures + abstract"

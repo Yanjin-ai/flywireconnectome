@@ -1,6 +1,6 @@
 # Codex 3D meshes — how to view the conserved circuit (no token)
 
-The 105 FAFB root IDs of the conserved circuit are in `codex_circuit_ids.txt`.
+The 109 FAFB root IDs of the conserved circuit are in `codex_circuit_ids.txt`.
 
 1. Open Codex: <https://codex.flywire.ai/> (public, no login required to browse).
 2. Paste the root IDs (comma- or newline-separated) into the cell search / multi-cell view to load their 3D meshes.
