@@ -39,8 +39,8 @@ streamlit run src/explorer_app.py
 
 ## What the explorer shows
 
-- Headline metrics (N, conserved edges, 7.4× edge conservation vs degree-null,
-  descending enrichment).
+- Headline metrics (N, conserved edges, 68.9× edge conservation vs a well-mixed
+  degree-null, descending enrichment).
 - **Conserved subgraph** tab — the conserved directed edges by cell type.
 - **Conservation track** tab — per-neuron conservation z-scores (top neurons +
   the ranked track curve).

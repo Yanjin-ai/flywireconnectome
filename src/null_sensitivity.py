@@ -2,10 +2,11 @@
 Null-model sensitivity analysis (reviewer-grade robustness of the headline).
 ============================================================================
 
-The headline beyond-degree result (§4.6) — "2,609 all-three consensus edges vs
-a degree-preserving null of 353 ± 17, i.e. 7.4x, Z ~ 136 sigma" — rests on a
-*degree-preserving rewiring* null produced by networkx `directed_edge_swap`.
-A careful reviewer asks four questions that the original code did NOT answer:
+The headline beyond-degree result (§4.6) rests on a *degree-preserving rewiring*
+null produced by networkx `directed_edge_swap`. An EARLIER version reported
+"2,609 consensus edges vs a null of 353 ± 17, i.e. 7.4x, Z ~ 136 sigma" — but
+that null was under-mixed. This script answers four questions the original code
+did NOT, and shows the corrected, well-mixed result is 2,609 vs ~38, i.e. ~69x:
 
   Q1  Is the null actually MIXED?  `directed_edge_swap` with too few swaps stays
       close to the observed graph, which *inflates* the null consensus count
