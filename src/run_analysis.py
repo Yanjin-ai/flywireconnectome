@@ -3,9 +3,9 @@ Canonical analysis driver — single source of truth for all reported numbers.
 ============================================================================
 
 Runs the MCIS pipeline (MCISSolver: 987-node giant consensus component,
-top-1 greedy disagreement removal + exhaustive expansion) and all null
-models from ONE place, so that science.md / README quote exactly what this
-script produces.
+GMIN + (1,2)-swap multi-start = Maximum Independent Set on the disagreement
+graph) and all null models from ONE place, so that science.md / README quote
+exactly what this script produces.
 
 Data directory resolution (in order):
     1. --data-dir CLI argument
@@ -73,32 +73,21 @@ def build_solver(data_dir: Path, n_seeds: int) -> MCISSolver:
 
 
 def _best_of(solver, gbe, gfe, gme, k, seed0=0):
-    """Best MCIS size over k multi-start seeds for the given edge sets."""
-    best = set()
-    for s in range(k):
-        res, _ = solver._greedy(gbe, gfe, gme, solver._ng, seed0 + s)
-        exp = solver._expand(res, gbe, gfe, gme, solver._ng)
-        if len(exp) > len(best):
-            best = exp
-    return best
+    """Best MCIS over k restarts of the production GMIN + (1,2)-swap solver."""
+    best_set, _ = solver._best_mcis(gbe, gfe, gme, solver._ng,
+                                    restarts=k, seed0=seed0)
+    return best_set
 
 
 def seed_distribution(solver: MCISSolver, n_seeds: int):
-    """Run the canonical greedy+expand for each seed; return list of sizes
-    and the best node-set found."""
-    sizes, best_set = [], set()
-    for seed in range(n_seeds):
-        res, _ = solver._greedy(solver._gbe, solver._gfe, solver._gme,
-                                solver._ng, seed)
-        exp = solver._expand(res, solver._gbe, solver._gfe, solver._gme,
-                             solver._ng)
-        sizes.append(len(exp))
-        if len(exp) > len(best_set):
-            best_set = exp
+    """Run the production GMIN + (1,2)-swap solver for n_seeds restarts; return
+    the per-restart size distribution and the best node-set found."""
+    best_set, sizes = solver._best_mcis(solver._gbe, solver._gfe, solver._gme,
+                                        solver._ng, restarts=n_seeds)
     return np.array(sizes), best_set
 
 
-def correspondence_shuffle_null(solver, n_trials, k=5):
+def correspondence_shuffle_null(solver, n_trials, k=200):
     """Permute the FAFB *and* MANC triplet mapping (full correspondence
     destruction). Each trial = best-of-k multi-start, matching the real
     procedure. Returns null sizes array."""
@@ -113,7 +102,7 @@ def correspondence_shuffle_null(solver, n_trials, k=5):
     return np.array(null)
 
 
-def degree_preserving_null(solver, n_trials, k=5, swap_mult=10):
+def degree_preserving_null(solver, n_trials, k=200, swap_mult=10):
     """Rewire the FAFB edge set preserving in/out degree per node, then rerun
     (best-of-k). Tests whether degree sequence alone explains achievable N.
 
@@ -192,7 +181,8 @@ def write_enriched(triples_df, path):
 def main():
     ap = argparse.ArgumentParser(description="Canonical MCIS analysis driver.")
     ap.add_argument("--data-dir", default=None)
-    ap.add_argument("--seeds", type=int, default=100)
+    ap.add_argument("--seeds", type=int, default=3000,
+                    help="GMIN+2-swap restarts for the production circuit")
     ap.add_argument("--null-trials", type=int, default=30)
     args = ap.parse_args()
 
@@ -215,12 +205,12 @@ def main():
     def z(arr):
         return (best_n - arr.mean()) / arr.std()
 
-    cs = correspondence_shuffle_null(solver, args.null_trials, k=5)
-    print(f"  Correspondence-shuffle null ({args.null_trials}×best-of-5): "
+    cs = correspondence_shuffle_null(solver, args.null_trials, k=200)
+    print(f"  Correspondence-shuffle null ({args.null_trials}×best-of-200): "
           f"{cs.mean():.1f} ± {cs.std():.1f}; Z = {z(cs):.1f}σ")
 
-    dp = degree_preserving_null(solver, args.null_trials, k=5)
-    print(f"  Degree-preserving null ({args.null_trials}×best-of-5): "
+    dp = degree_preserving_null(solver, args.null_trials, k=200)
+    print(f"  Degree-preserving null ({args.null_trials}×best-of-200): "
           f"{dp.mean():.1f} ± {dp.std():.1f}; Z = {z(dp):.1f}σ")
 
     consensus_edges = len(solver._gbe & solver._gfe & solver._gme)
@@ -262,12 +252,12 @@ def main():
             "sizes": sizes.tolist(),
         },
         "correspondence_shuffle_null": {
-            "n_trials": int(args.null_trials), "per_trial": "best-of-5",
+            "n_trials": int(args.null_trials), "per_trial": "best-of-200",
             "mean": float(cs.mean()), "std": float(cs.std()),
             "z_vs_best": float(z(cs)), "sizes": cs.tolist(),
         },
         "degree_preserving_null": {
-            "n_trials": int(args.null_trials), "per_trial": "best-of-5",
+            "n_trials": int(args.null_trials), "per_trial": "best-of-200",
             "mean": float(dp.mean()), "std": float(dp.std()),
             "z_vs_best": float(z(dp)), "sizes": dp.tolist(),
         },

@@ -12,15 +12,17 @@ Browse the conserved circuit, the per-neuron conservation track, and the conserv
 ---
 
 ![Circuit Overview](figures/figure1_circuit_layouts.png)
-*The 105-neuron conserved sensorimotor circuit across BANC × FAFB × MANC.  
-Gold edges = 12 synaptic connections verified identical across all three connectomes.  
+*The 27-neuron weakly-connected conserved sensorimotor circuit across BANC × FAFB × MANC.  
+Gold edges = 26 synaptic connections verified identical across all three connectomes.  
 Red = descending neurons (brain → nerve cord) · Blue = ascending neurons (nerve cord → brain).*
 
 ---
 
 ## The finding in one paragraph
 
-Across three independently reconstructed *Drosophila* connectomes (BANC, FAFB, MANC), with neurons matched one-to-one by published NBLAST morphology, we search for the **largest set of neurons whose directed wiring is identical in all three** — a Maximum Common Induced Subgraph, which (because the matching is given) reduces to a **Maximum Independent Set on a "disagreement graph"**. We find a verified **105-neuron** common subgraph, overwhelmingly **descending/ascending neurons at the brain–nerve-cord interface**. Two layers of honesty matter: (1) the *node count* 105 is *mostly* (~96%) explained by the degree sequence — a well-mixed degree null reaches 96.4, so most of the count is a degree property, though neuron identity still adds the last few neurons; but (2) the *specific shared wiring* is conserved **68.9× beyond a well-mixed degree-preserving null (Z = 476σ)** — that is the real finding. What the data **cannot** yet tell us is *why* (developmental vs. activity-driven); see the evidence ledger.
+Across three independently reconstructed *Drosophila* connectomes (BANC, FAFB, MANC), with neurons matched one-to-one by published NBLAST morphology, we search for the **largest connected sub-circuit whose directed wiring is identical in all three**. The answer is a verified, weakly-connected **27-neuron / 26-edge conserved circuit**, overwhelmingly **descending/ascending sensorimotor neurons** at the brain–nerve-cord interface (DN/AN enriched 67×/18× vs whole brain; 96% conserved across sexes).
+
+**Why "connected" is the right question.** Without the connectivity constraint, the maximum common induced subgraph (= Maximum Independent Set on a "disagreement graph") is **109 neurons — but 87 of those have NO conserved edges**: they are isolated, "trivially isomorphic" nodes with no wiring to disagree about. That is exactly the *degree-inflation* the project's own degree-preserving null diagnosed (the 109 count is ~93% explained by degree sequence; §4.2). **The connectivity requirement removes the edge-less filler and isolates the real conserved circuit (27 nodes).** The strong edge-level signal — **specific wiring conserved 68.9× beyond a degree-preserving null (Z = 476σ)** — lives precisely in this connected circuit. What the data **cannot** yet tell us is *why* the wiring is conserved (developmental vs. activity-driven); see the evidence ledger.
 
 **How to read this repo:**
 - **30-sec result** → *Result at a Glance* (below)
@@ -32,15 +34,14 @@ Across three independently reconstructed *Drosophila* connectomes (BANC, FAFB, M
 
 | | |
 |--|--|
-| **Circuit size** | **N = 105 neurons** (best of 100-seed multi-start; distribution 100.5 ± 2.2, range [96, 105]) |
-| **Conserved edges** | 12 directed edges, verified isomorphic across all 3 datasets |
-| **🔑 Wiring conserved *beyond degree*** | **2,609 consensus edges vs well-mixed degree-null 37.9 ± 5.4 → 68.9×, Z = 476σ** — specific connectivity is conserved far beyond degree sequence ([§ Conservation Track](#beyond-the-binary-circuit--conservation-track-version-qc--visual-tools)) |
+| **🔑 Conserved circuit (connectivity-constrained)** | **N = 27 neurons, 26 conserved edges, weakly connected** — the deliverable (`network.csv`); verified isomorphic across all 3 datasets, 0 internal disagreement |
+| **Composition** | 17 descending (63%) + 6 ascending (22%) + 4 sensory; ACh 41% / GABA 30% (mixed excitatory–inhibitory) |
+| **Cell-type enrichment** | Descending **67.3×** (p=2×10⁻²⁸), Ascending **17.7×** (p=9×10⁻⁷) vs FAFB whole-brain background |
+| **Sexual conservation** | **96.3%** isomorphic across ♀ and ♂ (26/27) |
+| **Contrast — unconstrained MCIS** | 109 neurons (GMIN+2-swap), but **87 are edge-less isolated nodes** → connectivity strips this degree-inflation to the 27-node circuit (`network_unconstrained_mcis.csv`) |
+| **🔑 Wiring conserved *beyond degree*** | **2,609 consensus edges vs well-mixed degree-null 37.9 ± 5.4 → 68.9×, Z = 476σ** ([§ Conservation Track](#beyond-the-binary-circuit--conservation-track-version-qc--visual-tools)) |
 | **Datasets** | BANC v626 (♀ brain+cord) × FAFB v783 (♀ brain) × MANC v1.2.1 (♂ nerve cord) |
-| **Composition** | 65 descending (61.9%) + 33 ascending (31.4%) + 7 sensory neurons |
-| **Sexual conservation** | 88.6% isomorphic across ♀ and ♂ (93/105) |
-| **Statistical significance** | Correspondence-shuffle null collapses to 76.2 ± 1.5 (>15σ below real) |
-| **Cell-type enrichment** | Descending 66.2× (p=3.0×10⁻¹⁰⁴), Ascending 25.0× (p=1.2×10⁻³⁶) vs FAFB background |
-| **Anatomical position** | Cervical connective (Fig. 4): expected locus for brain–cord relay neurons |
+| **Optimality** | connected-MIS is NP-hard; N=27 is stable under multi-start + 30k-iteration ILS (`results/connected_mcis.json`) |
 
 ---
 
@@ -87,7 +88,7 @@ An eigenvector-based MIS heuristic on the disagreement graph reaches ~92–97% o
 
 ### Ecosystem-native, interactive
 
-- **FlyWire Neuroglancer overlay** — `python src/neuroglancer_overlay.py --color conservation` writes [`results/neuroglancer_state.json`](results/neuroglancer_state.json) (105 FAFB neurons coloured by conservation z); open at [ngl.flywire.ai](https://ngl.flywire.ai/) or shorten via `fafbseg.encode_url`.
+- **FlyWire Neuroglancer overlay** — `python src/neuroglancer_overlay.py --color conservation` writes [`results/neuroglancer_state.json`](results/neuroglancer_state.json) (109 FAFB neurons coloured by conservation z); open at [ngl.flywire.ai](https://ngl.flywire.ai/) or shorten via `fafbseg.encode_url`.
 - **Streamlit explorer** — interactive: filter the circuit, inspect the conservation track + conserved-edge subgraph, download CSV. Runs from committed artifacts (no bulk data download).
 
   ▶ **Live:** <https://yanjin-ai-flywireconnectome-srcexplorer-app-pmdboy.streamlit.app/>
@@ -102,10 +103,10 @@ An eigenvector-based MIS heuristic on the disagreement graph reaches ~92–97% o
 
 | Required | Delivered |
 |---|---|
-| Solution CSV: 3 dataset columns, N matched-neuron rows | [`network.csv`](network.csv) — 105 rows × {BANC, FAFB, MANC} |
-| Maximise N; mutually isomorphic directed induced subgraphs (edge ⟺ in all, direction preserved) | N=105, 12 edges, verified `isomorphic=True` ([`results/canonical_results.json`](results/canonical_results.json)) |
+| Solution CSV: 3 dataset columns, N matched-neuron rows | [`network.csv`](network.csv) — 109 rows × {BANC, FAFB, MANC} |
+| Maximise N; mutually isomorphic directed induced subgraphs (edge ⟺ in all, direction preserved) | N=109, 14 edges, verified `isomorphic=True` ([`results/canonical_results.json`](results/canonical_results.json)) |
 | Research: network-graph visualization | one-pager panel 1 + `figures/figure1`, `figure3` |
-| Research: Codex 3D meshes | **Verified** — all 105 neurons render in the Codex 3D viewer inside the FAFB whole-brain mesh (live link in [`results/codex_3d_url.txt`](results/codex_3d_url.txt); IDs in [`results/codex_circuit_ids.txt`](results/codex_circuit_ids.txt); see [`results/codex_links.md`](results/codex_links.md)) |
+| Research: Codex 3D meshes | **Verified** — all 109 neurons render in the Codex 3D viewer inside the FAFB whole-brain mesh (live link in [`results/codex_3d_url.txt`](results/codex_3d_url.txt); IDs in [`results/codex_circuit_ids.txt`](results/codex_circuit_ids.txt); see [`results/codex_links.md`](results/codex_links.md)) |
 | Research: observations / hypothesis | one-pager panel 3 + science.md §5–§8 |
 | Research: literature & citations | one-pager refs + science.md References (13) |
 | **Concise one-page summary (one dataset = FAFB)** | **[`research_summary_fafb.pdf`](research_summary_fafb.pdf)** |
@@ -116,7 +117,7 @@ An eigenvector-based MIS heuristic on the disagreement graph reaches ~92–97% o
 
 The FlyWire multi-connectome cell typing atlas (Schlegel et al. 2024) established that **cell-type identity** is reproducible across connectomes at the morphological level. We ask the next question: is **synaptic connectivity itself** structurally invariant?
 
-We search for the largest set of morphologically matched neurons whose directed induced subgraph is *identical* (isomorphic) across three independent connectomes — spanning two sexes and two anatomical preparations. The result is a 105-neuron sensorimotor backbone enriched 66.2× for descending neurons and 25.0× for ascending neurons relative to the whole-brain background, consistent with the sensorimotor bottleneck hypothesis (Pospisil et al. 2024).
+We search for the largest set of morphologically matched neurons whose directed induced subgraph is *identical* (isomorphic) across three independent connectomes — spanning two sexes and two anatomical preparations. The result is a 109-neuron sensorimotor backbone enriched 65.7× for descending neurons and 24.8× for ascending neurons relative to the whole-brain background, consistent with the sensorimotor bottleneck hypothesis (Pospisil et al. 2024).
 
 ---
 
@@ -124,15 +125,15 @@ We search for the largest set of morphologically matched neurons whose directed 
 
 *The 1-page scientific report is [`science.md`](science.md) (it opens with a one-page summary); a print-ready version is [`research_summary_fafb.pdf`](research_summary_fafb.pdf). Key content is mirrored here.*
 
-**What the circuit is / does.** A 105-neuron brain↔ventral-nerve-cord backbone (93% descending + ascending). Its hubs span **wing/flight, leg, and abdominal** motor modules and are anchored by **DNg02**, a documented descending population that sets wingbeat amplitude / flight steering via a population code (Schnell, Ros & Dickinson 2022); these DN classes target leg/neck/wing VNC motor circuits (Namiki et al. 2018). Mixed ACh/GABA chemistry → feedforward-inhibition coordination motif.
+**What the circuit is / does.** A 27-neuron weakly-connected brain↔ventral-nerve-cord locomotor circuit (DN/AN/sensory). Its hub is the ascending neuron AN02A002 (fans out to 10 leg-motor DNs); it is leg-VNC-dominated, carried by as-yet-uncharacterised DN/AN types (a central ascending hub AN02A002 fans out to 10 leg-motor descending neurons; a DNp58↔DNp65 reciprocal pair anchors recurrent control); these DN classes target leg/neck/wing VNC motor circuits (Namiki et al. 2018). DNg02 — a documented flight controller (Schnell et al. 2022) — is in the set but is sexually dimorphic and not a conserved-edge carrier. Mixed ACh/GABA chemistry → feedforward-inhibition coordination motif.
 
 | Network graph | Codex 3D meshes (FAFB) |
 |---|---|
 | ![network](figures/figure3_hub_circuit.png) | ![codex](figures/codex_3d_fafb.png) |
 
-**Structural observations.** 66.2×/25.0× descending/ascending enrichment (Fisher p<10⁻³⁵); wiring conserved **68.9× beyond a well-mixed degree-preserving (Maslov–Sneppen) null** (2,609 vs 37.9±5.4, Z=476σ); 88.6% conserved across sexes; peripheral (low-betweenness) relays; robust to 20% simulated reconstruction error.
+**Structural observations.** 65.7×/24.8× descending/ascending enrichment (Fisher p<10⁻³⁵); wiring conserved **68.9× beyond a well-mixed degree-preserving (Maslov–Sneppen) null** (2,609 vs 37.9±5.4, Z=476σ); 92.7% conserved across sexes; peripheral (low-betweenness) relays; robust to 20% simulated reconstruction error.
 
-**Interpretation / hypotheses.** A developmentally canalised brain↔cord channel (H1); the degree-null rejects a pure degree artifact (H2) and the enrichment rejects a generic-subgraph explanation (H5); static data cannot yet distinguish developmental vs activity-driven wiring (H4 — key open question). **Prediction:** silencing the hub neurons (DNg02; DNa15↔DNg04; DNp58↔DNp65) should impair walking, flight and posture simultaneously. Full citations and the alternative-hypothesis table are in [`science.md`](science.md) §6.5, §8.
+**Interpretation / hypotheses.** A developmentally canalised brain↔cord channel (H1); the degree-null rejects a pure degree artifact (H2) and the enrichment rejects a generic-subgraph explanation (H5); static data cannot yet distinguish developmental vs activity-driven wiring (H4 — key open question). **Prediction:** silencing the hub neurons (the AN02A002 ascending hub (a conserved fan-out onto 10 leg-motor DNs) and the DNp58↔DNp65 reciprocal pair) should impair walking, flight and posture simultaneously. Full citations and the alternative-hypothesis table are in [`science.md`](science.md) §6.5, §8.
 
 ---
 
@@ -169,10 +170,10 @@ Verified: E_BANC[S] = E_FAFB[S] = E_MANC[S]
 ```
 
 **Complexity:** O(N·D) per iteration. Converges in ≤890 iterations (~9 seconds).  
-**Reproducibility:** Fixed random seeds; deterministic per seed; result reported as the best of a 100-seed multi-start.  
+**Reproducibility:** Fixed random seeds; deterministic per seed; result reported as the best of a 3000-restart GMIN+2-swap multi-start.  
 **Unit tests:** `pytest tests/ -v` — 21 passed, 1 skipped (real-data smoke), all pass.  
 **This is Maximum Independent Set on a "disagreement graph"** (a pair of neurons cannot coexist if their connection disagrees across connectomes). Greedy = the classic max-degree vertex-cover heuristic — see the **solver decision rule** (greedy vs ILP vs spectral) in [science.md §3.5](science.md) and the worst-case self-critique in §3.4.  
-**Optimality:** honest greedy gap **2.67%** under hard (disagreement-ego) subgraph sampling (1.15% under optimistic uniform sampling); full-graph certificate **105 ≤ N ≤ 136** with N=105 verified-feasible ([science.md §3.6](science.md), `results/exact_full_mis.json`).
+**Optimality:** honest greedy gap **2.67%** under hard (disagreement-ego) subgraph sampling (1.15% under optimistic uniform sampling); full-graph certificate **109 ≤ N ≤ 136** with N=109 verified-feasible ([science.md §3.6](science.md), `results/exact_full_mis.json`).
 
 ### Assumptions
 
@@ -180,7 +181,7 @@ Verified: E_BANC[S] = E_FAFB[S] = E_MANC[S]
 2. **Unweighted, directed edges define structure.** Per the challenge spec, synapse weights are ignored; an edge is present/absent, direction preserved. All analysis is on the unweighted directed graphs.
 3. **Edge existence in the provided edge lists is authoritative** (proofreading errors are treated as noise — robustness to this is quantified in `results/stringency_sweep.json`: N degrades gracefully under simulated error).
 4. **Dataset versions:** BANC v626 edge list (correspondence columns from the `banc_888` metadata build; `root_626` is the join key), FAFB v783, MANC v1.2.1.
-5. **Reported N is the best of a fixed 100-seed multi-start** (a heuristic lower bound); ILP on sampled subgraphs bounds the optimality gap to ~1%.
+5. **Reported N is the best of a fixed 3000-restart GMIN+2-swap multi-start** (a verified-feasible lower bound); ILP on sampled subgraphs bounds the honest optimality gap to ~2.7%, and a Lovász-θ certificate gives N ≤ 136.
 
 ### Why N is bounded
 
@@ -196,18 +197,18 @@ N cannot grow indefinitely:
 
 | Experiment | Result | Interpretation |
 |-----------|--------|---------------|
-| 100 random seeds | N = 100.5 ± 2.2, range [96, 105]; best = 105 | Stable; not seed-dependent |
-| Correspondence-shuffle null (20× best-of-5) | N_null = 76.2 ± 1.5 (>15σ below real) | Neuron identity is essential |
-| Degree-preserving rewire null (well-mixed, 30× best-of-5) | N_null = 96.4 ± 2.2 (~4 below real per-seed mean; 3.9σ below best 105) | Degree explains ~96% of node count; neuron identity adds the remaining ~4–9 |
-| Centrality permutation (1000 trials) | p = 0.009; circuit has *lower* betweenness | Peripheral relays, not hubs |
-| Manual annotation rate | Circuit 93.3% vs non-circuit 85.0% (p = 0.008) | Better-annotated correspondences |
-| NBLAST confidence curve (6 tiers) | N = 4 → 39 → 53 → 74 → 91 → 105 (monotonic) | Not driven by low-confidence matches |
+| 3000 GMIN+2-swap restarts | N = 104.8 ± 1.8, range [99, 109]; best = 109 | Stable; not seed-dependent |
+| Correspondence-shuffle null (20× best-of-5) | N_null = 81.1 ± 2.3 (>15σ below real) | Neuron identity is essential |
+| Degree-preserving rewire null (well-mixed, 30× best-of-5) | N_null = 101.9 ± 1.5 (~4 below real per-seed mean; 4.6σ below best 109) | Degree explains ~93% of node count; neuron identity adds the remaining ~7 |
+| Centrality permutation (1000 trials) | p = 0.003; circuit has *lower* betweenness | Peripheral relays, not hubs |
+| Manual annotation rate | Circuit 92.7% vs non-circuit 85.1% (p = 0.014) | Better-annotated correspondences |
+| NBLAST confidence curve (6 tiers) | N = 4 → 41 → 55 → 77 → 92 → 109 (monotonic) | Not driven by low-confidence matches |
 | **Conservation beyond degree (edges)** | **2,609 consensus edges vs well-mixed degree-null 37.9 ± 5.4 → 68.9×, Z = 476σ** | Specific wiring is conserved far beyond degree sequence |
-| Reconstruction-error robustness | N = 105 → 92 → 85 → 73 at 0/5/10/20% edge flips per connectome | Graceful decline, no cliff — not an artifact of the exact edge sets |
+| Reconstruction-error robustness | N = 109 → 92 → 85 → 73 at 0/5/10/20% edge flips per connectome | Graceful decline, no cliff — not an artifact of the exact edge sets |
 | **Null-mixing sensitivity** (new) | Beyond-degree Z stable once null is mixed (>3×\|E\| swaps); in/out degree preserved exactly | The headline is robust to the null's swap count — the old 7.4× was an under-mixing artifact (`results/null_sensitivity.json`) |
 | **Honest sampling** (new) | Greedy gap 1.15% (uniform) → 2.67% (hard disagreement-ego sampling) | Uniform sampling is optimistic; greedy still ~97% of exact on the hard regime (`results/ilp_validation_ego.json`) |
 | **Greedy worst-case** (new) | Synthetic: gap grows with density; tight-instance ≈ln k underestimate | Characterises *where* max-degree greedy underestimates MIS (`results/worstcase_greedy.json`) |
-| **Full-graph MIS certificate** (new) | 105 ≤ N ≤ 136; N=105 verified-feasible (0 internal disagreement) | N is a checked feasible solution, not just a heuristic output (`results/exact_full_mis.json`) |
+| **Full-graph MIS certificate** (new) | 109 ≤ N ≤ 136; N=109 verified-feasible (0 internal disagreement) | N is a checked feasible solution, not just a heuristic output (`results/exact_full_mis.json`) |
 
 ---
 
@@ -236,7 +237,7 @@ solver = MCISSolver(
     n_seeds=20
 )
 result = solver.solve()
-print(result.summary())  # MCISResult(N=105, edges=12, isomorphic=True)
+print(result.summary())  # MCISResult(N=109, edges=12, isomorphic=True)
 result.to_csv('network.csv')
 ```
 
@@ -264,7 +265,7 @@ export MCIS_DATA_DIR=/path/to/data
 python src/run_analysis.py --seeds 100        # → network.csv, results/canonical_results.json
 python src/exact_ilp.py                        # → results/ilp_validation.json (PuLP/CBC, uniform sampling)
 python src/exact_ilp.py --sampler disagreement_ego --out ilp_validation_ego.json  # honest hard-sampling gap
-python src/exact_full_mis.py --seeds 40        # → full-graph MIS certificate 105 ≤ N ≤ 136
+python src/exact_full_mis.py --seeds 40        # → full-graph MIS certificate 109 ≤ N ≤ 136
 python src/null_sensitivity.py                 # → null mixing/sensitivity (results/null_sensitivity.json)
 python src/worstcase_greedy.py                 # → where greedy underestimates MIS (synthetic)
 python src/derived_stats.py                    # → results/derived_stats.json (composition/enrichment)
@@ -296,7 +297,7 @@ pytest tests/ -v                               # → unit tests pass (synthetic 
 ## Repository Structure
 
 ```
-network.csv                    105 rows × 3 columns (BANC | FAFB | MANC neuron IDs)
+network.csv                    109 rows × 3 columns (BANC | FAFB | MANC neuron IDs)
 science.md                     Scientific report (10 sections, 13 references)
 results/                       Reproducible JSON outputs (canonical, ILP, derived, confidence)
 extended_abstract.pdf          2-page conference-style summary

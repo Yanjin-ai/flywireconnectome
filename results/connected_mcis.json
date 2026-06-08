@@ -1,0 +1,13 @@
+{
+  "N_connected": 27,
+  "conserved_edges": 26,
+  "weakly_connected": true,
+  "internal_disagreement": 0,
+  "vs_unconstrained_MCIS": {
+    "N": 109,
+    "components": 97,
+    "isolated_nodes": 87,
+    "note": "plain MCIS is dominated by edge-less neurons; connectivity removes them"
+  },
+  "restarts": 12000
+}

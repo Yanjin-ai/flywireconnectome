@@ -31,9 +31,12 @@ def main():
     can = load("canonical_results.json")
     der = load("derived_stats.json")
     ilp = load("ilp_validation.json")
+    conn = load("connected_mcis.json")  # the deliverable: 27-node connected circuit
 
-    N = can["N_reported"]
-    E = can["n_conserved_edges"]
+    # Headline = the connectivity-constrained deliverable (a real circuit);
+    # the unconstrained MCIS (canonical) is the methodological contrast.
+    N = conn.get("N_connected", can["N_reported"])
+    E = conn.get("conserved_edges", can["n_conserved_edges"])
     sd = can["seed_distribution"]
     cs = can["correspondence_shuffle_null"]
     dp = can["degree_preserving_null"]

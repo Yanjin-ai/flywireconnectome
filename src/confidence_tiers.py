@@ -58,7 +58,7 @@ def main():
         gfe = {(loc[u], loc[v]) for u, v in fe if u in loc and v in loc}
         gme = {(loc[u], loc[v]) for u, v in me if u in loc and v in loc}
         solver._ng = len(giant)
-        n = len(_best_of(solver, gbe, gfe, gme, 5))
+        n = len(_best_of(solver, gbe, gfe, gme, 200))
         rows.append({"pct": pct, "pool": k, "N": n})
         print(f"  top {pct:>3d}% | pool {k:>4d} | N = {n}")
 

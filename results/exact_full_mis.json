@@ -4,11 +4,11 @@
   "disagreement_edges": 44968,
   "density": 0.0924,
   "lower_bound": {
-    "N": 105,
+    "N": 109,
     "method": "greedy multi-start + expansion",
     "verified_independent": true,
-    "seed_max": 105,
-    "seed_mean": 100.5
+    "seed_max": 109,
+    "seed_mean": 104.77066666666667
   },
   "upper_bound": {
     "N": 136,
@@ -16,12 +16,12 @@
     "lovasz_theta": {
       "value": 136.29,
       "ub_floor": 136,
-      "seconds": 152.9
+      "seconds": 150.7
     },
     "method": "Lov\u00e1sz theta (numerical) \u2227 clique cover"
   },
   "cbc_crosscheck": null,
-  "certificate": "105 <= N <= 136",
+  "certificate": "109 <= N <= 136",
   "previous_reported_N": 105,
   "note": "Full-graph exact MIS does not close in reasonable time (one dense 987-node component, 45k constraints). The earlier '82 proven' was a pulp/CBC warmStart bug \u2014 warmStart fixed the 0-vars, yielding a spurious optimum below a known feasible solution. N=105 is verified feasible. Clique cover is the solver-free combinatorial UB; Lov\u00e1sz theta (if computed) is a tighter numerical SDP UB (SCS tol ~1e-3)."
 }

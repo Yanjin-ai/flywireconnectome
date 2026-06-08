@@ -1,0 +1,15 @@
+{
+  "production_greedy_best": 105,
+  "gmin_best": 108,
+  "gmin_plus_2swap_best": 109,
+  "overall_best_LB": 109,
+  "restarts": 300,
+  "kernelization": {
+    "removed_deg01": 0,
+    "residual_core_nodes": 987
+  },
+  "upper_bound_lovasz_theta": 136,
+  "gap_after": "109 <= N <= 136",
+  "previous_reported_N": 105,
+  "verdict": "best IS found = 109; EXCEEDS 105 \u2014 new true N, update docs"
+}
