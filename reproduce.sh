@@ -39,9 +39,15 @@ mkdir -p results figures
 
 step () { echo; echo "===> $*"; }
 
-# ---- 1. Canonical result: N, the circuit, the three null models -------------
-step "run_analysis.py  (N, seed distribution, correspondence + degree nulls)"
+# ---- 1. Canonical result: unconstrained MCIS (contrast) + nulls -------------
+step "run_analysis.py  (unconstrained MCIS N=109 contrast, nulls, centrality)"
 python3 src/run_analysis.py --seeds 3000 --null-trials 30
+mv -f network.csv network_unconstrained_mcis.csv 2>/dev/null || true
+mv -f network_enriched.csv network_enriched_unconstrained.csv 2>/dev/null || true
+
+# ---- 1b. THE DELIVERABLE: largest weakly-CONNECTED conserved circuit (N=27) --
+step "connected_mcis.py  (connectivity requirement -> network.csv = 27-node circuit)"
+python3 src/connected_mcis.py --restarts 12000 --ils 30000
 
 # ---- 2. Derived composition / enrichment / sexual-conservation stats ---------
 step "derived_stats.py  (composition, NT, descending/ascending enrichment)"

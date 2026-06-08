@@ -53,6 +53,25 @@ The rest of the document derives each row. The single most important caveat to c
 
 ---
 
+## 0.5 The connectivity requirement: the conserved circuit is 27 neurons
+
+The headline deliverable (`network.csv`) is the largest **weakly-connected** common induced subgraph: **27 neurons, 26 conserved edges, connected, 0 internal disagreement** ([`src/connected_mcis.py`](src/connected_mcis.py), `results/connected_mcis.json`, `results/connected_circuit.csv`).
+
+**Why this, and not the larger 109?** The *unconstrained* Maximum Common Induced Subgraph (= Maximum Independent Set on the disagreement graph; §3) is N = 109 — but it is **not a circuit**: on the consensus graph it splits into **97 components, 87 of them isolated single neurons** with no conserved edge at all. Those isolated nodes are "trivially isomorphic" — they have no induced edges, so nothing to disagree about. This is precisely the artifact the degree-preserving null already exposed in §4.2 (the 109 node-count is ~93% explained by the degree sequence *because* it is dominated by edge-less neurons). **The connectivity requirement removes the edge-less filler and leaves the actual conserved circuit.**
+
+| | Unconstrained MCIS (contrast) | **Connected MCIS (deliverable)** |
+|---|---|---|
+| N | 109 | **27** |
+| conserved edges | 14 | **26** |
+| structure | 97 components, 87 isolated | **single weakly-connected circuit** |
+| descending / ascending enrichment | 65.7× / 24.8× | **67.3× / 17.7×** (p = 2×10⁻²⁸ / 9×10⁻⁷) |
+| cross-sex conservation | 92.7% | **96.3%** (26/27) |
+| neurotransmitters | ACh 63% / GABA 26% | **ACh 41% / GABA 30%** (more balanced E/I) |
+
+The 27-node circuit is still overwhelmingly sensorimotor (17 DN + 6 AN + 4 sensory) and *more* GABA-rich than the inflated set — a mixed excitatory/inhibitory connected backbone. The strong edge-level conservation signal (68.9× beyond degree, Z = 476σ; §4.6) lives in exactly this connected wiring. The unconstrained 109 is retained throughout this document as the **methodological contrast** (it is where the solver, null, sampling, and certificate analyses of §3–§4 apply); the 27-node connected circuit is the biological deliverable. Connected-MIS is NP-hard; N = 27 is stable under multi-start growth + 30 000-iteration iterated local search.
+
+---
+
 ## 1. Hypothesis
 
 The *Drosophila* nervous system has been reconstructed across multiple independent specimens, sexes, and anatomical preparations. Schlegel et al. (2024) established a consensus cell-type atlas spanning five datasets, demonstrating that **cell-type identity** is reproducible at the morphological level. A deeper unresolved question is whether **synaptic connectivity itself** is structurally invariant across independently prepared connectomes.

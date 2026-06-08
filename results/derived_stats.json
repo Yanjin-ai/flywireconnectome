@@ -1,77 +1,69 @@
 {
-  "N": 109,
+  "N": 27,
   "composition": {
     "descending": [
-      67,
-      61.5
+      17,
+      63.0
     ],
     "ascending": [
-      34,
-      31.2
+      6,
+      22.2
     ],
     "sensory_ascending": [
-      6,
-      5.5
-    ],
-    "sensory_descending": [
-      2,
-      1.8
+      4,
+      14.8
     ]
   },
   "neurotransmitter": {
     "acetylcholine": [
-      69,
-      63.3
+      11,
+      40.7
     ],
     "gaba": [
-      28,
-      25.7
-    ],
-    "glutamate": [
-      5,
-      4.6
+      8,
+      29.6
     ],
     "serotonin": [
       4,
-      3.7
+      14.8
     ],
-    "dopamine": [
+    "glutamate": [
       3,
-      2.8
+      11.1
     ]
   },
   "sexual_conservation": {
-    "isomorphic": 101,
-    "dimorphic": 8,
-    "pct_isomorphic": 92.7
+    "isomorphic": 26,
+    "dimorphic": 1,
+    "pct_isomorphic": 96.3
   },
   "enrichment": {
     "descending": {
-      "circuit": 67,
-      "circuit_pct": 61.5,
+      "circuit": 17,
+      "circuit_pct": 63.0,
       "background": 1303,
       "background_pct": 0.94,
-      "fold": 65.7,
-      "p_value": 4.1202072642525384e-107
+      "fold": 67.3,
+      "p_value": 2.2535110125205057e-28
     },
     "ascending": {
-      "circuit": 34,
-      "circuit_pct": 31.2,
+      "circuit": 6,
+      "circuit_pct": 22.2,
       "background": 1750,
       "background_pct": 1.26,
-      "fold": 24.8,
-      "p_value": 1.3769822706875746e-37
+      "fold": 17.7,
+      "p_value": 9.225140937590351e-07
     }
   },
   "annotation_quality": {
     "metric": "manual_cluster non-null",
-    "circuit": 101,
-    "circuit_n": 109,
-    "circuit_pct": 92.7,
-    "noncircuit": 2811,
-    "noncircuit_n": 3305,
-    "noncircuit_pct": 85.1,
-    "fisher_p": 0.013858025628114062
+    "circuit": 23,
+    "circuit_n": 27,
+    "circuit_pct": 85.2,
+    "noncircuit": 2889,
+    "noncircuit_n": 3387,
+    "noncircuit_pct": 85.3,
+    "fisher_p": 0.6357215597497632
   },
   "fafb_background_total": 139244
 }

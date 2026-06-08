@@ -7,7 +7,8 @@ contract at the top of that script).
 
 | Reported quantity | Producing script | Output file (key) |
 |---|---|---|
-| N (best of 100-seed multi-start), conserved edges, isomorphism | `src/run_analysis.py` | `canonical_results.json` → `N_reported`, `n_conserved_edges` |
+| **Connected conserved circuit (the deliverable, N=27)** | `src/connected_mcis.py` | `connected_mcis.json`, `connected_circuit.csv`, `network.csv` |
+| Unconstrained MCIS (contrast, N=109), conserved edges, isomorphism | `src/run_analysis.py` | `canonical_results.json` → `N_reported`; `network_unconstrained_mcis.csv` |
 | Seed distribution (mean ± sd, range) | `src/run_analysis.py` | `canonical_results.json` → `seed_distribution` |
 | Correspondence-shuffle null | `src/run_analysis.py` | `canonical_results.json` → `correspondence_shuffle_null` |
 | Degree-preserving null (node-count) | `src/run_analysis.py` | `canonical_results.json` → `degree_preserving_null` |

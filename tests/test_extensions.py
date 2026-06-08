@@ -86,6 +86,20 @@ def test_warmstart_is_independent():
     assert not any(w in keep for v in keep for w in adj.get(v, ()))
 
 
+def test_connected_mcis_grows_connected_disagreement_free():
+    import connected_mcis as cm
+    # consensus path 0-1-2-3 (all-3 agreed edges); disagreement between 0 and 3
+    consensus = {(0, 1), (1, 2), (2, 3)}
+    Cadj = cm.consensus_adj(consensus)
+    Dadj = {0: {3}, 3: {0}, 1: set(), 2: set()}
+    rng = np.random.default_rng(0)
+    S = cm.grow(0, Cadj, Dadj, forced=set(), rng=rng)
+    connected, dis, _ = cm.verify(S, consensus, Dadj)
+    assert connected and dis == 0
+    # 0 and 3 disagree, so they cannot both be in S
+    assert not ({0, 3} <= S)
+
+
 def test_lovasz_theta_on_C5():
     cv = pytest.importorskip("cvxpy")  # skip if SDP solver not installed
     C5 = nx.cycle_graph(5)
