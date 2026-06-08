@@ -22,7 +22,7 @@
 
 **Structural observations.**
 - **Cell-type identity:** 66.2× enriched for descending and 25.0× for ascending neurons vs the whole-brain FAFB background (Fisher p < 10⁻³⁵) — not a random brain sample.
-- **Wiring conserved beyond degree:** 2,609 edges are shared by all three connectomes vs 352.9 ± 16.5 under a degree-preserving (Maslov–Sneppen) null → **7.4×, Z = 136σ**. Specific connectivity is conserved, not just degree sequence.
+- **Wiring conserved beyond degree:** 2,609 edges are shared by all three connectomes vs 37.9 ± 5.4 under a well-mixed degree-preserving (Maslov–Sneppen) null → **68.9×, Z = 476σ**. Specific connectivity is conserved, not just degree sequence.
 - **Cross-sex:** 88.6% of the circuit is wired identically in ♀ and ♂; the few dimorphic neurons target abdominal VNC / lateral brain.
 - **Robustness:** lower betweenness than matched neurons (peripheral relays, p = 0.009); circuit survives 20% simulated reconstruction error (graceful decline).
 
@@ -31,6 +31,24 @@
 **Key citations.** Schlegel et al. 2024 (cell typing); Bates et al. 2025 (BANC correspondence); Dorkenwald et al. 2024 (FAFB); Pospisil et al. 2024 (sensorimotor bottleneck); Namiki et al. 2018 & Schnell et al. 2022 (descending-neuron function); Witvliet et al. 2021 (connectome stereotypy). Full reference list in §References.
 
 > Print-ready version: [`research_summary_fafb.pdf`](research_summary_fafb.pdf). The detailed report (methods, statistics, all figures) follows below.
+
+---
+
+## 0. What is certain, and what should be questioned (evidence ledger)
+
+Before the details, here is an honest decomposition of *how much confidence each claim carries and what it rests on* — so a reader can see exactly where the result is solid and where it is open. Every row is backed by a committed script writing to `results/` (see `results/manifest.md`).
+
+| Claim | Confidence | What supports it | What to question |
+|---|---|---|---|
+| The 105-neuron set is a **valid** mutually-isomorphic subgraph | **Certain** | Verified: 0 internal disagreement edges; it is a true independent set in the disagreement graph D | Nothing — this is a checked combinatorial fact |
+| N ≈ 100–105 is a **stable** structural quantity | **High** | 100-seed multi-start 100.5 ± 2.2; survives 20% edge corruption → 73 (§4.7); N=105 verified feasible, exact optimum bracketed (§3.6) | Global optimum not *certified* exactly (full-graph MIS is NP-hard; greedy honest gap 2.67% under hard sampling, §3.2) |
+| The **node count** N is *mostly* (~96%) a degree-sequence property — but not entirely | **High** | Well-mixed degree-preserving null reaches 96.4 ± 2.2 — ~96% of real, but 3.9σ below best N=105, so identity adds ~4–9 neurons (§4.2) | Only FAFB is rewired in that null; see §4.2 |
+| **Specific wiring** is conserved far beyond degree | **High** | 2,609 consensus edges vs well-mixed null 37.9 ± 5.4 → 68.9×, Z = 476σ (§4.6); robust across swap counts (§4.2 sensitivity) | Reciprocity is not preserved by the null (§4.6 caveat); a small part of the signal could be reciprocal motifs |
+| The circuit is **specifically sensorimotor** (not a generic matched set) | **High** | DN/AN enriched 66.2×/25.0× vs whole-brain, p < 10⁻³⁵ (§5) | Enrichment is vs FAFB background; appropriate |
+| Conserved **across sexes** | **Medium–High** | 88.6% isomorphic ♀/♂ (§7), near Berg 2025's 95.2% baseline | Sample includes sex-specific neurons |
+| The conservation is **developmentally canalised** (not activity-refined) | **Low–Medium (the key open question)** | Consistent with lineage enrichment + cross-sex stability (§8.2) | A static connectome **cannot** distinguish development from activity (H4, §8.4); needs perturbation/activity data |
+
+The rest of the document derives each row. The single most important caveat to carry forward: **a structural snapshot establishes that the wiring *is* invariant, not *why*** — the developmental-vs-functional mechanism is explicitly unresolved (§8.4).
 
 ---
 
@@ -46,7 +64,7 @@ This extends previous work (Schlegel et al. 2024; Witvliet et al. 2021) which qu
 
 1. *Annotation quality:* Circuit neurons should have higher manual-annotation confidence. **Verified:** 93.3% manually-annotated (`manual_cluster`) vs 85.0% for non-circuit members (Fisher exact p = 0.008; §4.4).
 2. *Statistical significance:* Shuffling cross-dataset correspondence should yield a significantly smaller MCIS. **Verified:** null collapses to 76.2 ± 1.5 vs real 100.5 ± 2.2 (>15σ separation; §4.2).
-3. *Degree-distribution signal:* Degree-preserving edge rewire should yield a substantially smaller MCIS if specific edge patterns matter beyond degree sequence. **Result:** the degree-preserving null reaches 100.8 ± 2.1 — statistically indistinguishable from the real per-seed mean — so the FAFB degree distribution alone accounts for nearly all of the achievable N; neuron identity via NBLAST correspondence provides the additional signal to reach the full N = 105 (Z ≈ 2σ against the best; §4.2, full interpretation).
+3. *Degree-distribution signal:* Degree-preserving edge rewire should yield a smaller MCIS if specific edge patterns matter beyond degree sequence. **Result:** a well-mixed degree-preserving null reaches 96.4 ± 2.2 — ~96% of the real per-seed mean (100.5), so the FAFB degree distribution accounts for *most* of the achievable node count, but it is distinguishable: the best N = 105 sits 3.9σ above the null, so neuron identity via NBLAST correspondence adds the remaining ~4–9 neurons (§4.2). The much stronger identity signal is at the edge level (§4.6, ~69× beyond degree).
 
 ---
 
@@ -137,9 +155,46 @@ where $\mathcal{D}$ is the set of disagreement edges restricted to the subgraph.
 | 40 nodes | 10 | 20.3 ± 1.5 | 20.6 ± 1.6 | **1.5%** |
 | 50 nodes | 10 | 22.9 ± 1.6 | 23.5 ± 1.7 | **2.6%** |
 
-Across all 50 instances the greedy + expansion heuristic achieves a **mean optimality gap of 1.15%** (maximum 10.5% on a single 50-node instance; 80% of instances within 2%). The gap grows modestly with subgraph size, as expected for a local-search heuristic. ILP solve times were 0.02–1.3 s for these sizes; the full 987-node instance is intractable for exact ILP, but the consistent low gap on subgraphs, together with the 100-seed variance of ±2.2 (§4.1), indicates that the reported N is within a few neurons of the true optimum.
+Across all 50 instances the greedy + expansion heuristic achieves a **mean optimality gap of 1.15%** (maximum 10.5% on a single 50-node instance; 80% of instances within 2%) **under uniform random subgraph sampling**. The gap grows modestly with subgraph size, as expected for a local-search heuristic. ILP solve times were 0.02–1.3 s for these sizes.
 
-**Unit tests:** `pytest tests/ -v` — 14 tests covering isomorphism verification, planted subgraph recovery (known ground truth), expansion monotonicity, null model consistency, a synthetic greedy-vs-exact (brute-force) check, and data-loading smoke tests. 13 run on synthetic graphs; 1 real-data smoke test is skipped when `MCIS_DATA_DIR` is unset. All pass.
+**Honest sampling — the uniform gap is optimistic.** Uniform random subgraphs are overwhelmingly drawn from the sparse, easy regime of the disagreement graph (§3.4), so 1.15% understates the true difficulty. We therefore re-ran the same ILP-vs-greedy comparison with a `disagreement_ego` sampler — grow a connected ball in the disagreement graph from a high-disagreement seed, targeting exactly the dense neighbourhoods where max-degree greedy struggles ([`src/exact_ilp.py --sampler disagreement_ego`](src/exact_ilp.py), `results/ilp_validation_ego.json`). Under this harder sampling the **mean gap is 2.67%** (maximum 16.7%; 74% within 2%) — roughly 2.3× the uniform estimate, and the honest figure to quote. A second hard sampler that over-weights high-disagreement nodes (`--sampler degree_stratified`, `results/ilp_validation_stratified.json`) independently agrees at **2.57%**. Greedy still recovers ~97% of the exact optimum even on the hard regime. The decisive optimality statement, however, is the full-graph certificate (§3.6), not subgraph extrapolation.
+
+**Unit tests:** `pytest tests/ -v` — 21 passed, 1 skipped, covering isomorphism verification, planted subgraph recovery (known ground truth), expansion monotonicity, null model consistency, a synthetic greedy-vs-exact (brute-force) check, and data-loading smoke tests. The 1 skipped is a real-data smoke test, skipped when `MCIS_DATA_DIR` is unset. All pass.
+
+### 3.4 Where the heuristic systematically underestimates N (algorithmic self-critique)
+
+Our solver removes, at each step, the node incident to the most disagreement edges. Read as a graph algorithm, this is exactly the **max-degree greedy heuristic for Minimum Vertex Cover** (the kept set is the complementary independent set). That heuristic is *not* a constant-factor approximation: its worst-case ratio is **Θ(log n)** (Johnson 1974), so in adversarial structure it can keep an independent set a logarithmic factor below the optimum. We therefore characterise *where* it fails rather than asserting it is universally tight ([`src/worstcase_greedy.py`](src/worstcase_greedy.py), `results/worstcase_greedy.json`):
+
+- **Tight-instance family (Johnson 1974).** On the classic construction whose unique optimum independent set is the high-degree side, greedy keeps the low-degree side and underestimates the MIS — provably a Θ(log *k*) factor in the worst case. Our realisation uses randomised target assignment, so per-instance gaps are noisy (0–6.6% across *k* ∈ {10,20,40,80}, reaching 6.6% at *k*=80); it confirms the *existence* of systematic underestimation rather than a clean monotone curve.
+- **Density sweep (the cleaner signal).** On Erdős–Rényi graphs the greedy optimality gap is ≈0 on sparse graphs and rises monotonically with density: 3.2% → 7.1% → 8.9% → 10.7% as edge density goes 0.05 → 0.1 → 0.2 → 0.35.
+
+Translated to the disagreement graph D: greedy is **near-optimal when D is sparse and star-like** — a handful of badly-matched "hub" neurons carry most disagreement, and removing them resolves the rest. This is the empirical regime here (45k disagreement edges over 987 nodes, density 0.09 but heavy-tailed), which is *why* the measured gap is only ~1%. Greedy **systematically underestimates when D contains dense, near-regular clusters** — e.g. a brain region one connectome reconstructed densely while another did not, producing many mutually-disagreeing neurons of similar degree, where max-degree removal has near-ties and peels too aggressively.
+
+**Consequence for the validation in §3.2.** The 1.15% gap there was measured on *uniformly random* induced subgraphs, which are overwhelmingly drawn from the sparse, easy regime and therefore give an **optimistic** estimate. To stress the hard regime we add a `disagreement_ego` sampler (grow a connected ball in D from a high-disagreement seed) and a `degree_stratified` sampler; the gap measured under those schemes is the honest upper end (§3.2, `results/ilp_validation_*.json`). The decisive answer to "is N really near-optimal?" is the **full-graph certificate** below, not subgraph extrapolation.
+
+### 3.5 Three solvers and when to use which
+
+The repository ships three MCIS solvers. Their roles are **not** interchangeable, and the honest recommendation differs from "use the fanciest one":
+
+| Solver | Guarantee | Cost | Use it when |
+|---|---|---|---|
+| **Greedy multi-start** (`solver.py`) | Local optimum; Θ(log n) worst case but ~1% empirically | O(N·D)/iter; 987 nodes in ~9 s | **Default workhorse.** Full-graph N, all null models, any production query. Deterministic given seeds. |
+| **Exact ILP / MIS** (`exact_ilp.py`, `exact_full_mis.py`) | Provable optimum or a certified upper bound | seconds on ≲100-node subgraphs; full 987-node graph is time-limited | You need a **certificate** — to validate the heuristic or to state N as a bounded interval rather than a point estimate (§3.6). |
+| **Spectral relaxation** (`spectral_mcis.py`) | Heuristic; no approximation guarantee | O(n·#edges) via Lanczos | A research probe of constraint centrality / a fast first pass. **Not recommended over greedy:** on our benchmark it reaches 92.7–97.5% of ILP and is *beaten by greedy* (96–98%) at sizes ≥ 80 (`results/spectral_validation.json`). We keep it for the conservation-track colouring, not as the production solver. |
+
+The practical rule: **greedy multi-start for every real query; ILP/MIS when you need a guarantee; spectral only as an exploratory relaxation.** Reporting all three honestly — including that spectral does not win — is part of the methodological rigor.
+
+### 3.6 Full-graph optimality certificate
+
+Rather than infer near-optimality only from subgraph gaps, we bound the true optimum on the **full** 987-node disagreement graph D ([`src/exact_full_mis.py`](src/exact_full_mis.py), `results/exact_full_mis.json`). D has 44,968 disagreement edges (density 0.092) and is a *single* dense connected component — there is no component decomposition to exploit, and exact branch-and-bound does not close in reasonable time. We therefore certify an interval:
+
+- **Lower bound — verified feasible: N ≥ 105.** The greedy multi-start solution is checked to be a genuine independent set in D (0 internal disagreement edges), so a common subgraph of size 105 provably *exists*.
+- **Upper bound (combinatorial) — N ≤ 245**, from a greedy **clique cover** of D taken as the *minimum* over 40 randomised vertex orderings (any independent set meets each clique at most once, so the number of cliques covering V bounds the independence number; randomised restarts tighten a single degree-ordered pass from 272 to 245). This bound is solver-free and fully rigorous.
+- **Upper bound (tighter) — N ≤ 136**, from the **Lovász ϑ** function (α(D) ≤ ϑ(D)), computed as an SDP with cvxpy/SCS in ~150 s (`--theta`, optional dependency). ϑ(D) = 136.3, so α(D) ≤ 136. This is a *numerical* SDP bound (SCS tolerance ~1e-3); the clique cover above remains the purely combinatorial guarantee.
+
+So the certified statement is **105 ≤ N* ≤ 136**, with N = 105 a verified-feasible solution and the subgraph experiments (§3.2: ~97% of exact on hard samples) indicating the truth is much nearer the lower end. The remaining gap (105–136) reflects the genuine NP-hardness of certifying MIS exactly on one dense 987-node component; a clique-cut ILP could close it further.
+
+> **Reproducibility note / bug caught.** An initial version of this script used CBC with `warmStart`, which in this pulp/CBC build silently *fixes* the warm-started variables and returned a spurious "82, proven optimal" — i.e. **below** a feasible solution of 100 we had handed it, which is impossible for a correct solver. We caught it precisely because 82 < 100 violated the feasibility invariant, removed the warm start, and re-derived the honest interval above. This is exactly the kind of check the evidence ledger (§0) is meant to enforce.
 
 ---
 
@@ -153,15 +208,15 @@ The narrow range (±2.2 over a 987-node search space) confirms that N ≈ 100 is
 
 ### 4.2 Three null models
 
-All nulls use the *same* search procedure as the real result (best-of-5 multi-start per trial), so comparisons are apples-to-apples (20 trials each; [`src/run_analysis.py`](src/run_analysis.py)).
+All nulls use the *same* search procedure as the real result (best-of-5 multi-start per trial), so comparisons are apples-to-apples (20–30 trials each; [`src/run_analysis.py`](src/run_analysis.py)).
 
 | Null model | Construction | N_null | vs real | Interpretation |
 |-----------|-------------|--------|-----------|----------------|
 | Correspondence-shuffle | Permute *both* FAFB and MANC neuron→triplet mappings; BANC unchanged | 76.2 ± 1.5 | >15σ below real 100.5 ± 2.2 | Neuron identity (NBLAST matching) is essential |
-| Degree-preserving rewire | Rewire ~33% of FAFB edges while preserving exact in/out degree per neuron | 100.8 ± 2.1 | indistinguishable from real mean (Z ≈ 2σ vs best N=105) | FAFB degree sequence alone accounts for nearly all of the achievable N |
+| Degree-preserving rewire (well-mixed) | Rewire FAFB edges preserving exact in/out degree, 10×\|E\| swaps | 96.4 ± 2.2 | ~4 neurons below real per-seed mean; 3.9σ below best N=105 | FAFB degree sequence explains *most* (~96%) of N, but **not all** — identity adds the rest |
 | Centrality permutation (1000 trials) | Permute neuron labels on the consensus-graph betweenness | — | p = 0.009 | Circuit neurons have *lower* betweenness than matched pool average |
 
-**Interpretation of the degree-preserving null.** The degree-preserving rewire is a Maslov–Sneppen randomisation (Maslov & Sneppen 2002): it scrambles connectivity while holding each neuron's in/out degree fixed, isolating the contribution of the degree sequence from that of specific wiring. This result indicates that the FAFB degree distribution is the dominant determinant of how large an MCIS can be found: the Maslov–Sneppen null reaches 100.8 ± 2.1, statistically indistinguishable from the real per-seed mean (100.5 ± 2.2). The correspondence-shuffle null (collapsing to 76.2 ± 1.5) shows that NBLAST-based neuron identity is additionally required — but the honest reading is that the degree sequence is a near-sufficient condition, and specific neuron identity provides the additional, smaller contribution needed to reach the best N = 105.
+**Interpretation of the degree-preserving null.** The degree-preserving rewire is a Maslov–Sneppen randomisation (Maslov & Sneppen 2002): it scrambles connectivity while holding each neuron's in/out degree fixed, isolating the contribution of the degree sequence from that of specific wiring. With a **well-mixed** null (10×\|E\| swaps — the earlier code used only ~0.33×\|E\|, which was under-mixed and gave a spuriously high 100.8 ± 2.1 ≈ real; see §4.6 and `src/null_sensitivity.py`), the null reaches **96.4 ± 2.2**. So the FAFB degree distribution is the *dominant* determinant of how large an MCIS can be found (it gets ~96% of the way), but it is now statistically **distinguishable** from the real result: real per-seed mean 100.5 sits ~1.9σ above the null, and the best N = 105 sits 3.9σ above it. The correspondence-shuffle null (collapsing to 76.2 ± 1.5) shows NBLAST-based neuron identity is essential; the degree null shows degree explains most but not all of the *node count*. The far larger identity signal is at the *edge* level (§4.6, ~69×).
 
 ### 4.3 Centrality: circuit neurons are peripheral relays
 
@@ -192,7 +247,7 @@ N increases monotonically without discontinuity across all confidence tiers ([`s
 **Figure 1.** NBLAST confidence analysis. **(A)** MCIS size vs confidence threshold: monotonic increase from N=4 (top 10%) to N=105 (full pool). **(B)** Distribution of NBLAST agreement across 2,798 triplets.
 
 ![Fig. 2 — Robustness panel](figures/figure5_robustness.png)
-**Figure 2.** Robustness and validation. **(A)** 100-seed MCIS distribution: 100.5 ± 2.2, range [96, 105]. **(B)** Null comparison: correspondence-shuffle collapses to 76.2 ± 1.5; degree-preserving rewire reaches 100.8 ± 2.1. **(C)** N bound waterfall (3,414 → 2,798 → 987 → 105). **(D)** Empirical runtime O(N^1.9); 987 nodes in ~8.8 seconds. **(E)** Centrality: circuit has lower betweenness (p = 0.009). **(F)** MCIS stability across confidence tiers. **(G)** Annotation quality: 93.3% vs 85.0% manually annotated (p = 0.008).
+**Figure 2.** Robustness and validation. **(A)** 100-seed MCIS distribution: 100.5 ± 2.2, range [96, 105]. **(B)** Null comparison: correspondence-shuffle collapses to 76.2 ± 1.5; well-mixed degree-preserving rewire reaches 96.4 ± 2.2. **(C)** N bound waterfall (3,414 → 2,798 → 987 → 105). **(D)** Empirical runtime O(N^1.9); 987 nodes in ~8.8 seconds. **(E)** Centrality: circuit has lower betweenness (p = 0.009). **(F)** MCIS stability across confidence tiers. **(G)** Annotation quality: 93.3% vs 85.0% manually annotated (p = 0.008).
 
 ### 4.6 Conservation beyond degree sequence — the conservation track
 
@@ -200,14 +255,19 @@ The MCIS *size* (node count) is largely explained by the degree sequence (§4.2)
 
 We answer this at the edge level ([`src/conservation_track.py`](src/conservation_track.py), `results/conservation_track.json`). Over the 987-node consensus component (56,337 edges present in ≥1 connectome):
 
-| Quantity | Observed | Degree-preserving null (100 trials) | Result |
+| Quantity | Observed | Well-mixed degree-preserving null (50 trials) | Result |
 |---|---|---|---|
-| Edges present in all 3 connectomes | **2,609** | 352.9 ± 16.5 | **7.4× enrichment, Z = 136σ** |
+| Edges present in all 3 connectomes | **2,609** | 37.9 ± 5.4 | **68.9× enrichment, Z = 476σ** |
 
-So while node-count MCIS is degree-explained, **specific synaptic connectivity is conserved 7.4× above the degree-sequence expectation** — strong, unambiguous evidence that the cross-connectome agreement reflects real wiring identity, not merely matched degree distributions. This reframes the contribution from a binary "conserved circuit" to a continuous **conservation track**: every neuron receives a conservation z-score (observed consensus-incident edges vs degree-null), yielding a ranked map of which neurons carry the conserved wiring (top: ANXXX108 z=35, DNge106 z=28, DNg73/AN17B008 z=21). This per-neuron track is what the Neuroglancer overlay (§10.5) colours.
+So while node-count MCIS is *mostly* degree-explained (~96%, §4.2), **specific synaptic connectivity is conserved ~69× above the degree-sequence expectation** — strong, unambiguous evidence that the cross-connectome agreement reflects real wiring identity, not merely matched degree distributions. This reframes the contribution from a binary "conserved circuit" to a continuous **conservation track**: every neuron receives a conservation z-score (observed consensus-incident edges vs degree-null), yielding a ranked map of which neurons carry the conserved wiring (top: DNp59 z=114, DNp65 z=86, DNpe042 z=86, DNge059 z=81). This per-neuron track is what the Neuroglancer overlay (§10.5) colours.
+
+> **Why 69× and not the previously reported 7.4×.** The null here is a Maslov–Sneppen rewiring, and it only represents the degree-constrained ensemble once it is *mixed*. The earlier code ran `directed_edge_swap` with ~0.5×\|E\| swaps, which is far too few: [`src/null_sensitivity.py`](src/null_sensitivity.py) traces the null consensus count as a function of swap count and shows it falls from ≈358 at 0.5×\|E\| (the old, under-mixed value → 7.3×) to a plateau of ≈38 by 3–10×\|E\| (→ ~68×). In/out degree is preserved exactly at every swap count (verified per node). The corrected, well-mixed result is **stronger**, not weaker; we now default to 10×\|E\| swaps. One honest caveat: `directed_edge_swap` does not preserve **reciprocity** (mutual-edge fraction drops from 0.12–0.39 to ≈0.03–0.09), so a small part of the beyond-degree signal could reflect conserved reciprocal motifs rather than purely feedforward wiring — a stronger reciprocity-preserving null is future work.
 
 ![Fig. 10 — Conservation track](figures/figure10_conservation_track.png)
-**Figure 10.** **(A)** Edge support across connectomes (1 / 2 / all-3). **(B)** Beyond-degree test: observed 2,609 consensus edges vs degree-preserving null 353 ± 17 (Z = 136σ). **(C)** Per-neuron conservation z-score track.
+**Figure 10.** **(A)** Edge support across connectomes (1 / 2 / all-3). **(B)** Beyond-degree test: observed 2,609 consensus edges vs well-mixed degree-preserving null 37.9 ± 5.4 (Z = 476σ). **(C)** Per-neuron conservation z-score track.
+
+![Fig. 14 — Null-model sensitivity](figures/figure14_null_sensitivity.png)
+**Figure 14.** Null-model sensitivity ([`src/null_sensitivity.py`](src/null_sensitivity.py)). **(A)** The degree-preserving null's consensus-edge count vs number of swaps: it plateaus (well-mixed) only past ~3×\|E\|; the old 0.5×\|E\| operating point was under-mixed. **(B)** Beyond-degree Z vs swap count for rewire-all-three (headline) and rewire-FAFB-only nulls — both verdicts are robust once mixed.
 
 ### 4.7 Robustness to connectomic reconstruction error
 
@@ -346,12 +406,12 @@ The 88.6% cross-sex conservation is consistent with the developmental constraint
 
 ### 8.4 Alternative hypotheses — what the data can and cannot distinguish
 
-The headline observation (105 matched neurons with edge-level connectivity conserved 7.4× above a degree-preserving null) is consistent with several hypotheses. We state them explicitly and mark which our current data adjudicate:
+The headline observation (105 matched neurons with edge-level connectivity conserved ~69× above a well-mixed degree-preserving null) is consistent with several hypotheses. We state them explicitly and mark which our current data adjudicate:
 
 | Hypothesis | Prediction | Verdict from this study |
 |---|---|---|
-| **H1 — Developmental canalisation.** The backbone is wired by lineage-specific programs largely independent of sex/specimen. | Conserved across sexes; enriched in known output hemilineages; conserved beyond degree. | **Supported** (88.6% cross-sex; LB/SMPpv2 hemilineages; 7.4× beyond-degree) — but not *proven*: a structural snapshot cannot show the wiring was set developmentally rather than refined by activity. |
-| **H2 — Degree/sampling artifact.** Apparent conservation is a by-product of matched degree sequences and shared dense regions. | A Maslov–Sneppen (degree-preserving) null should reproduce the shared edges. | **Rejected at the edge level** (observed 2,609 vs 353 ± 17; Z = 136σ). Note it is *not* rejected for node-count (§4.2) — hence we report edges, not N, as the conserved signal. |
+| **H1 — Developmental canalisation.** The backbone is wired by lineage-specific programs largely independent of sex/specimen. | Conserved across sexes; enriched in known output hemilineages; conserved beyond degree. | **Supported** (88.6% cross-sex; LB/SMPpv2 hemilineages; ~69× beyond-degree) — but not *proven*: a structural snapshot cannot show the wiring was set developmentally rather than refined by activity. |
+| **H2 — Degree/sampling artifact.** Apparent conservation is a by-product of matched degree sequences and shared dense regions. | A well-mixed Maslov–Sneppen (degree-preserving) null should reproduce the shared edges. | **Rejected at the edge level** (observed 2,609 vs well-mixed null 37.9 ± 5.4; Z = 476σ, 68.9×). Note it is *not* rejected for node-count (§4.2) — hence we report edges, not N, as the conserved signal. |
 | **H3 — Annotation/proofreading bias.** Conservation tracks the best-annotated, most-proofread neurons. | The result should collapse when restricted to high-confidence matches, and circuit/non-circuit annotation rates should differ strongly. | **Largely rejected**: N grows monotonically across all NBLAST-confidence tiers (§4.5) and the annotation-rate gap is modest (93.3% vs 85.0%). A residual bias cannot be fully excluded. |
 | **H4 — Functional/activity-driven conservation** (vs developmental). | Conserved edges would correlate with co-activity or behavioural necessity, not just lineage. | **Cannot be distinguished** with static connectomes alone — requires activity imaging or perturbation (§8.3 prediction 1) and the synapse-weight readout (prediction 2). This is the key open question. |
 | **H5 — Generic-subgraph property** (any matched neuron set would look conserved). | Enrichment for specific classes should be absent. | **Rejected**: the circuit is 66.2×/25.0× enriched for descending/ascending neurons — the conservation is specifically sensorimotor, not a generic property of matched neurons. |
@@ -364,9 +424,9 @@ Our structural backbone complements three recent computational/functional lines.
 
 ## 9. Limitations
 
-- **N is a near-optimal lower bound.** The greedy algorithm finds a local optimum; the true MCIS on 987 nodes is NP-hard to certify exactly. ILP validation on 50 subgraphs (20–50 nodes) demonstrates a mean optimality gap of 1.15% (maximum 10.5% on one 50-node instance; §3.2), and the 100-seed variance of ±2.2 (§4.1) provides independent evidence of stability. Together these indicate the reported N = 105 is within a few neurons of the true optimum, but a formally certified proof of global optimality on the full 987-node instance remains intractable.
+- **N is a verified-feasible lower bound, bracketed above by Lovász ϑ.** N = 105 is a *verified* common subgraph (0 internal disagreement; §3.6), not merely a heuristic output. The exact optimum is certified to lie in **[105, 136]** — lower bound from the verified feasible solution, upper bound from the Lovász ϑ SDP (ϑ = 136.3; a solver-free clique cover independently gives ≤ 245). The honest greedy optimality gap is **2.67%** under hard (disagreement-ego) subgraph sampling — higher than the 1.15% under uniform sampling, which is optimistic (§3.2, §3.4). The 100-seed variance of ±2.2 (§4.1) is independent evidence of stability. A *certified-optimal* proof on the full 987-node single dense component remains intractable (it is genuinely NP-hard); a clique-cut ILP could shrink the 105–136 interval further.
 - **No continuous NBLAST scores.** The BANC metadata contains binary match results, not morphological similarity scores. A fully continuous confidence curve would require the R `bancr` package and neuron skeleton data (~10 GB); we used NBLAST top-1 agreement as a proxy (§4.5).
-- **Degree-preserving null reaches the real MCIS *size*** (null 100.8 ± 2.1 ≈ real 100.5 ± 2.2; §4.2). This limits claims based on *node count*. It does **not** limit the wiring claim: at the *edge* level, all-3 consensus edges are enriched 7.4× over the same degree-preserving null (Z = 136σ; §4.6), so specific connectivity is conserved well beyond degree sequence. The right unit of analysis is edges, not node count.
+- **Degree-preserving null reaches ~96% of the real MCIS *size*** (well-mixed null 96.4 ± 2.2 vs real per-seed 100.5 ± 2.2; best N=105 is 3.9σ above the null; §4.2). So the node *count* is mostly — but, with a properly-mixed null, not entirely — a degree property; identity adds the last ~4–9 neurons. This modest node-count signal does **not** capture the main result: at the *edge* level, all-3 consensus edges are enriched ~69× over the same well-mixed degree null (Z = 476σ; §4.6), so specific connectivity is conserved far beyond degree sequence. The right unit of analysis is edges, not node count.
 - **Limited MANC cross-link coverage.** Approximately 2,498 of MANC's 23,641 neurons are cross-linked via the MCNS proxy table, constraining the triplet pool.
 - **Centrality result is directional only.** The betweenness difference (p = 0.009) should be treated as a directional observation until confirmed with a formal parametric test and/or replicated on a second connectome pair.
 - **AN05B102 appears twice** in the dimorphic neuron list (left and right hemisphere); this is expected for bilateral pairs and reflects correct data, not a duplication error.

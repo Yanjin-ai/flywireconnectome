@@ -1,0 +1,116 @@
+{
+  "observed_consensus_edges": 2609,
+  "giant_nodes": 987,
+  "degree_preserved_exact": {
+    "BANC": true,
+    "FAFB": true,
+    "MANC": true
+  },
+  "mixing_trace": [
+    {
+      "swaps": 4212,
+      "consensus_mean": 996.0,
+      "consensus_std": 15.297058540778355
+    },
+    {
+      "swaps": 13899,
+      "consensus_mean": 231.0,
+      "consensus_std": 6.29285308902091
+    },
+    {
+      "swaps": 42121,
+      "consensus_mean": 48.0,
+      "consensus_std": 6.356099432828281
+    },
+    {
+      "swaps": 126363,
+      "consensus_mean": 37.8,
+      "consensus_std": 5.706137047074843
+    },
+    {
+      "swaps": 421210,
+      "consensus_mean": 37.0,
+      "consensus_std": 7.4565407529228995
+    },
+    {
+      "swaps": 1263630,
+      "consensus_mean": 39.2,
+      "consensus_std": 3.7629775444453557
+    }
+  ],
+  "swap_multiplier_sweep": [
+    {
+      "multiplier": 0.5,
+      "rewire_all": {
+        "mean": 358.0,
+        "std": 15.383974345619102,
+        "z": 146.32109683938845,
+        "enrichment": 7.287709497206704
+      },
+      "rewire_one_fafb": {
+        "mean": 1402.6,
+        "std": 16.284143616823492,
+        "z": 74.08433801539572,
+        "enrichment": 1.860116925709397
+      }
+    },
+    {
+      "multiplier": 1.0,
+      "rewire_all": {
+        "mean": 105.26666666666667,
+        "std": 8.314378442727326,
+        "z": 301.1329530619784,
+        "enrichment": 24.784673844205194
+      },
+      "rewire_one_fafb": {
+        "mean": 925.8666666666667,
+        "std": 15.823470612423248,
+        "z": 106.36941632841783,
+        "enrichment": 2.8179003456221197
+      }
+    },
+    {
+      "multiplier": 3.0,
+      "rewire_all": {
+        "mean": 38.666666666666664,
+        "std": 5.815687596683837,
+        "z": 441.96550977032587,
+        "enrichment": 67.47413793103449
+      },
+      "rewire_one_fafb": {
+        "mean": 367.26666666666665,
+        "std": 18.127204846736728,
+        "z": 123.66679542085564,
+        "enrichment": 7.103830096206209
+      }
+    },
+    {
+      "multiplier": 10.0,
+      "rewire_all": {
+        "mean": 39.266666666666666,
+        "std": 6.444291185917105,
+        "z": 398.76120727583594,
+        "enrichment": 66.44312393887945
+      },
+      "rewire_one_fafb": {
+        "mean": 213.26666666666668,
+        "std": 7.233870947762953,
+        "z": 331.1827582539615,
+        "enrichment": 12.233510472022505
+      }
+    }
+  ],
+  "reciprocity": {
+    "observed": {
+      "BANC": 0.1748046875,
+      "FAFB": 0.12477423239012643,
+      "MANC": 0.38550841622943427
+    },
+    "degree_null": {
+      "BANC": 0.030924479166666668,
+      "FAFB": 0.025135460565924143,
+      "MANC": 0.08907670758054177
+    }
+  },
+  "verdict": "Beyond-degree enrichment is robust across swap counts once the null is mixed; rewire-all and rewire-one agree qualitatively."
+}

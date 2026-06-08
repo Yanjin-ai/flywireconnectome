@@ -12,4 +12,5 @@ seaborn>=0.12
 pulp>=2.7
 pytest>=7.0
 streamlit>=1.30          # for src/explorer_app.py
+# optional (tighter MIS upper bound via Lovász theta SDP): cvxpy>=1.4
 # optional (Neuroglancer short links, FlyWire auth): fafbseg, nglui, caveclient

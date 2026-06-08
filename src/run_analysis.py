@@ -113,9 +113,15 @@ def correspondence_shuffle_null(solver, n_trials, k=5):
     return np.array(null)
 
 
-def degree_preserving_null(solver, n_trials, k=5):
+def degree_preserving_null(solver, n_trials, k=5, swap_mult=10):
     """Rewire the FAFB edge set preserving in/out degree per node, then rerun
-    (best-of-k). Tests whether degree sequence alone explains achievable N."""
+    (best-of-k). Tests whether degree sequence alone explains achievable N.
+
+    swap_mult * |E| double-edge swaps. The original m//3 (~0.33x) was
+    UNDER-MIXED (null 101.0 ~ real, overstating "degree explains all of N");
+    well-mixed (>=3x|E|, see src/null_sensitivity.py) the null drops to ~95.5,
+    so degree explains MOST (~95%) but not all of N — neuron identity adds the
+    remaining ~5 neurons. Default is now a well-mixed 10x|E|."""
     ng = solver._ng
     null = []
     for t in range(n_trials):
@@ -124,8 +130,9 @@ def degree_preserving_null(solver, n_trials, k=5):
         G.add_edges_from(solver._gfe)
         n_e = G.number_of_edges()
         try:
-            nx.directed_edge_swap(G, nswap=max(1, n_e // 3),
-                                  max_tries=n_e * 20, seed=2000 + t)
+            nx.directed_edge_swap(G, nswap=max(1, swap_mult * n_e),
+                                  max_tries=swap_mult * n_e * 30 + 100,
+                                  seed=2000 + t)
         except nx.NetworkXError:
             pass  # too few edges to swap; use as-is
         gfe_n = set(G.edges())

@@ -3,11 +3,11 @@
   "union_edges": 56337,
   "observed_consensus_edges": 2609,
   "degree_null": {
-    "trials": 100,
-    "mean": 352.91,
-    "std": 16.526400091974054,
-    "z": 136.51430362596975,
-    "enrichment": 7.392819699073418
+    "trials": 50,
+    "mean": 37.86,
+    "std": 5.4074393200478905,
+    "z": 475.4819883909911,
+    "enrichment": 68.91178024300054
   },
   "support_histogram": {
     "1": 41442,
@@ -16,80 +16,80 @@
   },
   "top_conserved_neurons": [
     {
-      "BANC": "720575941662302844",
-      "cell_type": "ANXXX108",
-      "conservation_z": 35.0
+      "BANC": "720575941573616891",
+      "cell_type": "DNp59",
+      "conservation_z": 114.14
     },
     {
-      "BANC": "720575941404748144",
-      "cell_type": "DNge106",
-      "conservation_z": 27.64
+      "BANC": "720575941526723940",
+      "cell_type": "DNp65",
+      "conservation_z": 85.57
     },
     {
-      "BANC": "720575941431747086",
-      "cell_type": "DNg73",
-      "conservation_z": 21.29
+      "BANC": "720575941531996645",
+      "cell_type": "DNpe042",
+      "conservation_z": 85.57
     },
     {
-      "BANC": "720575941620053375",
-      "cell_type": "AN17B008",
-      "conservation_z": 21.29
+      "BANC": "720575941607119725",
+      "cell_type": "DNge059",
+      "conservation_z": 81.45
     },
     {
-      "BANC": "720575941518794668",
-      "cell_type": "DNge106",
-      "conservation_z": 20.88
+      "BANC": "720575941535861482",
+      "cell_type": "AN09B018_d",
+      "conservation_z": 78.43
     },
     {
-      "BANC": "720575941571547912",
-      "cell_type": "AN06B034",
-      "conservation_z": 20.8
+      "BANC": "720575941615534489",
+      "cell_type": "DNp68",
+      "conservation_z": 78.43
     },
     {
-      "BANC": "720575941438669653",
-      "cell_type": "AN12B055",
-      "conservation_z": 20.8
+      "BANC": "720575941433595406",
+      "cell_type": "ANXXX404",
+      "conservation_z": 78.43
     },
     {
-      "BANC": "720575941490416181",
-      "cell_type": "DNg93",
-      "conservation_z": 20.36
+      "BANC": "720575941652614129",
+      "cell_type": "DNae002",
+      "conservation_z": 71.29
+    },
+    {
+      "BANC": "720575941439151378",
+      "cell_type": "AN27X017",
+      "conservation_z": 71.29
+    },
+    {
+      "BANC": "720575941551948543",
+      "cell_type": "DNp63",
+      "conservation_z": 71.29
+    },
+    {
+      "BANC": "720575941546513001",
+      "cell_type": "DNp70",
+      "conservation_z": 71.29
     },
     {
       "BANC": "720575941529735883",
       "cell_type": "AN06B007_a",
-      "conservation_z": 20.32
+      "conservation_z": 71.29
     },
     {
-      "BANC": "720575941412103535",
-      "cell_type": "AN12B089",
-      "conservation_z": 20.0
+      "BANC": "720575941572671995",
+      "cell_type": "DNp59",
+      "conservation_z": 71.24
     },
     {
-      "BANC": "720575941645316040",
-      "cell_type": "AN06B012",
-      "conservation_z": 20.0
+      "BANC": "720575941487783888",
+      "cell_type": "AN09B009",
+      "conservation_z": 66.33
     },
     {
-      "BANC": "720575941603791350",
-      "cell_type": "DNg76",
-      "conservation_z": 18.83
-    },
-    {
-      "BANC": "720575941528320952",
-      "cell_type": "DNg88",
-      "conservation_z": 18.79
-    },
-    {
-      "BANC": "720575941539243669",
-      "cell_type": "DNge143",
-      "conservation_z": 18.28
-    },
-    {
-      "BANC": "720575941519866840",
-      "cell_type": "DNg76",
-      "conservation_z": 18.12
+      "BANC": "720575941440280767",
+      "cell_type": "DNa15",
+      "conservation_z": 66.14
     }
   ],
-  "weighted": false
+  "weighted": null
 }

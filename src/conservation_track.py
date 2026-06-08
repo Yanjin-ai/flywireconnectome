@@ -41,16 +41,26 @@ from mcis_paths import data_dir, results_dir, figures_dir, repo_root  # noqa
 from run_analysis import build_solver  # noqa
 
 
-def degree_preserving_rewire(edges, n_nodes, seed):
-    """Rewire a directed edge set preserving each node's in/out degree."""
+# Swap multiplier for the Maslov–Sneppen null. The original code used m//2
+# (0.5x), which null_sensitivity.py showed is SEVERELY under-mixed: the null
+# consensus count only plateaus past ~3x|E| swaps. Under-mixing leaves residual
+# real structure in the null, inflating its consensus count (353 at 0.5x) and
+# thereby DEFLATING the enrichment. We default to a well-mixed 10x|E|, where the
+# null is converged (39 ± 6) and the beyond-degree enrichment is ~67x, not 7.4x.
+REWIRE_MULT = 10
+
+
+def degree_preserving_rewire(edges, n_nodes, seed, mult=REWIRE_MULT):
+    """Rewire a directed edge set preserving each node's exact in/out degree,
+    with enough swaps (`mult` × |E|) to actually mix (see null_sensitivity.py)."""
     G = nx.DiGraph()
     G.add_nodes_from(range(n_nodes))
     G.add_edges_from(edges)
     m = G.number_of_edges()
     if m > 1:
         try:
-            nx.directed_edge_swap(G, nswap=max(1, m // 2),
-                                  max_tries=m * 30, seed=seed)
+            nx.directed_edge_swap(G, nswap=max(1, mult * m),
+                                  max_tries=mult * m * 30 + 100, seed=seed)
         except nx.NetworkXError:
             pass
     return set(G.edges())
@@ -91,7 +101,7 @@ def main():
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("--data-dir", default=None)
-    ap.add_argument("--null-trials", type=int, default=100)
+    ap.add_argument("--null-trials", type=int, default=50)
     ap.add_argument("--weights", default=None,
                     help="optional CSV: source,target,weight (synapse counts)")
     args = ap.parse_args()

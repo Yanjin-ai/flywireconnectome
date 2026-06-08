@@ -35,6 +35,62 @@ import pulp
 
 sys.path.insert(0, os.path.dirname(__file__))
 from run_analysis import build_solver, resolve_data_dir, REPO  # noqa: E402
+from incremental_mcis import build_disagreement  # noqa: E402
+
+
+def make_sampler(adj, ng, kind):
+    """Return a function rng,size -> set of local node indices.
+
+    The greedy optimality gap depends critically on WHERE we sample. A node is
+    "hard" iff it sits in a dense disagreement neighbourhood — that is exactly
+    where max-degree greedy peels too aggressively (science.md §3.4). Uniform
+    sampling draws mostly sparse, easy subgraphs and therefore reports an
+    OPTIMISTIC gap. We expose three schemes:
+
+      uniform            — original: each node equally likely (easy regime)
+      degree_stratified  — P(node) ∝ 1 + disagreement-degree (over-weights the
+                           constrained core, a harder regime)
+      disagreement_ego   — grow a connected ball in the disagreement graph from
+                           a high-degree seed (the worst case for greedy)
+    """
+    deg = np.array([len(adj.get(v, ())) for v in range(ng)], dtype=float)
+
+    def uniform(rng, size):
+        return set(rng.choice(ng, size=min(size, ng), replace=False).tolist())
+
+    def degree_stratified(rng, size):
+        w = 1.0 + deg
+        p = w / w.sum()
+        return set(rng.choice(ng, size=min(size, ng), replace=False,
+                              p=p).tolist())
+
+    def disagreement_ego(rng, size):
+        # BFS a connected ball in D from a seed chosen ∝ disagreement degree
+        if deg.sum() == 0:
+            return uniform(rng, size)
+        seed = int(rng.choice(ng, p=(deg / deg.sum())))
+        chosen, frontier = {seed}, [seed]
+        while frontier and len(chosen) < size:
+            nxt = []
+            rng.shuffle(frontier)
+            for u in frontier:
+                for w_ in adj.get(u, ()):
+                    if w_ not in chosen:
+                        chosen.add(w_)
+                        nxt.append(w_)
+                        if len(chosen) >= size:
+                            break
+                if len(chosen) >= size:
+                    break
+            frontier = nxt
+        # top up with random nodes if the ball was too small
+        if len(chosen) < size:
+            extra = [v for v in rng.permutation(ng).tolist() if v not in chosen]
+            chosen |= set(extra[:size - len(chosen)])
+        return chosen
+
+    return {"uniform": uniform, "degree_stratified": degree_stratified,
+            "disagreement_ego": disagreement_ego}[kind]
 
 
 def greedy_on_subset(gbe, gfe, gme, nodes):
@@ -103,6 +159,11 @@ def main():
     ap.add_argument("--tiers", type=int, nargs="+", default=[20, 30, 40, 50])
     ap.add_argument("--per-tier", type=int, nargs="+", default=[15, 15, 10, 10])
     ap.add_argument("--seed", type=int, default=7)
+    ap.add_argument("--sampler", default="uniform",
+                    choices=["uniform", "degree_stratified", "disagreement_ego"],
+                    help="subgraph sampling scheme (see make_sampler docstring)")
+    ap.add_argument("--out", default=None,
+                    help="output json filename (default ilp_validation.json)")
     args = ap.parse_args()
 
     data_dir = resolve_data_dir(args.data_dir)
@@ -111,12 +172,15 @@ def main():
     solver._load()
     gbe, gfe, gme, ng = solver._gbe, solver._gfe, solver._gme, solver._ng
     rng = np.random.default_rng(args.seed)
+    adj, _ = build_disagreement(set(gbe), set(gfe), set(gme), ng)
+    sampler = make_sampler(adj, ng, args.sampler)
+    print(f"Sampler: {args.sampler}")
 
     rows, all_gaps = [], []
     for size, count in zip(args.tiers, args.per_tier):
         g_ns, e_ns, times = [], [], []
         for _ in range(count):
-            nodes = set(rng.choice(ng, size=min(size, ng), replace=False).tolist())
+            nodes = sampler(rng, size)
             gn = greedy_on_subset(gbe, gfe, gme, nodes)
             en, dt = exact_on_subset(gbe, gfe, gme, nodes)
             g_ns.append(gn)
@@ -139,6 +203,7 @@ def main():
 
     all_gaps = np.array(all_gaps)
     summary = {
+        "sampler": args.sampler,
         "tiers": rows,
         "overall": {
             "n_instances": int(sum(args.per_tier)),
@@ -152,7 +217,7 @@ def main():
           f"{summary['overall']['frac_within_2pct']*100:.0f}% within 2%")
 
     (REPO / "results").mkdir(exist_ok=True)
-    out = REPO / "results" / "ilp_validation.json"
+    out = REPO / "results" / (args.out or "ilp_validation.json")
     with open(out, "w") as f:
         json.dump(summary, f, indent=2)
     print(f"  Wrote {out}")

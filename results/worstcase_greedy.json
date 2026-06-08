@@ -1,0 +1,72 @@
+{
+  "greedy_trap": {
+    "note": "Johnson 1974 tight instance: greedy keeps L (size k); true MIS is R (~k ln k) -> ~ln k underestimate factor",
+    "sweep": [
+      {
+        "k": 10,
+        "greedy_mean": 17.0,
+        "opt_mean": 17.0,
+        "gap_pct": 0.0
+      },
+      {
+        "k": 20,
+        "greedy_mean": 44.8,
+        "opt_mean": 46.0,
+        "gap_pct": 2.6
+      },
+      {
+        "k": 40,
+        "greedy_mean": 118.0,
+        "opt_mean": 118.0,
+        "gap_pct": 0.0
+      },
+      {
+        "k": 80,
+        "greedy_mean": 269.0,
+        "opt_mean": 288.0,
+        "gap_pct": 6.6
+      }
+    ],
+    "max_gap_pct": 6.6
+  },
+  "er_density_sweep": {
+    "params": {
+      "n": 40
+    },
+    "note": "gap ~0 sparse, grows with density -> uniform sampling is optimistic",
+    "sweep": [
+      {
+        "density": 0.05,
+        "greedy_mean": 24.2,
+        "opt_mean": 25.0,
+        "gap_pct": 3.2
+      },
+      {
+        "density": 0.1,
+        "greedy_mean": 17.6,
+        "opt_mean": 18.9,
+        "gap_pct": 7.1
+      },
+      {
+        "density": 0.2,
+        "greedy_mean": 12.5,
+        "opt_mean": 13.7,
+        "gap_pct": 8.9
+      },
+      {
+        "density": 0.35,
+        "greedy_mean": 8.3,
+        "opt_mean": 9.3,
+        "gap_pct": 10.7
+      },
+      {
+        "density": 0.5,
+        "greedy_mean": 6.5,
+        "opt_mean": 7.1,
+        "gap_pct": 8.5
+      }
+    ],
+    "max_gap_pct": 10.7
+  },
+  "thesis": "Max-degree greedy = Theta(log n) vertex-cover heuristic. It is near-optimal on sparse/star disagreement graphs (the empirical regime, ~1% gap) but systematically underestimates MIS when high- value independent nodes carry high disagreement-degree (dense, near-regular blobs). Uniform subgraph sampling under-samples that regime; the disagreement_ego sampler targets it."
+}

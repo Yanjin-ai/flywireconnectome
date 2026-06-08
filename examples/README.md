@@ -31,7 +31,7 @@ solver = MCISSolver(
 )
 result = solver.solve()
 print(result.summary())
-# MCISResult(N=104, edges=6, isomorphic=True)
+# MCISResult(N=105, edges=12, isomorphic=True)
 result.to_csv('network.csv')
 ```
 
