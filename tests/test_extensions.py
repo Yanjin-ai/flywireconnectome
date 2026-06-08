@@ -86,6 +86,16 @@ def test_warmstart_is_independent():
     assert not any(w in keep for v in keep for w in adj.get(v, ()))
 
 
+def test_lovasz_theta_on_C5():
+    cv = pytest.importorskip("cvxpy")  # skip if SDP solver not installed
+    C5 = nx.cycle_graph(5)
+    th = efm.lovasz_theta(C5)
+    # theta(C5) = sqrt(5) ~ 2.236, and it upper-bounds alpha(C5) = 2
+    assert th is not None
+    assert abs(th - 5 ** 0.5) < 1e-2
+    assert th >= 2 - 1e-6
+
+
 # ── exact_ilp samplers ──────────────────────────────────────────────
 def _toy_adj(ng=30, p=0.2, seed=5):
     rng = np.random.default_rng(seed)

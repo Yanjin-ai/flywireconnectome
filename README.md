@@ -172,7 +172,7 @@ Verified: E_BANC[S] = E_FAFB[S] = E_MANC[S]
 **Reproducibility:** Fixed random seeds; deterministic per seed; result reported as the best of a 100-seed multi-start.  
 **Unit tests:** `pytest tests/ -v` — 21 passed, 1 skipped (real-data smoke), all pass.  
 **This is Maximum Independent Set on a "disagreement graph"** (a pair of neurons cannot coexist if their connection disagrees across connectomes). Greedy = the classic max-degree vertex-cover heuristic — see the **solver decision rule** (greedy vs ILP vs spectral) in [science.md §3.5](science.md) and the worst-case self-critique in §3.4.  
-**Optimality:** honest greedy gap **2.67%** under hard (disagreement-ego) subgraph sampling (1.15% under optimistic uniform sampling); full-graph certificate **105 ≤ N ≤ 245** with N=105 verified-feasible ([science.md §3.6](science.md), `results/exact_full_mis.json`).
+**Optimality:** honest greedy gap **2.67%** under hard (disagreement-ego) subgraph sampling (1.15% under optimistic uniform sampling); full-graph certificate **105 ≤ N ≤ 136** with N=105 verified-feasible ([science.md §3.6](science.md), `results/exact_full_mis.json`).
 
 ### Assumptions
 
@@ -207,7 +207,7 @@ N cannot grow indefinitely:
 | **Null-mixing sensitivity** (new) | Beyond-degree Z stable once null is mixed (>3×\|E\| swaps); in/out degree preserved exactly | The headline is robust to the null's swap count — the old 7.4× was an under-mixing artifact (`results/null_sensitivity.json`) |
 | **Honest sampling** (new) | Greedy gap 1.15% (uniform) → 2.67% (hard disagreement-ego sampling) | Uniform sampling is optimistic; greedy still ~97% of exact on the hard regime (`results/ilp_validation_ego.json`) |
 | **Greedy worst-case** (new) | Synthetic: gap grows with density; tight-instance ≈ln k underestimate | Characterises *where* max-degree greedy underestimates MIS (`results/worstcase_greedy.json`) |
-| **Full-graph MIS certificate** (new) | 105 ≤ N ≤ 245; N=105 verified-feasible (0 internal disagreement) | N is a checked feasible solution, not just a heuristic output (`results/exact_full_mis.json`) |
+| **Full-graph MIS certificate** (new) | 105 ≤ N ≤ 136; N=105 verified-feasible (0 internal disagreement) | N is a checked feasible solution, not just a heuristic output (`results/exact_full_mis.json`) |
 
 ---
 
@@ -264,7 +264,7 @@ export MCIS_DATA_DIR=/path/to/data
 python src/run_analysis.py --seeds 100        # → network.csv, results/canonical_results.json
 python src/exact_ilp.py                        # → results/ilp_validation.json (PuLP/CBC, uniform sampling)
 python src/exact_ilp.py --sampler disagreement_ego --out ilp_validation_ego.json  # honest hard-sampling gap
-python src/exact_full_mis.py --seeds 40        # → full-graph MIS certificate 105 ≤ N ≤ 245
+python src/exact_full_mis.py --seeds 40        # → full-graph MIS certificate 105 ≤ N ≤ 136
 python src/null_sensitivity.py                 # → null mixing/sensitivity (results/null_sensitivity.json)
 python src/worstcase_greedy.py                 # → where greedy underestimates MIS (synthetic)
 python src/derived_stats.py                    # → results/derived_stats.json (composition/enrichment)
