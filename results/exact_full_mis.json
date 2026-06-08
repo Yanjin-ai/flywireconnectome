@@ -1,0 +1,21 @@
+{
+  "candidate_nodes": 987,
+  "forced_out": 0,
+  "disagreement_edges": 44968,
+  "density": 0.0924,
+  "lower_bound": {
+    "N": 105,
+    "method": "greedy multi-start + expansion",
+    "verified_independent": true,
+    "seed_max": 105,
+    "seed_mean": 100.5
+  },
+  "upper_bound": {
+    "N": 245,
+    "method": "greedy clique cover"
+  },
+  "cbc_crosscheck": null,
+  "certificate": "105 <= N <= 245",
+  "previous_reported_N": 105,
+  "note": "Full-graph exact MIS does not close in reasonable time (one dense 987-node component, 45k constraints). The earlier '82 proven' was a pulp/CBC warmStart bug \u2014 warmStart fixed the 0-vars, yielding a spurious optimum below a known feasible solution. N=105 is verified feasible; this brackets the true optimum."
+}
