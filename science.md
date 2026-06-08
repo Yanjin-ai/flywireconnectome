@@ -12,7 +12,7 @@
 
 **The circuit.** The largest set of morphologically matched neurons whose directed induced subgraph is *identical* across three independent connectomes — BANC (♀ brain+cord), FAFB (♀ brain), MANC (♂ cord) — is a **109-neuron sensorimotor backbone with 14 conserved directed edges**. It is 92% descending + ascending neurons (67 DN + 34 AN + 8 sensory): the brain↔ventral-nerve-cord communication channel.
 
-**What it does.** The conserved hubs span multiple motor modules — **wing/flight, leg, and abdominal** effectors — spanning leg, dorsal/flight and abdominal effectors, carried by as-yet-uncharacterised DN/AN types (the DNge076→DNge019/020 leg fan-out is the most stable motif). Descending axons of these classes target leg/neck/wing motor circuits in the VNC (Namiki et al. 2018). The mix of cholinergic and GABAergic descending neurons is consistent with a feedforward-inhibition coordination motif (Milo et al. 2002).
+**What it does.** The conserved hubs are leg-VNC-dominated (15 of 27 neurons), carried by as-yet-uncharacterised DN/AN types (a central ascending hub AN02A002 fans out to 10 leg-motor descending neurons; a DNp58↔DNp65 reciprocal pair anchors recurrent control). Descending axons of these classes target leg/neck/wing motor circuits in the VNC (Namiki et al. 2018). The mix of cholinergic and GABAergic descending neurons is consistent with a feedforward-inhibition coordination motif (Milo et al. 2002).
 
 ![Network graph](figures/figure3_hub_circuit.png)
 *Conserved-circuit network graph: hubs joined by the 14 directed edges identical across all three connectomes (gold).*
@@ -26,7 +26,7 @@
 - **Cross-sex:** 92.7% of the circuit is wired identically in ♀ and ♂; the few dimorphic neurons target abdominal VNC / lateral brain.
 - **Robustness:** lower betweenness than matched neurons (peripheral relays, p = 0.009); circuit survives 20% simulated reconstruction error (graceful decline).
 
-**Interpretation & hypotheses.** The backbone is a developmentally canalised brain↔cord channel (H1) — supported by cross-sex conservation and output-hemilineage enrichment. The degree-preserving null **rejects** a pure degree/sampling artifact at the edge level (H2), and the strong class enrichment **rejects** a generic-subgraph explanation (H5); current static data **cannot** distinguish developmentally fixed vs activity-refined wiring (H4 — the key open question). **Prediction:** silencing the hub neurons (the DNge076→DNge019/020 leg fan-out; the DNg82→DNg04 / DNp26→DNae002 dorsal-VNC links) should impair walking, flight and posture *simultaneously* — testable by optogenetic silencing with multi-behaviour assays.
+**Interpretation & hypotheses.** The backbone is a developmentally canalised brain↔cord channel (H1) — supported by cross-sex conservation and output-hemilineage enrichment. The degree-preserving null **rejects** a pure degree/sampling artifact at the edge level (H2), and the strong class enrichment **rejects** a generic-subgraph explanation (H5); current static data **cannot** distinguish developmentally fixed vs activity-refined wiring (H4 — the key open question). **Prediction:** silencing the hub neurons (the AN02A002 ascending hub (a conserved fan-out onto 10 leg-motor DNs) and the DNp58↔DNp65 reciprocal pair) should impair walking, flight and posture *simultaneously* — testable by optogenetic silencing with multi-behaviour assays.
 
 **Key citations.** Schlegel et al. 2024 (cell typing); Bates et al. 2025 (BANC correspondence); Dorkenwald et al. 2024 (FAFB); Pospisil et al. 2024 (sensorimotor bottleneck); Namiki et al. 2018 & Schnell et al. 2022 (descending-neuron function); Witvliet et al. 2021 (connectome stereotypy). Full reference list in §References.
 
@@ -338,12 +338,14 @@ Every result rests on the BANC-metadata 1:1 NBLAST correspondence; a wrong match
 
 ## 5. Cell-Type Enrichment: The Circuit Is Not a Random Brain Sample
 
-Comparing the 109 circuit neurons against the full 139,244-neuron FAFB annotation as background (computed by [`src/derived_stats.py`](src/derived_stats.py), `results/derived_stats.json`):
+Comparing the **27** connected-circuit neurons against the full 139,244-neuron FAFB annotation as background (computed by [`src/derived_stats.py`](src/derived_stats.py), `results/derived_stats.json`):
 
-| Neuron class | Circuit (N=109) | FAFB background (N=139,244) | Fold enrichment | Fisher exact p |
+| Neuron class | Circuit (N=27) | FAFB background (N=139,244) | Fold enrichment | Fisher exact p |
 |-------------|-----------------|----------------------------|-----------------|----------------|
-| Descending | 61.5% (67/109) | 0.94% (1,303/139,244) | **65.7×** | 4.1 × 10⁻¹⁰⁷ |
-| Ascending  | 31.2% (34/109) | 1.26% (1,750/139,244) | **24.8×** | 1.4 × 10⁻³⁷ |
+| Descending | 63.0% (17/27) | 0.94% (1,303/139,244) | **67.3×** | 2.3 × 10⁻²⁸ |
+| Ascending  | 22.2% (6/27) | 1.26% (1,750/139,244) | **17.7×** | 9.2 × 10⁻⁷ |
+
+*(For comparison, the unconstrained 109-node MCIS gives 65.7× / 24.8× — see §0.5; the connected circuit is, if anything, slightly more descending-enriched.)*
 
 The circuit is 65.7× enriched for descending neurons and 24.8× enriched for ascending neurons (both p < 10⁻³⁵). These reflect a near-complete exclusion of non-sensorimotor neuron classes from the MCIS.
 
@@ -360,11 +362,12 @@ The most represented developmental hemilineages among circuit neurons are LB12, 
 
 | Neuron class | Count | % | Functional role |
 |-------------|-------|---|-----------------|
-| Descending (DN) | 67 | 61.5% | Brain → VNC motor commands |
-| Ascending (AN) | 34 | 31.2% | VNC → Brain proprioceptive feedback |
-| Sensory-ascending | 6 | 5.5% | Peripheral sensory → Brain |
-| Sensory-descending | 2 | 1.8% | Sensory processing → VNC |
-| **Total** | **109** | | **14 conserved directed edges** |
+| Descending (DN) | 17 | 63.0% | Brain → VNC motor commands |
+| Ascending (AN) | 6 | 22.2% | VNC → Brain proprioceptive feedback |
+| Sensory-ascending | 4 | 14.8% | Peripheral sensory → Brain |
+| **Total** | **27** | | **26 conserved directed edges**, weakly connected |
+
+Motor targets are **leg-VNC-dominated** (15 of 27 neurons target leg motor neuropil), with smaller groups to the flange median bundle (3), lateral brain (2), abdominal VNC (2) and superior brain (1) — a locomotion-centred connected circuit.
 
 ### 6.2 Anatomical position
 
@@ -374,34 +377,27 @@ The most represented developmental hemilineages among circuit neurons are LB12, 
 ### 6.3 Circuit structure and neurotransmitters
 
 ![Fig. 5 — Circuit layouts](figures/figure1_circuit_layouts.png)
-**Figure 5.** Three force-directed layouts of the 109-neuron circuit. Gold edges = 14 directed connections verified identical across BANC, FAFB, and MANC. Red = descending (DN); blue = ascending (AN); large nodes = neurons involved in conserved edges.
+**Figure 5.** Force-directed layout of the 27-neuron connected circuit. Gold edges = 26 directed connections verified identical across BANC, FAFB, and MANC. Red = descending (DN); blue = ascending (AN); large nodes = the high-degree hubs.
 
 ![Fig. 6 — Hub neurons](figures/figure3_hub_circuit.png)
-**Figure 6.** Hub neurons connected by the 14 conserved edges (e.g. the DNge076→DNge019/DNge020 leg-motor fan-out, the DNg82→DNg04 and DNp26→DNae002 dorsal-VNC links, and the AN05B023→AN05B078/AN09B012 ascending pair), with neurotransmitter identity annotated. The mixed ACh/GABA chemistry is consistent with a feedforward inhibition motif — a canonical computation (Milo et al. 2002) enabling temporal filtering of descending motor commands.
+**Figure 6.** The 26 conserved edges form a single weakly-connected circuit with clear hub structure (below), neurotransmitter identity annotated. Mixed ACh/GABA + serotonin chemistry is consistent with a feedforward-inhibition + neuromodulatory coordination motif (Milo et al. 2002).
 
 ![Fig. 7 — Composition](figures/figure2_composition.png)
-**Figure 7.** **(A)** DN/AN dominance. **(B)** Acetylcholine-dominant NT profile (63.3%; 69/109). **(C)** Multi-effector motor targets (leg VNC, dorsal VNC, flange median bundle, abdominal VNC). **(D)** Node degree distribution. **(E)** Cross-dataset edge count comparison: asymmetry reflects partial-volume biology (MANC captures axonal synapses; FAFB captures dendritic synapses).
+**Figure 7.** **(A)** DN/AN dominance (17 DN + 6 AN + 4 sensory). **(B)** Mixed NT profile (ACh 41%, GABA 30%, serotonin 15%, Glu 11%). **(C)** Leg-VNC-dominated motor targets. **(D)** Node degree distribution. **(E)** Cross-dataset edge count comparison: asymmetry reflects partial-volume biology (MANC captures axonal synapses; FAFB captures dendritic synapses).
 
-### 6.4 Motor targets — multi-effector coordination
+### 6.4 Motor targets — a locomotion-centred connected circuit
 
-Among neurons with an annotated `cns_network` target: leg VNC (38 neurons, locomotion), dorsal VNC/flight (18), lateral brain (12), flange median bundle/whole-body coordination (11), posterior brain (8), abdominal VNC (7); 7 neurons are unannotated. The multi-effector profile is characteristic of coordination interneurons rather than single-behaviour specialists.
+Of the 27 neurons, **15 target leg VNC** (locomotion), with smaller groups to the flange median bundle (3, whole-body coordination), lateral brain (2), abdominal VNC (2) and superior brain (1). Unlike the inflated 109 set (which spread across many effectors), the connected circuit is **leg-motor-centred** — a coherent locomotor sub-circuit.
 
-### 6.5 Hub neurons: motor modules carrying the conserved edges
+### 6.5 Hub structure of the connected circuit
 
-The cell types that carry the 14 conserved edges, grouped by VNC/brain target (Codex `cns_network` annotation). The conserved core spans **multiple motor modules**, and the edges are a mix of excitatory (ACh) and inhibitory (GABA). We do **not** over-claim individual behavioural function: none of the conserved-edge carriers is individually behaviourally characterised in the literature.
+The 26 conserved edges form a single weakly-connected circuit with genuine hub architecture (`results/connected_circuit.csv`). Three features stand out:
 
-| Conserved edge (cell-type pair) | NT (source→target) | Module / target |
-|---|---|---|
-| **DNge076 → DNge019**, **DNge076 → DNge020** | GABA → ACh | flange median bundle → **leg VNC** (an inhibitory fan-out onto leg-motor DNs — *the one motif that persists from the earlier solver*) |
-| AN05B023 → AN05B078, AN05B023 → AN09B012 | GABA → GABA/ACh | leg-VNC ascending interneuron pair |
-| AN06B039 → DNg64 | GABA → GABA | leg VNC |
-| ANXXX092 → DNge056 | ACh → ACh | leg VNC → flange median bundle |
-| ANXXX170 → DNg68 | ACh → ACh | leg VNC → **abdominal VNC** |
-| DNg82 → DNg04, DNp26 → DNae002 | ACh → ACh | **dorsal VNC** (wing/flight neuropil) |
-| DNg51 → DNp22 | ACh → ACh | posterior brain → dorsal VNC |
-| ANXXX308 → ANXXX308, DNp58 → DNp58 | ACh (autapse) | flange / abdominal VNC — conserved self-edges (reported honestly; could be reconstruction artifacts) |
+- **A central ascending hub: AN02A002** (ascending neuron) fans out to **10 descending neurons** in one conserved motif — AN02A002 → {DNg108, DNge067, DNge079, DNge083, DNge122, DNp39, DNpe042, DNae007, DNb08, AN09B009}. A single ascending interneuron whose divergent output onto leg-motor DNs is identical across all three connectomes is the structural core of the circuit.
+- **A conserved reciprocal pair: DNp58 ↔ DNp65** (both directions present in all three datasets) — a mutually-connected descending pair, the kind of recurrent motif expected in motor control.
+- **Convergence nodes**: DNpe007 receives conserved input from four neurons (AN17A018, DNpe049, SAch01, SAxx02); AN05B101_b is a convergence target of DNg22, DNp65, DNpe007 and SAabg01.
 
-Two observations follow. (i) The conserved core is **multi-module**: leg/locomotion (DNge/AN05B/ANXXX092), dorsal/flight (DNg82→DNg04, DNp26→DNae002), abdominal/postural (ANXXX170→DNg68, DNp58) and flange/whole-body (DNge076 fan-out, ANXXX308) — a cross-program coordination backbone, not a single-behaviour pathway. (ii) It is **excitatory–inhibitory mixed**: GABAergic sources (DNge076, AN05B023, AN06B039, DNg64, AN05B078) alongside cholinergic ones give the chemistry expected of a feedforward-inhibition coordination motif (§8.3). Note that **DNg02** — the one documented flight controller (Schnell et al. 2022) — *is* present in the 109-neuron set but is **sexually dimorphic** (§7.2) and does **not** carry a conserved edge, so we no longer claim a characterised controller sits in the invariant core; the conserved-edge carriers are, as yet, uncharacterised types.
+The chemistry is **excitatory–inhibitory mixed with neuromodulation**: ACh 11, GABA 8, serotonin 4, Glu 3 across the 27. We do **not** over-claim individual behavioural function — the conserved-edge carriers (AN02A002, the DNge/DNp leg-motor types, DNp58/DNp65) are not yet individually characterised in the literature; the claim is structural: *this specific connected wiring is identical across three independent connectomes*.
 
 ---
 
@@ -409,27 +405,17 @@ Two observations follow. (i) The conserved core is **multi-module**: leg/locomot
 
 ### 7.1 Overview
 
-**92.7% of circuit neurons (101/109) are sexually isomorphic** — their wiring is preserved identically across ♀ FAFB/BANC and ♂ MANC. The remaining 7.3% (8 neurons) are sexually dimorphic. For comparison, Berg et al. (2025) report approximately 95.2% sexual conservation across all matched DN/AN neuron pairs; our circuit's 92.7% is slightly below this baseline, reflecting the presence of sex-specific behavioural neurons among the 109.
+**96.3% of the connected-circuit neurons (26/27) are sexually isomorphic** — their wiring is preserved identically across ♀ FAFB/BANC and ♂ MANC. Only **1 neuron (SAch01, a sensory-ascending ACh cell) is sexually dimorphic**. This is in line with Berg et al. (2025)'s ~95.2% sexual-conservation baseline for matched DN/AN pairs — the connected circuit is essentially sex-invariant, consistent with a developmentally canalised locomotor backbone.
 
 ![Fig. 8 — Dimorphism overview](figures/figure4_dimorphism_nt.png)
 **Figure 8.** Sexual dimorphism overview. Dimorphism status by neuron class and neurotransmitter profile.
 
 ![Fig. 9 — Sexual conservation deep dive](figures/figure8_sexual_conservation.png)
-**Figure 9.** **(A)** 92.7% isomorphic (101/109). **(B)** Dimorphism by neuron class. **(C)** Neurotransmitter identity of the 8 dimorphic neurons (ACh 5, GABA 2, Glu 1).
+**Figure 9.** **(A)** 96.3% isomorphic (26/27). **(B)** Dimorphism by neuron class. **(C)** The single dimorphic neuron (SAch01) is a sensory-ascending cholinergic cell.
 
-### 7.2 The 8 sexually dimorphic neurons
+### 7.2 The single sexually dimorphic neuron
 
-| Cell type | Class | NT | Motor target |
-|-----------|-------|-----|-------------|
-| AN05B023 | Ascending | GABA | Leg VNC |
-| AN09B012 | Ascending | ACh | Left visual |
-| AN12B089 | Ascending | GABA | Leg VNC |
-| ANXXX169 | Ascending | Glu | Abdominal VNC |
-| DNge010 | Descending | ACh | Leg VNC |
-| **DNg02_g** | Descending | ACh | Dorsal VNC (documented flight controller, Schnell 2022) |
-| SAch01 (×2) | Sensory-asc. | ACh | — |
-
-The 8 dimorphic neurons are ACh (5), GABA (2), Glu (1). Notably **DNg02** — the one behaviourally characterised type in the whole circuit (a flight-motor population; Schnell et al. 2022) — is among the *sexually dimorphic* members and does not carry a conserved edge, so the invariant core itself is built from as-yet-uncharacterised types. Neurons projecting to leg and abdominal VNC dominate the dimorphic set, consistent with sex-specific reproductive/locomotor behaviours; SAch01 appears as a bilateral pair.
+Only **SAch01** (sensory-ascending, ACh) differs in its conserved wiring between ♀ and ♂. The 26 of 27 sex-invariant neurons — including the central AN02A002 hub and the DNp58↔DNp65 reciprocal pair — mean the connected locomotor circuit is essentially sex-independent, as expected for a lineage-encoded backbone (§8.2). *(In the unconstrained 109-node set, 8 neurons are dimorphic, including DNg02 — a documented flight controller; but DNg02 is not part of the connected circuit.)*
 
 ---
 
@@ -437,7 +423,7 @@ The 8 dimorphic neurons are ACh (5), GABA (2), Glu (1). Notably **DNg02** — th
 
 ### 8.1 Structural evidence for the sensorimotor bottleneck
 
-Pospisil et al. (2024) showed that approximately 1% of *Drosophila* brain neurons directly influence motor output — the "effectome" — with descending neurons as the obligate conduit. Our result provides **direct structural corroboration**: the largest isomorphic subgraph across three independent connectomes consists almost entirely of DNs and ANs (92.7% of circuit neurons). This demonstrates that the sensorimotor bottleneck is not only functionally constrained but **structurally canalized across sexes, specimens, and anatomical preparations**. Notably, **DNg02** — a documented flight-motor population (Schnell et al. 2022) — is in the 109-neuron set but is sexually dimorphic and does not carry a conserved edge (§6.5); the conserved-edge carriers are as-yet-uncharacterised DN/AN types, so we make no individual-controller claim.
+Pospisil et al. (2024) showed that approximately 1% of *Drosophila* brain neurons directly influence motor output — the "effectome" — with descending neurons as the obligate conduit. Our result provides **direct structural corroboration**: the largest *connected* isomorphic circuit across three independent connectomes consists entirely of DNs, ANs and sensory-ascending neurons (descending/ascending enriched 67×/18× vs whole brain), is leg-VNC-dominated, and is **96.3% sex-invariant**. This demonstrates that the sensorimotor bottleneck is not only functionally constrained but **structurally canalized across sexes, specimens, and anatomical preparations**. The conserved-edge carriers (the AN02A002 ascending hub, the leg-motor DN types, the DNp58↔DNp65 reciprocal pair) are as-yet-uncharacterised individually, so we make no single-controller claim — the result is structural.
 
 ### 8.2 Developmental constraint as the mechanistic basis
 
@@ -445,7 +431,7 @@ The 92.7% cross-sex conservation is consistent with the developmental constraint
 
 ### 8.3 Testable experimental predictions
 
-1. **Multi-program impairment:** Silencing the hub neurons that carry the conserved edges (e.g. the DNge076→DNge019/DNge020 leg-motor fan-out, or the DNg82→DNg04 / DNp26→DNae002 dorsal-VNC links) should impair walking, flight, and posture simultaneously — testable via optogenetic silencing combined with multi-behaviour assays.
+1. **Multi-program impairment:** Silencing the hub neurons that carry the conserved edges (e.g. the AN02A002 ascending hub (a conserved fan-out onto 10 leg-motor DNs) and the DNp58↔DNp65 reciprocal pair) should impair walking, flight, and posture simultaneously — testable via optogenetic silencing combined with multi-behaviour assays.
 2. **Synapse strength:** The 14 conserved edges should exhibit above-average synapse counts in the weighted connectome, consistent with robust signal transmission. Testable via FlyWire API query of synapse weights.
 3. **Cross-species conservation:** Orthologous circuits should be identifiable in other holometabolous insects (*Manduca sexta*, *Apis mellifera*) as connectome data become available, given that DN/AN cell types are broadly conserved across Insecta.
 
@@ -489,7 +475,7 @@ Apply the same MCIS framework when three-way NBLAST correspondence tables for MA
 
 Concretely, the 65 DN nodes form the input layer (receiving descending motor commands from higher brain areas), the 33 AN nodes form the output layer (encoding proprioceptive feedback to the brain), and the 14 conserved directed edges define the recurrent connections that must be preserved. All other connectivity is trainable. This differs from flyGNN in two respects: (i) the graph is three-connectome-validated rather than taken from a single specimen, and (ii) the topology is a hard constraint, not an initialisation. The prediction is that fixing the conserved edges will reduce effective degrees of freedom and improve sample efficiency on tasks requiring brain–body coordination, while having negligible benefit on pure reflex tasks (consistent with the CartPole negative result in the companion Project B analysis).
 
-**Testable behavioral predictions via optogenetics.** The 14-edge subgraph involves a small number of identifiable hub neurons (the DNge076→DNge019/020 leg fan-out and the DNg82→DNg04 / DNp26→DNae002 dorsal links; §8.3). Because these edges are the *only* conserved connections in the circuit, their disruption should uniquely impair cross-program coordination:
+**Testable behavioral predictions via optogenetics.** The 26-edge connected circuit involves a small number of identifiable hub neurons (the AN02A002 ascending hub (a conserved fan-out onto 10 leg-motor DNs) and the DNp58↔DNp65 reciprocal pair; §8.3). Because these edges are the *only* conserved connections in the circuit, their disruption should uniquely impair cross-program coordination:
 
 1. *Multi-program silencing test:* Bilateral optogenetic silencing of each hub neuron during free locomotion should impair walking, flight initiation, and postural correction simultaneously. Single-program impairment without cross-program deficit would argue against the feedforward inhibition motif hypothesis.
 2. *Edge weight prediction:* Weighted synapse counts for the 14 conserved edges should exceed the 95th percentile of all DN→AN synaptic weights in the full connectome — a prediction directly queryable via `codex.flywire.ai/api/v2/neurons/` with no new experiments required.

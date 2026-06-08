@@ -125,7 +125,7 @@ We search for the largest set of morphologically matched neurons whose directed 
 
 *The 1-page scientific report is [`science.md`](science.md) (it opens with a one-page summary); a print-ready version is [`research_summary_fafb.pdf`](research_summary_fafb.pdf). Key content is mirrored here.*
 
-**What the circuit is / does.** A 109-neuron brain↔ventral-nerve-cord backbone (93% descending + ascending). Its hubs span **wing/flight, leg, and abdominal** motor modules carried by as-yet-uncharacterised DN/AN types (the DNge076→DNge019/020 leg fan-out is the most stable motif); these DN classes target leg/neck/wing VNC motor circuits (Namiki et al. 2018). DNg02 — a documented flight controller (Schnell et al. 2022) — is in the set but is sexually dimorphic and not a conserved-edge carrier. Mixed ACh/GABA chemistry → feedforward-inhibition coordination motif.
+**What the circuit is / does.** A 27-neuron weakly-connected brain↔ventral-nerve-cord locomotor circuit (DN/AN/sensory). Its hub is the ascending neuron AN02A002 (fans out to 10 leg-motor DNs); it is leg-VNC-dominated, carried by as-yet-uncharacterised DN/AN types (a central ascending hub AN02A002 fans out to 10 leg-motor descending neurons; a DNp58↔DNp65 reciprocal pair anchors recurrent control); these DN classes target leg/neck/wing VNC motor circuits (Namiki et al. 2018). DNg02 — a documented flight controller (Schnell et al. 2022) — is in the set but is sexually dimorphic and not a conserved-edge carrier. Mixed ACh/GABA chemistry → feedforward-inhibition coordination motif.
 
 | Network graph | Codex 3D meshes (FAFB) |
 |---|---|
@@ -133,7 +133,7 @@ We search for the largest set of morphologically matched neurons whose directed 
 
 **Structural observations.** 65.7×/24.8× descending/ascending enrichment (Fisher p<10⁻³⁵); wiring conserved **68.9× beyond a well-mixed degree-preserving (Maslov–Sneppen) null** (2,609 vs 37.9±5.4, Z=476σ); 92.7% conserved across sexes; peripheral (low-betweenness) relays; robust to 20% simulated reconstruction error.
 
-**Interpretation / hypotheses.** A developmentally canalised brain↔cord channel (H1); the degree-null rejects a pure degree artifact (H2) and the enrichment rejects a generic-subgraph explanation (H5); static data cannot yet distinguish developmental vs activity-driven wiring (H4 — key open question). **Prediction:** silencing the hub neurons (the DNge076→DNge019/020 leg fan-out; DNg82→DNg04; DNp26→DNae002) should impair walking, flight and posture simultaneously. Full citations and the alternative-hypothesis table are in [`science.md`](science.md) §6.5, §8.
+**Interpretation / hypotheses.** A developmentally canalised brain↔cord channel (H1); the degree-null rejects a pure degree artifact (H2) and the enrichment rejects a generic-subgraph explanation (H5); static data cannot yet distinguish developmental vs activity-driven wiring (H4 — key open question). **Prediction:** silencing the hub neurons (the AN02A002 ascending hub (a conserved fan-out onto 10 leg-motor DNs) and the DNp58↔DNp65 reciprocal pair) should impair walking, flight and posture simultaneously. Full citations and the alternative-hypothesis table are in [`science.md`](science.md) §6.5, §8.
 
 ---
 
