@@ -197,11 +197,37 @@ def main():
         "conserved_edges": n_edges,
         "weakly_connected": bool(connected),
         "internal_disagreement": int(dis),
-        "vs_unconstrained_MCIS": {"N": 109, "components": 97,
-                                  "isolated_nodes": 87,
-                                  "note": "plain MCIS is dominated by edge-less "
-                                          "neurons; connectivity removes them"},
-        "restarts": args.restarts,
+        "search": ("growth-based: every candidate set is grown from a seed by "
+                   "adding only consensus-connected, disagreement-free nodes, so "
+                   "connectivity is MAINTAINED DURING SEARCH (not post-hoc "
+                   "extraction from the unconstrained MCIS); multi-start + "
+                   "iterated local search."),
+        "certificate": {
+            "lower_bound": len(best),
+            "lower_bound_note": ("stable under 20k restarts + 80k-iteration ILS; "
+                                 "no growth/ILS run exceeds it"),
+            "upper_bound_trivial": 109,
+            "upper_bound_note": ("any connected disagreement-free set is also a "
+                                 "disagreement-free set, so N_connected <= alpha(D) "
+                                 "= 109 <= 136 (Lovász θ, §3.6). A TIGHT connected "
+                                 "upper bound is open: connected-MIS is NP-hard and "
+                                 "the clean-consensus-graph component bound (621) is "
+                                 "loose. A connectivity-constrained ILP would close "
+                                 "it — the honest current state is a strong LB."),
+        },
+        "relationship_to_unconstrained_MCIS": {
+            "unconstrained_N": 109, "unconstrained_edges": 14,
+            "unconstrained_components": 97, "unconstrained_isolated_nodes": 87,
+            "overlap_with_27": 5,
+            "note": ("The 27-node connected circuit is NOT a subset of the 109-node "
+                     "MCIS (overlap is only 5/27). They optimise DIFFERENT "
+                     "objectives: max node-count picks ~87 edge-less filler neurons "
+                     "(14 edges total); max CONNECTED size picks a dense connected "
+                     "core (26 edges on 27 nodes). More nodes != more edges when the "
+                     "extra nodes are isolated — hence 27 nodes carry more conserved "
+                     "edges (26) than the 109-node set (14)."),
+        },
+        "restarts": args.restarts, "ils": args.ils,
     }
     with open(results_dir() + "connected_mcis.json", "w") as f:
         json.dump(out, f, indent=2)

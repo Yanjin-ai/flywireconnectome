@@ -3,28 +3,28 @@
 **Yanjin Li** · FlyWire Qualification Challenge · June 2026
 
 **Datasets:** BANC v626 (♀ brain+cord) · FAFB v783 (♀ brain) · MANC v1.2.1 (♂ nerve cord)  
-**Result:** N = 109 neurons · 14 conserved directed edges · correspondence-shuffle null 81.1 ± 2.3 (>15σ separation)  
+**Result:** the deliverable is a **27-neuron weakly-connected conserved circuit (26 edges)**; the unconstrained MCIS (no connectivity) is 109 nodes / 14 edges — a methodological contrast, see §0.5  
 **Code:** [github.com/Yanjin-ai/flywireconnectome](https://github.com/Yanjin-ai/flywireconnectome) · all numbers reproduced by `src/run_analysis.py` (`results/`)
 
 ---
 
 ## 📄 One-Page Scientific Report
 
-**The circuit.** The largest set of morphologically matched neurons whose directed induced subgraph is *identical* across three independent connectomes — BANC (♀ brain+cord), FAFB (♀ brain), MANC (♂ cord) — is a **109-neuron sensorimotor backbone with 14 conserved directed edges**. It is 92% descending + ascending neurons (67 DN + 34 AN + 8 sensory): the brain↔ventral-nerve-cord communication channel.
+**The circuit.** The largest set of morphologically matched neurons whose directed induced subgraph is *identical* across three independent connectomes — BANC (♀ brain+cord), FAFB (♀ brain), MANC (♂ cord) — is a **weakly-connected 27-neuron sensorimotor circuit with 26 conserved directed edges**. It is 85% descending + ascending neurons (17 DN + 6 AN + 4 sensory-ascending): a leg-motor-dominated piece of the brain↔ventral-nerve-cord channel. *(Maximising node count without the connectivity constraint instead gives a different, mostly edge-less 109-node set — §0.5.)*
 
 **What it does.** The conserved hubs are leg-VNC-dominated (15 of 27 neurons), carried by as-yet-uncharacterised DN/AN types (a central ascending hub AN02A002 fans out to 10 leg-motor descending neurons; a DNp58↔DNp65 reciprocal pair anchors recurrent control). Descending axons of these classes target leg/neck/wing motor circuits in the VNC (Namiki et al. 2018). The mix of cholinergic and GABAergic descending neurons is consistent with a feedforward-inhibition coordination motif (Milo et al. 2002).
 
 ![Network graph](figures/figure3_hub_circuit.png)
-*Conserved-circuit network graph: hubs joined by the 14 directed edges identical across all three connectomes (gold).*
+*Conserved-circuit network graph: 27 neurons joined by the 26 directed edges identical across all three connectomes (gold).*
 
 ![Codex 3D meshes](figures/codex_3d_fafb.png)
-*Codex 3D meshes (FAFB): all 109 neurons inside the whole-brain outline, converging at the midline / cervical connective — the expected brain↔cord relay locus.*
+*Codex 3D meshes (FAFB): all 27 circuit neurons inside the whole-brain outline, converging at the midline / cervical connective — the expected brain↔cord relay locus.*
 
 **Structural observations.**
-- **Cell-type identity:** 65.7× enriched for descending and 24.8× for ascending neurons vs the whole-brain FAFB background (Fisher p < 10⁻³⁵) — not a random brain sample.
+- **Cell-type identity:** 67.3× enriched for descending and 17.7× for ascending neurons vs the whole-brain FAFB background (Fisher p = 2×10⁻²⁸ / 9×10⁻⁷) — not a random brain sample.
 - **Wiring conserved beyond degree:** 2,609 edges are shared by all three connectomes vs 37.9 ± 5.4 under a well-mixed degree-preserving (Maslov–Sneppen) null → **68.9×, Z = 476σ**. Specific connectivity is conserved, not just degree sequence.
-- **Cross-sex:** 92.7% of the circuit is wired identically in ♀ and ♂; the few dimorphic neurons target abdominal VNC / lateral brain.
-- **Robustness:** lower betweenness than matched neurons (peripheral relays, p = 0.009); circuit survives 20% simulated reconstruction error (graceful decline).
+- **Cross-sex:** 96.3% of the circuit (26/27) is wired identically in ♀ and ♂ (only SAch01 is dimorphic) — essentially sex-invariant.
+- **Robustness:** circuit survives 20% simulated reconstruction error (graceful decline).
 
 **Interpretation & hypotheses.** The backbone is a developmentally canalised brain↔cord channel (H1) — supported by cross-sex conservation and output-hemilineage enrichment. The degree-preserving null **rejects** a pure degree/sampling artifact at the edge level (H2), and the strong class enrichment **rejects** a generic-subgraph explanation (H5); current static data **cannot** distinguish developmentally fixed vs activity-refined wiring (H4 — the key open question). **Prediction:** silencing the hub neurons (the AN02A002 ascending hub (a conserved fan-out onto 10 leg-motor DNs) and the DNp58↔DNp65 reciprocal pair) should impair walking, flight and posture *simultaneously* — testable by optogenetic silencing with multi-behaviour assays.
 
@@ -57,7 +57,21 @@ The rest of the document derives each row. The single most important caveat to c
 
 The headline deliverable (`network.csv`) is the largest **weakly-connected** common induced subgraph: **27 neurons, 26 conserved edges, connected, 0 internal disagreement** ([`src/connected_mcis.py`](src/connected_mcis.py), `results/connected_mcis.json`, `results/connected_circuit.csv`).
 
-**Why this, and not the larger 109?** The *unconstrained* Maximum Common Induced Subgraph (= Maximum Independent Set on the disagreement graph; §3) is N = 109 — but it is **not a circuit**: on the consensus graph it splits into **97 components, 87 of them isolated single neurons** with no conserved edge at all. Those isolated nodes are "trivially isomorphic" — they have no induced edges, so nothing to disagree about. This is precisely the artifact the degree-preserving null already exposed in §4.2 (the 109 node-count is ~93% explained by the degree sequence *because* it is dominated by edge-less neurons). **The connectivity requirement removes the edge-less filler and leaves the actual conserved circuit.**
+**Two different objectives, two largely-disjoint optima.** It is tempting to think the 27-node circuit is "the connected core of the 109-node MCIS" — **it is not**. The 27-node circuit shares only **5 of its 27 neurons** with the particular 109-node MCIS; they are different node sets because they maximise *different things*:
+
+- **Maximise node count** (unconstrained MCIS, §3) → **N = 109**, but the maximiser fills up with neurons that have **no conserved edges at all**: the 109 set is 97 components, **87 isolated single neurons**, only **14 edges total**. Isolated nodes are "trivially isomorphic" (empty induced graph → nothing to disagree about), so the count is *gamed* by edge-less filler. This is exactly the degree-inflation the §4.2 null exposed (the 109 count is ~93% degree-explained *because* it is dominated by edge-less nodes).
+- **Maximise CONNECTED size** → a **different 27-node dense core** with **26 conserved edges** — an actual circuit.
+
+This also resolves the apparent paradox that **27 nodes carry *more* conserved edges (26) than the 109-node set (14)**: more nodes ≠ more edges when the extra 82 nodes are isolated filler. The connected objective deliberately seeks the edge-dense region, which is a different (and far more wired) part of the consensus graph than the node-count maximiser lands in.
+
+**How the connected solver works (no shortcut).** `connected_mcis.py` does **not** compute the 109 set and then extract a connected piece (that would give a weak lower bound). It grows each candidate set from a seed, adding only nodes that are both consensus-connected to the current set *and* disagreement-free with all of it — so **connectivity is maintained throughout the search** — over many random restarts plus iterated local search.
+
+**Optimality of N = 27 — a rigorous certificate: 27 ≤ N_connected ≤ 99.** Connected-MIS is a distinct NP-hard problem, but we can bracket it ([`src/connected_certificate.py`](src/connected_certificate.py), `results/connected_certificate.json`):
+
+- **Lower bound N ≥ 27** — a strong, verified-feasible bound, stable under 20 000 restarts + 80 000 ILS iterations (no run exceeds it).
+- **Upper bound N ≤ 99** — *rigorous*. A connected disagreement-free set is connected via "clean" consensus edges (consensus edges whose endpoints do not disagree), so it lives entirely inside **one connected component of the clean-consensus graph**. The giant such component has 621 nodes; the Lovász ϑ of the disagreement graph restricted to it is **ϑ = 99.5 ⇒ N_connected ≤ 99** — tighter than the trivial α(D) = 109 / ϑ = 136 of the full graph.
+
+The remaining gap (27–99) is genuine: ϑ is *connectivity-blind* (it bounds the independent set, ignoring that the 27 must be wired together), so it over-counts. The tight closure would be a connectivity-constrained ILP, but a single-commodity-flow formulation on the 621-node clean component did **not** find a feasible integer point in 600 s of CBC — an honest finding that exact connected-MCIS is intractable here at scale. So the operative statement is: **N = 27 is a strong, reproducible lower bound; the optimum is rigorously ≤ 99.**
 
 | | Unconstrained MCIS (contrast) | **Connected MCIS (deliverable)** |
 |---|---|---|
@@ -333,6 +347,8 @@ Every result rests on the BANC-metadata 1:1 NBLAST correspondence; a wrong match
 
 ![Fig. 12 — Match confidence](figures/figure16_match_confidence.png)
 **Figure 12.** **(A)** Per-neuron NBLAST top-1 agreement for the circuit vs the 987-node background. **(B)** Multi-connectome corroboration of the 109 matches.
+
+**The same risk applies to the 27-node deliverable, and we quantify it.** Of the 27 connected-circuit neurons: **7 have both FAFB & MANC NBLAST top-1 agreeing, 11 one, and 9 neither** (mean multi-connectome agreement 0.64; 7 of 27 are confirmed by only a single dataset). So **~1/3 of the 27 circuit neurons rest on a single-dataset correspondence** — the same systematic limitation as the 109 set. A wrong NBLAST match injects spurious edges into the disagreement graph and could alter both membership and N. We therefore treat the precise 27-membership as carrying correspondence uncertainty concentrated in those ~9 lower-confidence neurons (flagged in `circuit_match_confidence.csv`); the robust, correspondence-insensitive claim is the *edge-level* conservation (68.9×, §4.6), measured on the whole 987-node component. Restricting the search to higher-confidence matches (conf2 ≥ 1) is the natural sensitivity check and a clean next step.
 
 ---
 

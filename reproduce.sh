@@ -48,6 +48,8 @@ mv -f network_enriched.csv network_enriched_unconstrained.csv 2>/dev/null || tru
 # ---- 1b. THE DELIVERABLE: largest weakly-CONNECTED conserved circuit (N=27) --
 step "connected_mcis.py  (connectivity requirement -> network.csv = 27-node circuit)"
 python3 src/connected_mcis.py --restarts 12000 --ils 30000
+step "connected_certificate.py  (rigorous bound 27 <= N <= 99: Lovasz theta on clean component)"
+python3 src/connected_certificate.py --ilp-seconds 300
 
 # ---- 2. Derived composition / enrichment / sexual-conservation stats ---------
 step "derived_stats.py  (composition, NT, descending/ascending enrichment)"

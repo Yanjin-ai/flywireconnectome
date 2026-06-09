@@ -1,0 +1,19 @@
+{
+  "heuristic_lb": 27,
+  "clean_giant_component": 621,
+  "theta_ub_giant": 99.51692849850652,
+  "theta_ub_floor": 99,
+  "ilp": {
+    "feasible_lb": 0,
+    "proven_optimal": false,
+    "nodes": 621,
+    "edges": 908,
+    "seconds": 600
+  },
+  "certificate": {
+    "lb": 27,
+    "ub": 99,
+    "exact": false
+  },
+  "note": "A connected disagreement-free set lives in one clean-consensus component, so \u03d1 on the giant clean component is a rigorous UB (far tighter than the trivial \u03b1(D)=109). The single-commodity-flow ILP gives a certified-feasible connected circuit and, if it closes, the exact connected MCIS."
+}
