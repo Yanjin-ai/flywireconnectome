@@ -22,7 +22,7 @@ Red = descending neurons (brain → nerve cord) · Blue = ascending neurons (ner
 
 Across three independently reconstructed *Drosophila* connectomes (BANC, FAFB, MANC), with neurons matched one-to-one by published NBLAST morphology, we search for the **largest connected sub-circuit whose directed wiring is identical in all three**. The answer is a verified, weakly-connected **27-neuron / 26-edge conserved circuit**, overwhelmingly **descending/ascending sensorimotor neurons** at the brain–nerve-cord interface (DN/AN enriched 67×/18× vs whole brain; 96% conserved across sexes).
 
-**Why "connected" is the right question.** Without the connectivity constraint, the maximum common induced subgraph (= Maximum Independent Set on a "disagreement graph") is **109 neurons — but 87 of those have NO conserved edges**: they are isolated, "trivially isomorphic" nodes with no wiring to disagree about. That is exactly the *degree-inflation* the project's own degree-preserving null diagnosed (the 109 count is ~93% explained by degree sequence; §4.2). **The connectivity requirement removes the edge-less filler and isolates the real conserved circuit (27 nodes).** The strong edge-level signal — **specific wiring conserved 68.9× beyond a degree-preserving null (Z = 476σ)** — lives precisely in this connected circuit. What the data **cannot** yet tell us is *why* the wiring is conserved (developmental vs. activity-driven); see the evidence ledger.
+**Why "connected" is the right question.** Without the connectivity constraint, the maximum common induced subgraph (= Maximum Independent Set on a "disagreement graph") is **109 neurons — but 87 of those have NO conserved edges**: they are isolated, "trivially isomorphic" nodes with no wiring to disagree about. That is exactly the *degree-inflation* the project's own degree-preserving null diagnosed (the 109 count is ~93% explained by degree sequence; §4.2). **Requiring connectivity instead selects a different, edge-dense 27-node circuit** (it shares only 5 neurons with the 109 set — they optimise different objectives; §0.5). The strong edge-level signal — **specific wiring conserved 68.9× beyond a degree-preserving null (Z = 476σ)** — lives precisely in this connected circuit. What the data **cannot** yet tell us is *why* the wiring is conserved (developmental vs. activity-driven); see the evidence ledger.
 
 **How to read this repo:**
 - **30-sec result** → *Result at a Glance* (below)
@@ -38,7 +38,7 @@ Across three independently reconstructed *Drosophila* connectomes (BANC, FAFB, M
 | **Composition** | 17 descending (63%) + 6 ascending (22%) + 4 sensory; ACh 41% / GABA 30% (mixed excitatory–inhibitory) |
 | **Cell-type enrichment** | Descending **67.3×** (p=2×10⁻²⁸), Ascending **17.7×** (p=9×10⁻⁷) vs FAFB whole-brain background |
 | **Sexual conservation** | **96.3%** isomorphic across ♀ and ♂ (26/27) |
-| **Contrast — unconstrained MCIS** | 109 neurons (GMIN+2-swap), but **87 are edge-less isolated nodes** → connectivity strips this degree-inflation to the 27-node circuit (`network_unconstrained_mcis.csv`) |
+| **Contrast — unconstrained MCIS** | 109 neurons (GMIN+2-swap), but **87 are edge-less isolated nodes** (only 14 edges). The connected circuit (27 nodes, 26 edges) is a *separately-optimised* dense core, sharing only 5 neurons with the 109 set (`network_unconstrained_mcis.csv`; §0.5) |
 | **🔑 Wiring conserved *beyond degree*** | **2,609 consensus edges vs well-mixed degree-null 37.9 ± 5.4 → 68.9×, Z = 476σ** ([§ Conservation Track](#beyond-the-binary-circuit--conservation-track-version-qc--visual-tools)) |
 | **Datasets** | BANC v626 (♀ brain+cord) × FAFB v783 (♀ brain) × MANC v1.2.1 (♂ nerve cord) |
 | **Optimality** | connected-MIS is NP-hard; N=27 is stable under multi-start + 30k-iteration ILS (`results/connected_mcis.json`) |
@@ -88,7 +88,7 @@ An eigenvector-based MIS heuristic on the disagreement graph reaches ~92–97% o
 
 ### Ecosystem-native, interactive
 
-- **FlyWire Neuroglancer overlay** — `python src/neuroglancer_overlay.py --color conservation` writes [`results/neuroglancer_state.json`](results/neuroglancer_state.json) (109 FAFB neurons coloured by conservation z); open at [ngl.flywire.ai](https://ngl.flywire.ai/) or shorten via `fafbseg.encode_url`.
+- **FlyWire Neuroglancer overlay** — `python src/neuroglancer_overlay.py --color conservation` writes [`results/neuroglancer_state.json`](results/neuroglancer_state.json) (the 27 circuit neurons coloured by conservation z); open at [ngl.flywire.ai](https://ngl.flywire.ai/) or shorten via `fafbseg.encode_url`.
 - **Streamlit explorer** — interactive: filter the circuit, inspect the conservation track + conserved-edge subgraph, download CSV. Runs from committed artifacts (no bulk data download).
 
   ▶ **Live:** <https://yanjin-ai-flywireconnectome-srcexplorer-app-pmdboy.streamlit.app/>
