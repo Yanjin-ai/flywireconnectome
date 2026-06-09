@@ -103,10 +103,12 @@ An eigenvector-based MIS heuristic on the disagreement graph reaches ~92–97% o
 
 | Required | Delivered |
 |---|---|
-| Solution CSV: 3 dataset columns, N matched-neuron rows | [`network.csv`](network.csv) — 109 rows × {BANC, FAFB, MANC} |
-| Maximise N; mutually isomorphic directed induced subgraphs (edge ⟺ in all, direction preserved) | N=109, 14 edges, verified `isomorphic=True` ([`results/canonical_results.json`](results/canonical_results.json)) |
-| Research: network-graph visualization | one-pager panel 1 + `figures/figure1`, `figure3` |
-| Research: Codex 3D meshes | **Verified** — all 109 neurons render in the Codex 3D viewer inside the FAFB whole-brain mesh (live link in [`results/codex_3d_url.txt`](results/codex_3d_url.txt); IDs in [`results/codex_circuit_ids.txt`](results/codex_circuit_ids.txt); see [`results/codex_links.md`](results/codex_links.md)) |
+| **Solution CSV: 3 dataset columns, N matched-neuron rows** | **[`network.csv`](network.csv) — 27 rows × {BANC, FAFB, MANC}** (the single submitted circuit) |
+| Maximise N; mutually isomorphic directed induced subgraphs (edge ⟺ in all, direction preserved) | N=27, 26 edges, verified `isomorphic=True` ([`results/connected_mcis.json`](results/connected_mcis.json)) |
+| **Connectivity requirement: the structure must be weakly connected** (clarification email) | **Satisfied** — `network.csv` is a single weakly-connected component (verified; `connected_mcis.json` → `weakly_connected: true`) |
+| *(contrast, not the submission)* unconstrained max-N MCIS | 109 nodes / 14 edges in [`network_unconstrained_mcis.csv`](network_unconstrained_mcis.csv) — **not** weakly connected (97 components, 87 isolated); kept only to document the degenerate max-N objective (§0.5) |
+| Research: network-graph visualization | one-pager panel 1 + `figures/figure1`, `figure3` (the 27-node circuit) |
+| Research: Codex 3D meshes | **Verified** — the 27 circuit neurons render in the Codex 3D viewer inside the FAFB whole-brain mesh (live link in [`results/codex_3d_url.txt`](results/codex_3d_url.txt); IDs in [`results/codex_circuit_ids.txt`](results/codex_circuit_ids.txt); see [`results/codex_links.md`](results/codex_links.md)) |
 | Research: observations / hypothesis | one-pager panel 3 + science.md §5–§8 |
 | Research: literature & citations | one-pager refs + science.md References (13) |
 | **Concise one-page summary (one dataset = FAFB)** | **[`research_summary_fafb.pdf`](research_summary_fafb.pdf)** |
@@ -117,7 +119,7 @@ An eigenvector-based MIS heuristic on the disagreement graph reaches ~92–97% o
 
 The FlyWire multi-connectome cell typing atlas (Schlegel et al. 2024) established that **cell-type identity** is reproducible across connectomes at the morphological level. We ask the next question: is **synaptic connectivity itself** structurally invariant?
 
-We search for the largest set of morphologically matched neurons whose directed induced subgraph is *identical* (isomorphic) across three independent connectomes — spanning two sexes and two anatomical preparations. The result is a 109-neuron sensorimotor backbone enriched 65.7× for descending neurons and 24.8× for ascending neurons relative to the whole-brain background, consistent with the sensorimotor bottleneck hypothesis (Pospisil et al. 2024).
+We search for the largest **weakly-connected** set of morphologically matched neurons whose directed induced subgraph is *identical* (isomorphic) across three independent connectomes — spanning two sexes and two anatomical preparations. The result is a **27-neuron weakly-connected sensorimotor circuit** (26 conserved edges) enriched 67.3× for descending and 17.7× for ascending neurons relative to the whole-brain background, consistent with the sensorimotor bottleneck hypothesis (Pospisil et al. 2024). *(Dropping the connectivity constraint and maximising node count alone instead yields a degenerate 109-node set that is mostly edge-less isolated neurons — the methodological contrast in §0.5, not the submitted circuit.)*
 
 ---
 
@@ -195,9 +197,11 @@ N cannot grow indefinitely:
 
 ## Robustness Evidence
 
+> **Scope note.** The robustness/null/certificate experiments in this section were run on the **unconstrained max-N MCIS (N=109)** — they validate the *solver and the cross-connectome signal*, and are the methodological contrast (§0.5). The submitted **deliverable is the 27-node weakly-connected circuit** (`network.csv`); its own optimality certificate is **27 ≤ N ≤ 99** (above) and its match-confidence audit is in science.md §4.8.
+
 | Experiment | Result | Interpretation |
 |-----------|--------|---------------|
-| 3000 GMIN+2-swap restarts | N = 104.8 ± 1.8, range [99, 109]; best = 109 | Stable; not seed-dependent |
+| 3000 GMIN+2-swap restarts | N = 104.8 ± 1.8, range [99, 109]; best = 109 (unconstrained) | Stable; not seed-dependent |
 | Correspondence-shuffle null (20× best-of-5) | N_null = 81.1 ± 2.3 (>15σ below real) | Neuron identity is essential |
 | Degree-preserving rewire null (well-mixed, 30× best-of-5) | N_null = 101.9 ± 1.5 (~4 below real per-seed mean; 4.6σ below best 109) | Degree explains ~93% of node count; neuron identity adds the remaining ~7 |
 | Centrality permutation (1000 trials) | p = 0.003; circuit has *lower* betweenness | Peripheral relays, not hubs |
@@ -237,7 +241,8 @@ solver = MCISSolver(
     n_seeds=20
 )
 result = solver.solve()
-print(result.summary())  # MCISResult(N=109, edges=12, isomorphic=True)
+print(result.summary())  # MCISResult(N=109, edges=14, isomorphic=True) — UNCONSTRAINED MCIS
+# (for the weakly-connected deliverable circuit use src/connected_mcis.py -> network.csv, N=27)
 result.to_csv('network.csv')
 ```
 
@@ -297,7 +302,8 @@ pytest tests/ -v                               # → unit tests pass (synthetic 
 ## Repository Structure
 
 ```
-network.csv                    109 rows × 3 columns (BANC | FAFB | MANC neuron IDs)
+network.csv                    27 rows × 3 columns — the weakly-connected deliverable (BANC|FAFB|MANC)
+network_unconstrained_mcis.csv 109 rows — unconstrained max-N MCIS (contrast, not connected)
 science.md                     Scientific report (10 sections, 13 references)
 results/                       Reproducible JSON outputs (canonical, ILP, derived, confidence)
 extended_abstract.pdf          2-page conference-style summary
