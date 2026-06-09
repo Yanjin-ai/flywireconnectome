@@ -45,57 +45,20 @@ Across three independently reconstructed *Drosophila* connectomes (BANC, FAFB, M
 
 ---
 
-## Beyond the Binary Circuit — Conservation Track, Version-QC & Visual Tools
+## Key scientific finding — specific wiring conserved 68.9× beyond degree
 
-The MCIS *size* (node count) is largely explained by the degree sequence — but the shared **wiring** is not. This section is the substantive extension beyond the qualification result.
+The MCIS *size* (node count) is largely degree-explained — but the shared **wiring** is not. This is the substantive scientific result and the reason the conserved circuit is real, not a coincidence of matched degree distributions.
 
-### 🔑 Specific connectivity is conserved far beyond degree (the headline)
+Over the 987-node consensus component, **2,609 directed edges are present in all three connectomes vs 37.9 ± 5.4 under a *well-mixed* degree-preserving null → 68.9× enrichment, Z = 476σ**. Every neuron gets a continuous, null-normalised **conservation z-score** ([`src/conservation_track.py`](src/conservation_track.py) → `results/conservation_track.json`).
 
-Over the 987-node consensus component, **2,609 directed edges are present in all three connectomes vs 37.9 ± 5.4 under a *well-mixed* degree-preserving null → 68.9× enrichment, Z = 476σ**. So cross-connectome agreement reflects real wiring identity, not matched degree distributions. We therefore report a continuous, null-normalised **per-neuron conservation track** instead of a binary circuit ([`src/conservation_track.py`](src/conservation_track.py) → `results/conservation_track.json`, `results/neuron_conservation.csv`).
-
-> **Null-mixing note (methodological honesty).** An earlier version reported 7.4× against a null of 353 ± 17. That null was *under-mixed*: `directed_edge_swap` was run with only ~0.5×\|E\| swaps, leaving residual real structure that inflated the null. [`src/null_sensitivity.py`](src/null_sensitivity.py) shows the null consensus count only converges past ~3×\|E\| swaps (to ≈38); the corrected, well-mixed enrichment is **68.9×**, *stronger* than before. The default swap count is now 10×\|E\|.
-
-![Conservation track](figures/figure10_conservation_track.png)
-
-### Conserved circuit in 3D (conserved edges = gold; colour = conservation z)
-
-![3D conservation animation](figures/circuit_3d_conservation.gif)
-
-*The conserved edges concentrate along the cervical connective — the expected brain↔cord relay locus. ([`src/make_animation.py`](src/make_animation.py))*
-
-### Version-QC tool — "does my proofreading edit touch a published conserved circuit?"
-
-An **O(|ΔE|) consensus-impact query** (~2 µs, independent of graph size) reports which conserved edges an edit gains/loses, named by cell type ([`src/incremental_mcis.py`](src/incremental_mcis.py) → `results/qc_report_demo.txt`):
-
-```
-Connectome version QC report
-================================
-Conserved (all-3) edges lost:   1
-Neurons touching conserved wiring: 2
-  LOST  ANXXX202_b -> AN27X017  (a published conserved edge would disappear)
-```
-
-Packaged as the **`mcis-watch`** CLI (`python src/mcis_watch.py --dataset FAFB --edits edits.csv`), which also accepts neuron **merge/split** edits and has a `cave_edit_delta` hook for live FlyWire CAVE edit history. We formalise MCIS as Maximum Independent Set on the *disagreement graph*; exact incremental maintenance is provably correct but gives no speedup because that graph is one dense, low-diameter component (an honest structural finding) — so the O(|ΔE|) query above is the primitive that is both local and useful.
+> **Null-mixing note (methodological honesty).** An earlier version reported 7.4× against a null of 353 ± 17 — but that null was *under-mixed* (`directed_edge_swap` ran with only ~0.5×\|E\| swaps). [`src/null_sensitivity.py`](src/null_sensitivity.py) shows it only converges past ~3×\|E\| swaps (to ≈38); the corrected, well-mixed enrichment is **68.9×**, *stronger* than before. Default is now 10×\|E\|.
 
 | | |
 |--|--|
-| ![Incremental](figures/figure11_incremental.png) | ![Spectral](figures/figure12_spectral.png) |
-| Incremental MCIS: speed/accuracy vs radius | Spectral solver: 92–97% of ILP (beaten by greedy at scale; §3.5) |
+| ![Conservation track](figures/figure10_conservation_track.png) | ![3D conservation animation](figures/circuit_3d_conservation.gif) |
+| Per-neuron conservation track (beyond-degree test) | The 27-circuit in 3D — conserved edges concentrate along the cervical connective |
 
-### Spectral relaxation solver
-
-An eigenvector-based MIS heuristic on the disagreement graph reaches ~92–97% of the ILP optimum ([`src/spectral_mcis.py`](src/spectral_mcis.py) → `results/spectral_validation.json`). Honest caveat: it is **beaten by plain greedy** at sizes ≥ 80, so we keep it as a constraint-centrality probe, not the production solver — see the solver decision rule in [science.md §3.5](science.md).
-
-### Ecosystem-native, interactive
-
-- **FlyWire Neuroglancer overlay** — `python src/neuroglancer_overlay.py --color conservation` writes [`results/neuroglancer_state.json`](results/neuroglancer_state.json) (the 27 circuit neurons coloured by conservation z); open at [ngl.flywire.ai](https://ngl.flywire.ai/) or shorten via `fafbseg.encode_url`.
-- **Streamlit explorer** — interactive: filter the circuit, inspect the conservation track + conserved-edge subgraph, download CSV. Runs from committed artifacts (no bulk data download).
-
-  ▶ **Live:** <https://yanjin-ai-flywireconnectome-srcexplorer-app-pmdboy.streamlit.app/>
-
-  [![Open the live explorer](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://yanjin-ai-flywireconnectome-srcexplorer-app-pmdboy.streamlit.app/)
-
-  Locally: `streamlit run src/explorer_app.py`. Deploy your own: see [DEPLOY.md](DEPLOY.md).
+*Engineering extensions (version-QC `mcis-watch` tool, spectral solver, Neuroglancer overlay, Streamlit explorer) are condensed at the end → [Extensions](#extensions-beyond-the-challenge-spec).*
 
 ---
 
@@ -296,6 +259,22 @@ pytest tests/ -v                               # → unit tests pass (synthetic 
 > uses `root_626` IDs. The metadata's `root_626` column is the join key into the
 > v626 edge list, so the cross-dataset bijection is consistent despite the build
 > labels differing.
+
+---
+
+## Extensions (beyond the challenge spec)
+
+Engineering/tooling built on top of the core result — useful but not required by the challenge.
+
+- **Version-QC tool (`mcis-watch`)** — an **O(|ΔE|) consensus-impact query** (~2 µs, graph-size-independent) reports which conserved edges a proofreading edit gains/loses, named by cell type; also handles neuron merge/split and a CAVE edit-history hook ([`src/incremental_mcis.py`](src/incremental_mcis.py), [`src/mcis_watch.py`](src/mcis_watch.py) → `results/qc_report_demo.txt`). Honest finding: exact incremental MCIS gives no speedup (the disagreement graph is one dense low-diameter component), so the local O(|ΔE|) query is the useful primitive.
+- **Spectral relaxation solver** ([`src/spectral_mcis.py`](src/spectral_mcis.py)) — leading-eigenvector MIS heuristic; reaches ~92–97% of the ILP optimum but is **beaten by plain greedy** at scale (§3.5), so kept as a probe, not the production solver.
+- **Neuroglancer overlay** ([`src/neuroglancer_overlay.py`](src/neuroglancer_overlay.py)) — FlyWire-native 3D state of the 27 circuit neurons coloured by conservation z (`results/neuroglancer_state.json`).
+- **Streamlit explorer** — filter the circuit, inspect the conservation track + conserved-edge subgraph, download CSV, from committed artifacts. ▶ **Live:** <https://yanjin-ai-flywireconnectome-srcexplorer-app-pmdboy.streamlit.app/> · locally `streamlit run src/explorer_app.py` ([DEPLOY.md](DEPLOY.md)).
+
+| | |
+|--|--|
+| ![Incremental](figures/figure11_incremental.png) | ![Spectral](figures/figure12_spectral.png) |
+| Incremental MCIS: speed/accuracy vs radius | Spectral solver vs greedy/ILP |
 
 ---
 
