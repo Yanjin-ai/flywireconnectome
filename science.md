@@ -66,7 +66,12 @@ This also resolves the apparent paradox that **27 nodes carry *more* conserved e
 
 **How the connected solver works (no shortcut).** `connected_mcis.py` does **not** compute the 109 set and then extract a connected piece (that would give a weak lower bound). It grows each candidate set from a seed, adding only nodes that are both consensus-connected to the current set *and* disagreement-free with all of it — so **connectivity is maintained throughout the search** — over many random restarts plus iterated local search.
 
-**Optimality of N = 27.** Connected-MIS is a distinct NP-hard problem and we do **not** have a tight upper bound. What we have: N = 27 is a **strong lower bound** (stable under 20 000 restarts + 80 000 ILS iterations — no run exceeds it), and the trivial rigorous bound **27 ≤ N_connected ≤ 109 ≤ 136** (any connected disagreement-free set is also disagreement-free, so it is bounded by the unconstrained MIS / its Lovász-ϑ certificate). A *tight* connected upper bound (a connectivity-constrained ILP) is an honest open item; the clean-consensus-graph component bound (621) is far too loose to help.
+**Optimality of N = 27 — a rigorous certificate: 27 ≤ N_connected ≤ 99.** Connected-MIS is a distinct NP-hard problem, but we can bracket it ([`src/connected_certificate.py`](src/connected_certificate.py), `results/connected_certificate.json`):
+
+- **Lower bound N ≥ 27** — a strong, verified-feasible bound, stable under 20 000 restarts + 80 000 ILS iterations (no run exceeds it).
+- **Upper bound N ≤ 99** — *rigorous*. A connected disagreement-free set is connected via "clean" consensus edges (consensus edges whose endpoints do not disagree), so it lives entirely inside **one connected component of the clean-consensus graph**. The giant such component has 621 nodes; the Lovász ϑ of the disagreement graph restricted to it is **ϑ = 99.5 ⇒ N_connected ≤ 99** — tighter than the trivial α(D) = 109 / ϑ = 136 of the full graph.
+
+The remaining gap (27–99) is genuine: ϑ is *connectivity-blind* (it bounds the independent set, ignoring that the 27 must be wired together), so it over-counts. The tight closure would be a connectivity-constrained ILP, but a single-commodity-flow formulation on the 621-node clean component did **not** find a feasible integer point in 600 s of CBC — an honest finding that exact connected-MCIS is intractable here at scale. So the operative statement is: **N = 27 is a strong, reproducible lower bound; the optimum is rigorously ≤ 99.**
 
 | | Unconstrained MCIS (contrast) | **Connected MCIS (deliverable)** |
 |---|---|---|

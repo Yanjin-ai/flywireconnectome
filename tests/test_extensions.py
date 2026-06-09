@@ -110,6 +110,21 @@ def test_lovasz_theta_on_C5():
     assert th >= 2 - 1e-6
 
 
+def test_connected_certificate_clean_graph_and_theta_ub():
+    import connected_certificate as cc
+    # consensus path 0-1-2; disagreement only on the (0,2) pair (non-adjacent)
+    consensus = {(0, 1), (1, 2)}
+    Dadj = {0: {2}, 2: {0}, 1: set()}
+    clean = cc.clean_consensus_graph(consensus, Dadj)
+    # both consensus edges are between disagreement-free pairs -> both clean
+    assert clean.number_of_edges() == 2
+    # theta upper-bounds the independence number of D within the node set
+    pytest.importorskip("cvxpy")
+    th = cc.theta_ub([0, 1, 2], Dadj)
+    # alpha(D on {0,1,2}) = 2 ({0,1} or {1,2}); theta >= 2
+    assert th is not None and th >= 2 - 1e-6
+
+
 # ── exact_ilp samplers ──────────────────────────────────────────────
 def _toy_adj(ng=30, p=0.2, seed=5):
     rng = np.random.default_rng(seed)

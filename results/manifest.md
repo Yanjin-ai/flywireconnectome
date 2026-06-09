@@ -8,6 +8,7 @@ contract at the top of that script).
 | Reported quantity | Producing script | Output file (key) |
 |---|---|---|
 | **Connected conserved circuit (the deliverable, N=27)** | `src/connected_mcis.py` | `connected_mcis.json`, `connected_circuit.csv`, `network.csv` |
+| **Connected-circuit optimality certificate (27 ≤ N ≤ 99)** | `src/connected_certificate.py` | `connected_certificate.json` |
 | Unconstrained MCIS (contrast, N=109), conserved edges, isomorphism | `src/run_analysis.py` | `canonical_results.json` → `N_reported`; `network_unconstrained_mcis.csv` |
 | Seed distribution (mean ± sd, range) | `src/run_analysis.py` | `canonical_results.json` → `seed_distribution` |
 | Correspondence-shuffle null | `src/run_analysis.py` | `canonical_results.json` → `correspondence_shuffle_null` |

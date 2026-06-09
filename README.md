@@ -41,7 +41,7 @@ Across three independently reconstructed *Drosophila* connectomes (BANC, FAFB, M
 | **Contrast — unconstrained MCIS** | 109 neurons (GMIN+2-swap), but **87 are edge-less isolated nodes** (only 14 edges). The connected circuit (27 nodes, 26 edges) is a *separately-optimised* dense core, sharing only 5 neurons with the 109 set (`network_unconstrained_mcis.csv`; §0.5) |
 | **🔑 Wiring conserved *beyond degree*** | **2,609 consensus edges vs well-mixed degree-null 37.9 ± 5.4 → 68.9×, Z = 476σ** ([§ Conservation Track](#beyond-the-binary-circuit--conservation-track-version-qc--visual-tools)) |
 | **Datasets** | BANC v626 (♀ brain+cord) × FAFB v783 (♀ brain) × MANC v1.2.1 (♂ nerve cord) |
-| **Optimality** | connected-MIS is NP-hard; N=27 is stable under multi-start + 30k-iteration ILS (`results/connected_mcis.json`) |
+| **Optimality** | rigorous certificate **27 ≤ N ≤ 99** (LB = stable under 100k-iter search; UB = Lovász ϑ on the giant clean-consensus component; `results/connected_certificate.json`) |
 
 ---
 
